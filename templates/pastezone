@@ -1,0 +1,65 @@
+[% USE mydb = DBI(db, user, pass) %]
+[% USE Highlight %]
+[% IF show %]
+	[% TRY %]
+		[% entry = mydb.query ("SELECT id,poster,lang_id,code,date_format(expires, '%a %D %b %H:%i') as expiredate, date_format(posted, '%a %D %b %H:%i') as postedate from paste where id = '$show'") %]
+		[% IF entry.size != 1 %] 
+			[%THROW notfound "Entry was not found in database" %]
+		[% END %]
+		[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,date_format(posted, '%a %D %b %H:%i') as postedate,code,date_format(expires, '%a %D %b %H:%i') as expiredate, date_format(posted, '%a %D %b %H:%i') as postedate from paste where id = '$show'") %]
+		[% END %]
+		[% FOREACH language = mydb.query ("SELECT lang from lang where id = $entry.lang_id") %]
+		[% END %]
+	[% CATCH DBI %]
+		[% INCLUDE dberror %]
+		[% STOP %]
+	[% CATCH %]
+		[% INCLUDE common_error %]
+		[% STOP %]
+	[% END %]
+[% END %]
+
+[% IF show %]
+<h1>Posting [% entry.id %] from [% entry.0.poster %] posted at [% entry.postedate %] expires: 
+[% entry.expiredate %]
+</h1>
+[% END %]
+
+<form name="editor" method="post" action="paste.pl">
+<input type="hidden" name="parent_pid" value="[% entry.parent %]"/>
+<b>Name</b><br />
+<input type="text" maxlength="24" size="24" name="poster" value="[% entry.poster %]" />
+<input type="submit" name="paste" value="Send"/>
+<br />
+<input type="checkbox" name="remember" value="1" [% IF remember %] checked='checked' [% END %] />Remember my name in a cookie
+<br /> <br />
+<b>Language</b>
+<select name="lang" id="lang">
+	[% FOREACH lang = mydb.query('SELECT * from lang') -%]
+		<option value="[% lang.lang %]">[% lang.desc %]</option>
+	[% END %]
+</select>
+<br /><br />
+[% TRY -%]
+<pre>
+[% IF entry.code %]
+[% FILTER $Highlight "$language.lang" -%]
+[% entry.code %]
+[% END %]
+[% END %]
+</pre>
+<br />
+[% CATCH -%]
+<b>[% error.info %]</b><br />
+[% entry.code %]
+[% END %]
+
+<b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
+Include comments to indicate what you need feedback on.<br />
+<script type="text/javascript" src="pastebin.js"></script>
+<textarea id="code" class="codeedit" name="code2" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
+</form>
+
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+

@@ -1,0 +1,44 @@
+[% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
+[% TRY %]
+[% USE mydb = DBI(db, user, pass) %]
+[% CATCH %]
+[% INCLUDE dberror %]
+[% STOP %]
+[% END %]
+[% USE format %]
+<div id="menu">
+
+<h1>Recent Posts</h1>
+<ul> 
+[% FOREACH post = mydb.query("select id,poster,unix_timestamp()-unix_timestamp(posted) as age, 
+							  date_format(posted, '%a %D %b %H:%i') as postdate 
+							  from paste order by posted desc, id desc limit 10") -%]
+
+<li><a href='[% post.id %]'>[% post.poster %]</a><br />
+[% commented = format(' %s') %]
+[% days = post.age / (3600*24) %]
+[% hours = post.age / 3600 %]
+[% minutes = post.age / 60 %]
+[% IF days > 1 %]
+	[% round(days) %] days ago 
+[% ELSIF hours > 0 %]
+	[% round(hours) %] hour(s) ago
+[% ELSIF minutes > 0 %] 
+	[% round(minutes) %] minute(s) ago 
+[% ELSE %]
+	[% round(seconds) %] second(s) ago
+[% END %]
+</li>
+[% END %]
+<li><a href="/paste/">Make new post</a></li>
+</li>
+</ul>
+[% INCLUDE links %]
+</div>
+
+<div id="content">
+[% INCLUDE pastezone %]
+[% END %]
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+

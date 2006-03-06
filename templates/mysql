@@ -1,0 +1,2 @@
+[% USE mydb = DBI('dbi:mysql:pastebin', 'root', 'test') %]
+[% foo = mydb.query('SELECT * FROM lang') %]

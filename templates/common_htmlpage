@@ -1,0 +1,7 @@
+[% INCLUDE common_htmltop %]
+[% content %]
+[% INCLUDE common_htmlbottom %]
+
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+

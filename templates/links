@@ -1,0 +1,12 @@
+<h1>Links</h1>
+<ul>
+<li><a href='http://channel.debian.de'>#debian.de</a><br /></li>
+<li><a href='http://channel.debian.de/faq'>#debian.de FAQ</a><br /></li>
+<li><a href='http://www.debian.org'>Debian</a><br /></li>
+</ul>
+<h1>Admin</h1>
+<a href='mailto:formorer@debian.org'>Alexander Wirt</a>
+
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+

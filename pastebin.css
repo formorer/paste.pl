@@ -1,0 +1,159 @@
+/*
+The cleverer parts of this stylesheet came from
+The Layout Reservoir - well worth a look.
+http://www.bluerobot.com/web/layouts/
+*/
+
+body {
+	color:#333;
+	background-color: #ffffff;
+	margin:0px;
+	padding:0px;
+	font:11px verdana, arial, helvetica, sans-serif;
+}
+
+h1 {
+	border-top: 1px solid #3d8ea8;
+	border-bottom: 1px solid #005069;
+	border-right: 1px solid #3d8ea8;
+	border-left: 1px solid #3d8ea8;
+	/* background-color: #006b8c; */
+	background-color: #DF0451;
+	color: #ffffff;
+	font-family: trebuchet ms, verdana, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: left;
+	padding: 3px 0px 3px 10px;
+	margin-bottom: 0px;
+	margin-top: 0px; 
+}
+	
+
+p {
+	font:11px/20px verdana, arial, helvetica, sans-serif;
+	margin:0px 10px 10px 10px;
+}
+
+
+a {
+	color:#09c;
+	font-size:11px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-weight:600;
+	text-decoration:none;
+}
+
+a:link {color:#0000FF;}
+a:visited {color:#800080;}
+a:hover {text-decoration:underline;}
+  
+a.alt{color:white; text-decoration:underline;font-weight:normal;}
+a.alt:link{color:white;}
+a.alt:visited{color:white;}
+a.alt:hover{color:yellow;background-color:transparent;}
+
+a.code {
+	text-decoration:underline; 
+	font-family:courier, fixed;
+	font-weight:normal;}
+a.code:link {color:#0000FF;}
+a.code:visited {color:#800080;}
+a.code:hover {text-decoration:underline;}
+
+
+code { font-size:12px;}
+
+.codeedit {	font-size:12px;}
+
+
+#titlebar {
+	padding: 0px 0px 0px 5px;
+	height:16px;
+	border-top: solid 1px #73a5d3;
+	border-bottom: solid 1px #39526b;
+	background-color: #DF0451;
+	color: #fff;
+	width: 100%; 
+	margin-bottom: 11px;
+}
+
+.nav { margin: 0px 5px 0px 5px; }
+	
+li.highlight{ background-color: #ccccff; }
+
+ul {
+	margin-left:15px;
+	margin-top:0px;
+	padding-left:0px;
+}
+
+/*
+li {
+	list-style-type: square;
+	line-height: 11px;
+	padding-bottom: 3px;
+}
+*/
+
+#Content>p {margin:0px;}
+#Content>p+p {text-indent:30px;}
+
+#content {
+	margin:0px 5px 50px 170px;
+	padding:5px;
+	background-color: white;
+	border:1px solid black;
+}
+
+#menu {
+	position:absolute;
+	top:105px;
+	left:10px;
+	width:162px;
+	padding:5px;
+	background-color: white;
+	border:1px solid black;
+	line-height:17px;
+	overflow: hidden;
+
+	/* IE5 Hack */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width:140px;
+}
+
+/* be nice to Opera 5 */
+body>#Menu {width:150px;}
+
+
+/*
+ * A stylesheet designed to be used with the HTML output of the
+ * Perl module Text::Highlight::Vim.
+ *
+ * This is designed to make the highlighting look like the default gvim
+ * colour scheme, with 'background=light'.
+ *
+ * Geoff Richards (qef@laxan.com)
+ *
+ * This CSS file (light.css) is public domain.  Do what you want with it.
+ * That doesn't mean that HTML with this CSS in is public domain.
+ */
+
+body { color: black; background: white none }
+
+A:link { color: #00F; background: white none }
+A:visited { color: #909; background: white none }
+A:hover { color: #F00; background: white none }
+A:active { color: #F00; background: white none }
+
+.synComment    { color: #0000FF }
+.synConstant   { color: #FF00FF }
+.synIdentifier { color: #008B8B }
+.synStatement  { color: #A52A2A ; font-weight: bold }
+.synPreProc    { color: #A020F0 }
+.synType       { color: #2E8B57 ; font-weight: bold }
+.synSpecial    { color: #6A5ACD }
+.synUnderlined { color: #000000 ; text-decoration: underline }
+.synError      { color: #FFFFFF ; background: #FF0000 none }
+.synTodo       { color: #0000FF ; background: #FFFF00 none }

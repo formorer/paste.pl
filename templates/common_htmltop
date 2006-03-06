@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head
+  <title>[% title %]</title>
+  <link rel="stylesheet" type="text/css" href="pastebin.css" />
+</head>
+
+<body>
+
+<center><img src="images/debian.de.png" alt="" border="0" hspace="0" vspace="0" width="368" height="61"></center><br>
+<div id="titlebar">[% title %]</div>
+
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+
