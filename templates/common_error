@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="#debian.de database error" %]
+[% WRAPPER common_htmlpage title="#debian.de paste error" %]
 <center>
 <h2>Some Error</h2>
 Soem stange error has been occurred: <br> [% error.info %]<br>
