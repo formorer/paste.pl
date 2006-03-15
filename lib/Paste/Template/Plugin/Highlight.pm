@@ -460,9 +460,9 @@ sub filter {
     close ($fh); 
     my $text;  
     if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
-	$text .= "<ol style='list-style-type:decimal'>\n";
+	$text .= "<ol style='list-style-type:decimal' class='synline'>\n";
 	foreach my $line (split(/\n/, $syntax->html)) {
-	    $text .= "<li>$line</li>\n";
+	    $text .= "<li class='synline'>$line</li>\n";
 	}
 	$text .= "</ol>";
     } else {
