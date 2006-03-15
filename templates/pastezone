@@ -25,6 +25,12 @@
 </h1>
 [% END %]
 
+[% IF status %]
+<div class=status> 
+<b>There has been some error occured:</b><br>
+[% status %]
+</div>
+[% END %]
 <form name="editor" method="post" action="paste.pl">
 <input type="hidden" name="parent_pid" value="[% entry.parent %]"/>
 <b>Name</b><br />
@@ -36,7 +42,7 @@
 <b>Language</b>
 <select name="lang" id="lang">
 	[% FOREACH lang = mydb.query('SELECT * from lang') -%]
-		<option value="[% lang.lang %]">[% lang.desc %]</option>
+		<option value="[% lang.id %]">[% lang.desc %]</option>
 	[% END %]
 </select>
 <br /><br />
@@ -59,7 +65,7 @@
 <b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.<br />
 <script type="text/javascript" src="pastebin.js"></script>
-<textarea id="code" class="codeedit" name="code2" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
+<textarea id="code" class="codeedit" name="code" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
 </form>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
