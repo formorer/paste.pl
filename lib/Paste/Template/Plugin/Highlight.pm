@@ -441,9 +441,16 @@ sub init {
 
 sub filter {
     my ($self, $text, $args, $config) = @_;
+
+    #merge our caller and init configs
+    $config = $self->merge_config($config);
+    #then for arguments
+    $args = $self->merge_args($args);
+    
     if ( ! grep { lc($_) eq lc(@$args[0]) } @langs ) {
-    die Template::Exception->new( highlight => "@$args[0] is not supported" );
+	die Template::Exception->new( highlight => "@$args[0] is not supported" );
     }
+    
     my $fh = tempfile(UNLINK => 1);
     print $fh "$text"; 
     my $syntax = Text::VimColor->new(
@@ -451,8 +458,17 @@ sub filter {
 	filename => $fh,
     );
     close ($fh); 
-    
-    my $text = $syntax->html;
+    my $text;  
+    if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
+	$text .= "<ol style='list-style-type:decimal'>\n";
+	foreach my $line (split(/\n/, $syntax->html)) {
+	    $text .= "<li>$line</li>\n";
+	}
+	$text .= "</ol>";
+    } else {
+	$text = $syntax->html;
+    }
+    #my $text = $syntax->html;
     return $text;
 }
 
