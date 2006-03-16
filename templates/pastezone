@@ -45,7 +45,16 @@
 		<option value="[% lang.id %]">[% lang.desc %]</option>
 	[% END %]
 </select>
-<br /><br />
+<br />
+<b>Expiration</b><br />
+<select name="expire" id=expire">
+<option value="172800">72h</option>
+<option value="86400">24h</option>
+<option value="43200">12h</option>
+<option value="3600">1h</option>
+</select>
+
+<br />
 [% IF show %]
 [% TRY -%]
 [% IF entry.code %]
