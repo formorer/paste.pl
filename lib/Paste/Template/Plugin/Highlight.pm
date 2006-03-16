@@ -456,6 +456,7 @@ sub filter {
     my $syntax = Text::VimColor->new(
 	string	=> "$text",
 	filename => $fh,
+	filetype => @$args[0],
     );
     close ($fh); 
     my $text;  
