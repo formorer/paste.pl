@@ -447,7 +447,7 @@ sub filter {
     #then for arguments
     $args = $self->merge_args($args);
     
-    if ( ! grep { lc($_) eq lc(@$args[0]) } @langs ) {
+    if ( ! grep { lc($_) eq lc(@{$args}[0]) } @langs ) {
 	die Template::Exception->new( highlight => "@$args[0] is not supported" );
     }
     
