@@ -467,9 +467,12 @@ sub filter {
 	}
 	$text .= "</ol>";
     } else {
-	$text = $syntax->html;
+	    print "<br>";
+	    foreach my $line (split(/\n/, $syntax->html)) {
+		    $text .= "$line<br>\n";
+	    }
+	    print "<br>";
     }
-    #my $text = $syntax->html;
     return $text;
 }
 
