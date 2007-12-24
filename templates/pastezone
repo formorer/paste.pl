@@ -1,5 +1,6 @@
 [% USE mydb = DBI(db, user, pass) %]
 [% USE Highlight %]
+[% USE CGI %]
 [% IF show %]
 	[% TRY %]
 		[% entry = mydb.query ("SELECT id,poster,lang_id,code,expires as expiredate,posted as postedate from paste where id = '$show'") %]
@@ -30,10 +31,12 @@
 [% status %]
 </div>
 [% END %]
+<b>[% CGI.cookie('lang') | html %]</b>
+
 <form name="editor" method="post" action="./" ENCTYPE="multipart/form-data">
 <input type="hidden" name="parent_pid" value="[% entry.parent %]"/>
 <b>Name</b><br />
-<input type="text" maxlength="24" size="24" name="poster" value="[% entry.poster %]" />
+<input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
 <input type="submit" name="paste" value="Send"/>
 <br />
 <input type="checkbox" name="remember" value="1" [% IF remember %] checked='checked' [% END %] />Remember my name in a cookie
@@ -41,7 +44,7 @@
 <b>Language</b>
 <select name="lang" id="lang">
 	[% FOREACH lang = mydb.query('SELECT * from lang') -%]
-		<option value="[% lang.lang_id %]">[% lang.desc %]</option>
+		<option [% IF lang.lang_id == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.lang_id %]" >[% lang.desc %]</option>
 	[% END %]
 </select>
 <b>Expiration</b>

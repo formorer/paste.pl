@@ -8,6 +8,7 @@ use Template;
 use POSIX;
 use DBI;
 use CGI::Carp qw(fatalsToBrowser); 
+use CGI::Cookie;
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 
 my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
@@ -158,6 +159,7 @@ sub print_paste {
 		} else {
 			$name = $cgi->param("poster"); 
 		}
+
 		my $dbh = DBI->connect('dbi:Pg:dbname=paste', 'postgres') or error("Could not connect to db", "Could not connect to DB: " . $DBI::errstr);
 		my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
 		my $code = $cgi->param("code");
@@ -181,7 +183,15 @@ sub print_paste {
 				}
 			}
 		}
-		print header;
+		if ($cgi->param("remember")) {
+			my $cookie_lang = new CGI::Cookie(-name=>'paste_lang',
+				-value=> $cgi->param("lang"));
+		    my $cookie_name = new CGI::Cookie(-name=>'paste_name', 
+				-value=> $name);
+			print header(-cookie=>[$cookie_lang, $cookie_name]); 
+		} else {
+			print header;
+		}
 		$template->process('after_paste', { "db" => 'dbi:Pg:dbname=paste',
 											"user" => 'postgres', 
 											"status" => $statusmessage,
