@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 use strict; 
-use lib '/var/www/paste.pl/lib/';
+use lib 'lib/';
 use warnings;
 use CGI qw(:standard);
 use Template;
