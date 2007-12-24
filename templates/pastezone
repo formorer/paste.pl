@@ -39,7 +39,7 @@
 <input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
 <input type="submit" name="paste" value="Send"/>
 <br />
-<input type="checkbox" name="remember" value="1" [% IF remember %] checked='checked' [% END %] />Remember my name in a cookie
+<input type="checkbox" name="remember" value="1" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />Remember my name and my selected language in a cookie
 <br /> <br />
 <b>Language</b>
 <select name="lang" id="lang">
