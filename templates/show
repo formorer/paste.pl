@@ -1,0 +1,100 @@
+[% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
+[% TRY %]
+	[% USE mydb = DBI(db, user, pass) %]
+	[% CATCH %]
+		[% INCLUDE dberror %]
+	[% STOP %]
+[% END %]
+[% USE format %]
+[% USE Highlight %]
+
+<div id="menu">
+
+<h1>Recent Posts</h1>
+<ul> 
+[% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
+							  posted as postdate 
+							  from paste order by posted desc, id desc limit 10") -%]
+
+<li><a href='[% post.id %]'>[% post.poster %]</a><br />
+[% commented = format(' %s') %]
+[% days = post.age / (3600*24) %]
+[% hours = post.age / 3600 %]
+[% minutes = post.age / 60 %]
+[% IF round(days) > 1 %]
+	[% round(days) %] days ago 
+[% ELSIF hours >= 1 %]
+	[% round(hours) %] hour(s) ago
+[% ELSIF minutes >= 1 %] 
+	[% round(minutes) %] minute(s) ago 
+[% ELSE %]
+	[% round(post.age) %] second(s) ago
+[% END %]
+</li>
+[% END %]
+<li><a href="[% base_url %]">Make new post</a></li>
+</li>
+</ul>
+[% INCLUDE links %]
+</div>
+
+<div id="content">
+
+[% TRY -%]
+	[% entry = mydb.query ("SELECT id,poster,lang_id,code,expires as expiredate,posted as postedate from paste where id = '$show'") %]
+	[% IF entry.size != 1 %] 
+		[%THROW notfound "Entry was not found in database" %]
+	[% END %]
+	[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,posted as postedate,code,expires as expiredate from paste where id = '$show'") %]
+	[% END %]
+	[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
+	[% END %]
+[% CATCH DBI %]
+	[% INCLUDE dberror %]
+[% STOP %]
+[% CATCH %]
+	[% INCLUDE common_error %]
+[% STOP %]
+
+[% END %]
+
+<h1>Posting [% entry.id %] from [% entry.0.poster %] posted at [% entry.postedate %] expires: 
+[% entry.expiredate %]
+</h1>
+
+[% TRY -%]
+	[% IF entry.code -%]
+	[% IF lines == 0 %]
+		[% FILTER $Highlight "$language.desc" linenumbers = 0 -%]
+		[% entry.code -%]
+		[% END -%]
+	[% ELSE %]
+		<p>
+		[% FILTER $Highlight "$language.desc" linenumbers = 1 -%]
+		[% entry.code -%]
+		[% END -%]
+		</p>
+	[% END %]
+
+	<br/>
+	<a href='plain/[% entry.id %]'>Show as text</a> | 
+	<a href='download/[% entry.id %]'>Download</a> |
+	[% IF lines == 0 %]
+	<a href='./?show=[% entry.id %];lines=1'>With linenumbers</a> |
+	[% ELSE %]
+	<a href='./?show=[% entry.id %];lines=0'>Without linenumbers</a> |
+	[% END %]
+	<a href='./'>Paste new</a> 
+	<br/>
+	[% END %]
+[% CATCH -%]
+<b>[% error.info %]</b><br />
+<pre>
+[% entry.code %]
+<pre>
+[% END %]
+
+[% END %]
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+

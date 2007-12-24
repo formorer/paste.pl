@@ -2,13 +2,13 @@
 [% USE Highlight %]
 [% IF show %]
 	[% TRY %]
-		[% entry = mydb.query ("SELECT id,poster,lang_id,code,date_format(expires, '%a %D %b %H:%i') as expiredate, date_format(posted, '%a %D %b %H:%i') as postedate from paste where id = '$show'") %]
+		[% entry = mydb.query ("SELECT id,poster,lang_id,code,expires as expiredate,posted as postedate from paste where id = '$show'") %]
 		[% IF entry.size != 1 %] 
 			[%THROW notfound "Entry was not found in database" %]
 		[% END %]
-		[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,date_format(posted, '%a %D %b %H:%i') as postedate,code,date_format(expires, '%a %D %b %H:%i') as expiredate, date_format(posted, '%a %D %b %H:%i') as postedate from paste where id = '$show'") %]
+		[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,posted as postedate,code,expires as expiredate from paste where id = '$show'") %]
 		[% END %]
-		[% FOREACH language = mydb.query ("SELECT lang from lang where id = $entry.lang_id") %]
+		[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
 		[% END %]
 	[% CATCH DBI %]
 		[% INCLUDE dberror %]
@@ -27,11 +27,10 @@
 
 [% IF status %]
 <div class=status> 
-<b>There has been some error occured:</b><br>
 [% status %]
 </div>
 [% END %]
-<form name="editor" method="post" action="paste.pl">
+<form name="editor" method="post" action="./" ENCTYPE="multipart/form-data">
 <input type="hidden" name="parent_pid" value="[% entry.parent %]"/>
 <b>Name</b><br />
 <input type="text" maxlength="24" size="24" name="poster" value="[% entry.poster %]" />
@@ -42,11 +41,10 @@
 <b>Language</b>
 <select name="lang" id="lang">
 	[% FOREACH lang = mydb.query('SELECT * from lang') -%]
-		<option value="[% lang.id %]">[% lang.desc %]</option>
+		<option value="[% lang.lang_id %]">[% lang.desc %]</option>
 	[% END %]
 </select>
-<br />
-<b>Expiration</b><br />
+<b>Expiration</b>
 <select name="expire" id=expire">
 <option value="172800">72h</option>
 <option value="86400">24h</option>
@@ -58,9 +56,12 @@
 [% IF show %]
 [% TRY -%]
 [% IF entry.code %]
-[% FILTER $Highlight "$language.lang" linenumbers = 1 -%]
+[% FILTER $Highlight "$language.desc" linenumbers = 1 -%]
 [% entry.code %]
 [% END %]
+<br/>
+<a href='plain/[% entry.id %]'>Show as text</a>
+<br/>
 [% END %]
 <br />
 [% CATCH -%]
@@ -75,6 +76,8 @@
 Include comments to indicate what you need feedback on.<br />
 <script type="text/javascript" src="pastebin.js"></script>
 <textarea id="code" class="codeedit" name="code" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
+<br>
+<input type="file" name="upload" />
 </form>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

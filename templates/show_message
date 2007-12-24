@@ -1,11 +1,13 @@
 [% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
 [% TRY %]
-[% USE mydb = DBI(db, user, pass) %]
-[% CATCH %]
-[% INCLUDE dberror %]
-[% STOP %]
+	[% USE mydb = DBI(db, user, pass) %]
+	[% CATCH %]
+		[% INCLUDE dberror %]
+	[% STOP %]
 [% END %]
 [% USE format %]
+[% USE Highlight %]
+
 <div id="menu">
 
 <h1>Recent Posts</h1>
@@ -37,7 +39,10 @@
 </div>
 
 <div id="content">
-[% INCLUDE pastezone %]
+<h1>[% title %]</h1>
+<br> 
+[% message %]
+<br>
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
