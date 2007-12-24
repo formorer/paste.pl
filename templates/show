@@ -1,44 +1,12 @@
 [% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
+[% USE format %]
+[% USE Highlight %]
 [% TRY %]
 	[% USE mydb = DBI(db, user, pass) %]
 	[% CATCH %]
 		[% INCLUDE dberror %]
 	[% STOP %]
 [% END %]
-[% USE format %]
-[% USE Highlight %]
-
-<div id="menu">
-
-<h1>Recent Posts</h1>
-<ul> 
-[% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
-							  posted as postdate 
-							  from paste order by posted desc, id desc limit 10") -%]
-
-<li><a href='[% post.id %]'>[% post.poster %]</a><br />
-[% commented = format(' %s') %]
-[% days = post.age / (3600*24) %]
-[% hours = post.age / 3600 %]
-[% minutes = post.age / 60 %]
-[% IF round(days) > 1 %]
-	[% round(days) %] days ago 
-[% ELSIF hours >= 1 %]
-	[% round(hours) %] hour(s) ago
-[% ELSIF minutes >= 1 %] 
-	[% round(minutes) %] minute(s) ago 
-[% ELSE %]
-	[% round(post.age) %] second(s) ago
-[% END %]
-</li>
-[% END %]
-<li><a href="[% base_url %]">Make new post</a></li>
-</li>
-</ul>
-[% INCLUDE links %]
-</div>
-
-<div id="content">
 
 [% TRY -%]
 	[% entry = mydb.query ("SELECT id,poster,lang_id,code,expires as expiredate,posted as postedate from paste where id = '$show'") %]

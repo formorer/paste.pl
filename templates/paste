@@ -1,43 +1,55 @@
 [% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
-[% TRY %]
-[% USE mydb = DBI(db, user, pass) %]
-[% CATCH %]
-[% INCLUDE dberror %]
-[% STOP %]
-[% END %]
 [% USE format %]
-<div id="menu">
-
-<h1>Recent Posts</h1>
-<ul> 
-[% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
-							  posted as postdate 
-							  from paste order by posted desc, id desc limit 10") -%]
-
-<li><a href='[% post.id %]'>[% post.poster %]</a><br />
-[% commented = format(' %s') %]
-[% days = post.age / (3600*24) %]
-[% hours = post.age / 3600 %]
-[% minutes = post.age / 60 %]
-[% IF round(days) > 1 %]
-	[% round(days) %] days ago 
-[% ELSIF hours >= 1 %]
-	[% round(hours) %] hour(s) ago
-[% ELSIF minutes >= 1 %] 
-	[% round(minutes) %] minute(s) ago 
-[% ELSE %]
-	[% round(post.age) %] second(s) ago
+[% USE CGI %]
+[% TRY %]
+    [% USE mydb = DBI(db, user, pass) %]
+    [% CATCH %]
+        [% INCLUDE dberror %]
+    [% STOP %]
 [% END %]
-</li>
-[% END %]
-<li><a href="[% base_url %]">Make new post</a></li>
-</li>
-</ul>
-[% INCLUDE links %]
+
+<h1>Posting [% entry.id %] from [% entry.0.poster %] posted at [% entry.postedate %] expires: 
+[% entry.expiredate %]
+</h1>
+
+[% IF status %]
+<div class=status> 
+[% status %]
 </div>
+[% END %]
 
-<div id="content">
-[% INCLUDE pastezone %]
+<b>[% CGI.cookie('lang') | html %]</b>
+
+<form name="editor" method="post" action="./" ENCTYPE="multipart/form-data">
+<b>Name</b><br />
+<input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
+<input type="submit" name="paste" value="Send"/>
+<br />
+<input type="checkbox" name="remember" value="1" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />Remember my name and my selected language in a cookie
+<br /> <br />
+<b>Language</b>
+<select name="lang" id="lang">
+	[% FOREACH lang = mydb.query('SELECT * from lang') -%]
+		<option [% IF lang.lang_id == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.lang_id %]" >[% lang.desc %]</option>
+	[% END %]
+</select>
+<b>Expiration</b>
+<select name="expire" id=expire">
+<option value="172800">72h</option>
+<option value="86400">24h</option>
+<option value="43200">12h</option>
+<option value="3600">1h</option>
+</select>
+<br />
+
+<b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
+Include comments to indicate what you need feedback on.<br />
+<script type="text/javascript" src="pastebin.js"></script>
+<textarea id="code" class="codeedit" name="code" cols="80" rows="10" onkeydown="checkTab(this)"></textarea>
+<br>
+<input type="file" name="upload" />
+</form>
+
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]

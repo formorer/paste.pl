@@ -1,4 +1,6 @@
 [% INCLUDE common_htmltop %]
+[% INCLUDE navbar %]
+<div id="content">
 [% content %]
 [% INCLUDE common_htmlbottom %]
 
