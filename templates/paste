@@ -2,7 +2,7 @@
 [% USE format %]
 [% USE CGI %]
 [% TRY %]
-    [% USE mydb = DBI(db, user, pass) %]
+    [% USE mydb = DBI(dbname, dbuser, dbpass) %]
     [% CATCH %]
         [% INCLUDE dberror %]
     [% STOP %]

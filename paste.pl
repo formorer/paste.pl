@@ -10,6 +10,19 @@ use DBI;
 use CGI::Carp qw(fatalsToBrowser); 
 use CGI::Cookie;
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
+use Config::IniFiles;
+
+my $config_file = 'paste.conf'; 
+my $config = Config::IniFiles->new( -file => $config_file ); 
+unless ($config) {
+	my $error = "$!\n"; 
+	$error .= join "\n", @Config::IniFiles::errors;
+	die "Could not load configfile '$config_file': $error";
+}
+
+my $dbname = $config->val('database', 'dbname') || die "Databasename not specified";  
+my $dbuser = $config->val('database', 'dbuser') || die "Databaseuser not specified"; 
+my $dbpass = $config->val('database', 'dbpassword') || ''; 
 
 my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
 
@@ -37,7 +50,7 @@ sub print_plain {
 	if ($cgi->param("plain")) {
 		 $show = $cgi->param("plain");
 	}
-	my $dbh = DBI->connect('dbi:Pg:dbname=paste', 'postgres') or error ("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
+	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error ("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
 	my $sth = $dbh->prepare("SELECT code from paste where id = '$show'");
 	$sth->execute() or error ("Could not execute query", "Error in executing query: " . $DBI::errstr);
 	print "Content-type: text/plain\r\n\r\n";
@@ -86,7 +99,7 @@ sub print_delete {
 	} else {
 		print_paste($cgi);
 	}
-	my $dbh = DBI->connect('dbi:Pg:dbname=paste', 'postgres') or error("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
+	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
 	my $sth = $dbh->prepare("SELECT id from paste where sha1 = '$sha1'"); 
 	$sth->execute() or error ("Error", "Error in executing query: " . $DBI::errstr);
 	my $id;
@@ -97,9 +110,9 @@ sub print_delete {
 		my $sth = $dbh->prepare("DELETE from paste where id = ?"); 
 		$sth->execute($id) or error ("Error", "Error in executing query: " . $DBI::errstr); 
 		print header;
-		$template->process('show_message', {    "db" => 'dbi:Pg:dbname=paste',
-				"user" => 'postgres',
-				#"pass" => 'test',
+		$template->process('show_message', {    "db" => "dbi:Pg:dbname=$dbname",
+				"dbuser" => $dbuser,
+				"dbpass" => $dbpass,
 				"title" => "Entry $id deleted",
 				"message" => "The entry with the id $id has been deleted.",
 				"round" => sub { return floor(@_); },
@@ -122,9 +135,9 @@ sub print_show {
 		$lines = $cgi->param("lines"); 
 	}
 	print header;
-    $template->process('show', {	"db" => 'dbi:Pg:dbname=paste', 
-									"user" => 'postgres', 
-									#"pass" => 'test',
+    $template->process('show', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+									"dbuser" => $dbuser, 
+									"dbpass" => $dbpass,
 									"show" => $show,
 									"status" => $status, 
 									"lines" => $lines,
@@ -160,7 +173,7 @@ sub print_paste {
 			$name = $cgi->param("poster"); 
 		}
 
-		my $dbh = DBI->connect('dbi:Pg:dbname=paste', 'postgres') or error("Could not connect to db", "Could not connect to DB: " . $DBI::errstr);
+		my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error("Could not connect to db", "Could not connect to DB: " . $DBI::errstr);
 		my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
 		my $code = $cgi->param("code");
 		$code =~ s/\r\n/\n/g;
@@ -192,8 +205,9 @@ sub print_paste {
 		} else {
 			print header;
 		}
-		$template->process('after_paste', { "db" => 'dbi:Pg:dbname=paste',
-											"user" => 'postgres', 
+		$template->process('after_paste', { "dbname" => "dbi:Pg:dbname=$dbname",
+											"dbuser" => $dbuser, 
+											"dbpass" => $dbpass, 
 											"status" => $statusmessage,
 											"round" => sub { return floor(@_); },
 											"id" => $id, 
@@ -204,9 +218,9 @@ sub print_paste {
 										return;
 	}
 	print header;	
-    $template->process('paste', {	"db" => 'dbi:Pg:dbname=paste', 
-									"user" => 'postgres', 
-									#"pass" => 'test',
+    $template->process('paste', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+									"dbuser" => $dbuser, 
+									"dbpass" => $dbpass,
 									"status" => $statusmessage, 
 									"base_url" => $base_url,
 									"round" => sub { return floor(@_); }, 
@@ -222,9 +236,9 @@ sub do_submit {
 sub error ($$) {
 	my ($title,$errormessage) = @_;
 	print header;	
-	$template->process('show_message', {	"db" => 'dbi:Pg:dbname=paste', 
-			"user" => 'postgres', 
-			#"pass" => 'test',
+	$template->process('show_message', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+			"dbuser" => $dbuser, 
+			"dbpass" => $dbpass,
 			"title" => $title, 
 			"message" => $errormessage,
 			"round" => sub { return floor(@_); }, 
