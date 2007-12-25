@@ -11,6 +11,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use Config::IniFiles;
+use Encode;
 
 my $config_file = 'paste.conf'; 
 my $config = Config::IniFiles->new( -file => $config_file ); 
@@ -109,7 +110,7 @@ sub print_delete {
 	if ($id) {
 		my $sth = $dbh->prepare("DELETE from paste where id = ?"); 
 		$sth->execute($id) or error ("Error", "Error in executing query: " . $DBI::errstr); 
-		print header;
+		print_header();
 		$template->process('show_message', {    "db" => "dbi:Pg:dbname=$dbname",
 				"dbuser" => $dbuser,
 				"dbpass" => $dbpass,
@@ -134,7 +135,7 @@ sub print_show {
 	if (defined($cgi->param("lines"))) {
 		$lines = $cgi->param("lines"); 
 	}
-	print header;
+	print_header();
     $template->process('show', {	"dbname" => "dbi:Pg:dbname=$dbname", 
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
@@ -153,7 +154,7 @@ sub print_paste {
 	my $code;
 	if ($cgi->param("upload")) {
 		my $filename = $cgi->upload("upload");
-		print header;
+		print_header();
 		while (<$filename>) {
 			$code .= $_;
 		}
@@ -177,7 +178,15 @@ sub print_paste {
 		my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
 		my $code = $cgi->param("code");
 		$code =~ s/\r\n/\n/g;
+
+		#even if it already should be valid UTF-8 encoding again won't harm. Postgresql is a little bit picky about clean UTF-8
+		$code = encode_utf8($code);
+
+		#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry. 
+		#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
+
 		my $digest = sha1_hex($code . time()); 
+
 		$sth->execute($name,$code,$cgi->param("lang"),$cgi->param("expire"),$digest); 
 			
 		my $id;
@@ -201,9 +210,10 @@ sub print_paste {
 				-value=> $cgi->param("lang"));
 		    my $cookie_name = new CGI::Cookie(-name=>'paste_name', 
 				-value=> $name);
-			print header(-cookie=>[$cookie_lang, $cookie_name]); 
+			my %header = (-cookie=>[$cookie_lang, $cookie_name]);
+			print_header(\%header); 
 		} else {
-			print header;
+			print_header();
 		}
 		$template->process('after_paste', { "dbname" => "dbi:Pg:dbname=$dbname",
 											"dbuser" => $dbuser, 
@@ -217,7 +227,7 @@ sub print_paste {
 			
 										return;
 	}
-	print header;	
+	print_header();	
     $template->process('paste', {	"dbname" => "dbi:Pg:dbname=$dbname", 
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
@@ -235,7 +245,7 @@ sub do_submit {
 
 sub error ($$) {
 	my ($title,$errormessage) = @_;
-	print header;	
+	print_header();	
 	$template->process('show_message', {	"dbname" => "dbi:Pg:dbname=$dbname", 
 			"dbuser" => $dbuser, 
 			"dbpass" => $dbpass,
@@ -246,6 +256,11 @@ sub error ($$) {
 		} 
 	) or die $template->error() . "\n";
 	exit;
+}
+
+sub print_header {
+	my $args = shift; 
+	print header ( -charset => 'utf-8', -encoding => 'utf-8', %{$args} );
 }
 # vim: syntax=perl sw=4 ts=4 noet shiftround
 
