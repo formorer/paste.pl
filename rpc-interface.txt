@@ -1,0 +1,56 @@
+XML-RPC Interface Description for paste.debian.net
+==================================================
+
+Preface
+-------
+
+paste.debian.net supports submitting, retrival and deleting of paste
+entries via XML-RPC. This documents describes the available methods. An example
+implementation of a client (written in Perl) can be found in the 
+link:http://git.snow-crash.org/?p=paste.pl.git;a=blob_plain;f=client.pl;hb=HEAD[git
+repository].
+
+Submitting entries (addPaste)
+-----------------------------
+
+paste.addPaste(pastetext[,name,expire,lang) returns rc, id, statusmessage, digest
+
+.expects
+- *pastetext*: a string that contains the pastetext including \n or \r\n.
+
+- *name* `(optional)`: a string that contains the name of the submitter. If
+not submitted or empty "anonymous" is choosen. 
+
+- *expire* `(optional)`: an integer which is the time in seconds from now
+when the entry should expire. If not submitted or empty 172800 (72 hours) is
+choosen. 
+
+- *lang* `(optional)`: a string the indicates which hilighting should be
+choosen for an entry. If not submitted or empty no hilighting happens. 
+
+.returns
+- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+  is an error in submitting the entry. See *statusmessage* for details. 
+
+- *statusmessage* `(string)`: This string either contains an error message
+or some other informations. If the entry could be submitted there will be
+something like the following returned. 
++
+-------------------------------------------------------------------------
+Your entry has been added to the database
+To download your entry use: http://localhost/paste.pl/38
+To delete your entry use:
+http://localhost/paste.pl/b08c09a0a71d651b202035944573735f314c10a6
+-------------------------------------------------------------------------
++
+You can use this message in your application. 
+
+- *id* `(integer)`: The id of the new entry. This can be use for retrival
+  (see getPaste) of paste entrys. 
+
+- *digest* `(sha1 hex)`: The digest of the entry. This can be used for
+  deleting an entry (see deletePaste).
+ 
+
+// vim: ft=asciidoc autoindent textwidth=75 formatoptions=tcqn
+
