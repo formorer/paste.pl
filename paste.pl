@@ -27,7 +27,7 @@ my $dbpass = $config->val('database', 'dbpassword') || '';
 my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
 
 #config 
-my $base_url = 'http://localhost/paste.pl';
+my $base_url = $config->val('www', 'base_url');
 
 my $cgi = new CGI();
 if ($cgi->param("plain")) {

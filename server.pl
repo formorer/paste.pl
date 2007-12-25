@@ -19,13 +19,15 @@ my $dbname = $config->val('database', 'dbname') || die "Databasename not specifi
 my $dbuser = $config->val('database', 'dbuser') || die "Databaseuser not specified";
 my $dbpass = $config->val('database', 'dbpassword') || '';
 
+my $base_url = $config->val('www', 'base_url');
+
 sub addPaste {
     my ($code, $name, $expire) = @_;
     $name = $name || 'anonymous';
 	$expire = $expire || 72000;
 
     my $lang = 418;
-	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error("Could not connect to db", "Could not connect to DB: " . $DBI::errstr);
+	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or die "Could not connect to db", "Could not connect to DB: " . $DBI::errstr;
 	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
 	$code =~ s/\r\n/\n/g;
 	my $digest = sha1_hex($code . time());
@@ -48,13 +50,18 @@ sub addPaste {
 				$id = $row[0];
 			}
 			$statusmessage = "Your entry has been added to the database\n";
-			$statusmessage .= "To download your entry use: http://localhost/paste.pl/$id\n";
-			$statusmessage .= "To delete your entry use: http://localhost/paste.pl/$id\n";
+			$statusmessage .= "To download your entry use: $base_url/$id\n";
+			$statusmessage .= "To delete your entry use: $base_url/$digest\n";
 		}
 	}
     return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error} ;
 }
 
+sub deletePaste {
+	my ($digest) = @_; 
+
+
+}
 process_cgi_call({'paste.addPaste' => \&addPaste});
 
 
