@@ -52,5 +52,46 @@ You can use this message in your application.
   deleting an entry (see deletePaste).
  
 
+Deleting entries (deletePaste)
+-----------------------------
+
+paste.deletePaste(digest) returns rc, statusmessage
+
+.expects
+- *digest*: the digest of the entry that should be deleted 
+
+.returns
+
+- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+  is an error in deleting the entry. See *statusmessage* for details. 
+
+- *statusmessage* `(string)`: This string either contains an error message
+or some other informations. 
+
+Getting entries (getPaste)
+--------------------------
+
+paste.getPaste(id) returnѕ rc, statusmessage, code, submitter, submitdate, expiredate
+
+.expects 
+
+- *id*: the id of the entry that should be retrived 
+
+.returns 
+
+- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+  is an error in getting the entry. See *statusmessage* for details. 
+
+- *statusmessage* `(string)`: This string either contains an error message
+or some other informations. 
+
+- *code* `(string)`: The pasteentry with lines separated by \n
+
+- *submitter* `(string)`: The name of the submitter 
+
+- *submitdate* `(string)`: A timestamp when the entry has been submitted
+
+- *expiredate* `(string)`: A timestamp when the entry expires
+
 // vim: ft=asciidoc autoindent textwidth=75 formatoptions=tcqn
 
