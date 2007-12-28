@@ -138,10 +138,38 @@ sub add_paste ($$$$) {
 	
 }
 
+=pod
+
+=head2 delete_paste( B<digest> )
+
+=over 4
+
+Deletes a entry from the database. 
+
+=over 4 
+
+=item B<digest> 
+
+The digest of the entry you want to delete
+
+=back 
+
+=back
+
+=cut
+
+
 sub delete_paste ($) {
 	my ($self, $sha1) = @_;
 	my $dbh = $self->{dbh}; 
 
+	my $deleted_id_ref = $dbh->selectall_arrayref("SELECT id from paste where sha1 = '$sha1'"); 
+
+	my $id = @{@{$deleted_id_ref}[0]}[0];
+	if (!$id) {
+		$self->{error} = "No entry with digest '$sha1' found"; 
+		return 0;
+	}
 	my $sth = $dbh->prepare("DELETE from paste where sha1 = ?");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
@@ -154,8 +182,28 @@ sub delete_paste ($) {
         $self->{error} = "Could not delete paste from db: " . $dbh->errstr;
         return 0;
     }
-	return 1;
+	return $id;
 }
+
+=pod
+
+=head2 get_paste( B<id> )
+
+=over 4
+
+Returns an entry from the database. Returns undef if the entry couldn't be found. Otherwise a hashref with the entry will be returned. Beware that the digest is included. You should not reveal this to externals, otherwise your entrys can be deleted.  
+
+=over 4 
+
+=item B<id> 
+
+The id of the entry you want to retreive
+
+=back 
+
+=back
+
+=cut
 
 sub get_paste ($) {
 	my ($self, $id) = @_;
@@ -168,11 +216,29 @@ sub get_paste ($) {
 	}
 
 	$sth->execute($id);
-	if ($dbh->errstr) 
-		$self->{error} = "Could not delete paste from db: " . $dbh->errstr;
+	if ($dbh->errstr){ 
+		$self->{error} = "Could not get paste from db: " . $dbh->errstr;
 		return 0;
 	}
+	my $hash_ref = $sth->fetchrow_hashref;
+	if (defined($hash_ref->{code})) {
+		return $hash_ref; 
+	} else {
+		return undef;
+	}
+}
+
+sub get_langs () {
+	my ($self, $id) = @_;
+	my $dbh = $self->{dbh};
+	my $ary_ref = $dbh->selectall_arrayref("SELECT * from lang", { Slice => {} }); 
+	if ($dbh->errstr) {
+		$self->{error} = "Could not get languages vom database: " . $dbh->errstr;
+		return 0;
+	}
+	return $ary_ref;
 }
 1;
+
 # vim: syntax=perl sw=4 ts=4 noet shiftround
 
