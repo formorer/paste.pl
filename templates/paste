@@ -8,9 +8,7 @@
     [% STOP %]
 [% END %]
 
-<h1>Posting [% entry.id %] from [% entry.0.poster %] posted at [% entry.postedate %] expires: 
-[% entry.expiredate %]
-</h1>
+<h1>New entry:</h1>
 
 [% IF status %]
 <div class=status> 
