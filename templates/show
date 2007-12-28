@@ -32,14 +32,17 @@
 
 [% TRY -%]
 	[% IF entry.code -%]
+	[% IF entry.lang_id == -1 %] 
+	[% language.desc = "Plain" %]
+	[% END %]
 	[% IF lines == 0 %]
 		[% FILTER $Highlight "$language.desc" linenumbers = 0 -%]
-		[% entry.code -%]
+			[% entry.code -%]
 		[% END -%]
 	[% ELSE %]
 		<p>
 		[% FILTER $Highlight "$language.desc" linenumbers = 1 -%]
-		[% entry.code -%]
+			[% entry.code -%]
 		[% END -%]
 		</p>
 	[% END %]

@@ -428,6 +428,7 @@ my @langs = qw (
     zsh
 );
 
+push @langs, "Plain";
 sub init {
     my $self = shift;
 

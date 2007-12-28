@@ -29,6 +29,7 @@
 <br /> <br />
 <b>Language</b>
 <select name="lang" id="lang">
+	<option value="-1">Plain</option>
 	[% FOREACH lang = mydb.query('SELECT * from lang') -%]
 		<option [% IF lang.lang_id == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.lang_id %]" >[% lang.desc %]</option>
 	[% END %]
