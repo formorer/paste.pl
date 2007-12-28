@@ -3,9 +3,8 @@
 use strict;
 use Frontier::RPC2;
 use Config::IniFiles;
-use DBI;
-use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
-
+use lib 'lib/'; 
+use Paste;
 
 my $config_file = 'paste.conf';
 my $config = Config::IniFiles->new( -file => $config_file );
@@ -15,54 +14,52 @@ unless ($config) {
     die "Could not load configfile '$config_file': $error";
 }
 
-my $dbname = $config->val('database', 'dbname') || die "Databasename not specified";
-my $dbuser = $config->val('database', 'dbuser') || die "Databaseuser not specified";
-my $dbpass = $config->val('database', 'dbpassword') || '';
-
 my $base_url = $config->val('www', 'base_url');
 
+my $paste = new Paste($config_file); 
+
 sub addPaste {
-    my ($code, $name, $expire) = @_;
+    my ($code, $name, $expire, $lang) = @_;
     $name = $name || 'anonymous';
 	$expire = $expire || 72000;
+	$lang = $lang || -1;
 
-    my $lang = 418;
-	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or die "Could not connect to db", "Could not connect to DB: " . $DBI::errstr;
-	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
-	$code =~ s/\r\n/\n/g;
-	my $digest = sha1_hex($code . time());
-	$sth->execute($name,$code,$lang,$expire,$digest);
-	my $id;
 	my $error = 0; 
-	my $statusmessage ="";
-	
-	if ($dbh->errstr) {
+	my $statusmessage;
+	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang); 
+	if ($paste->error) {
 		$error = 1; 
-		$statusmessage .= "Could not add your entry to the paste database : " . $dbh->errstr;
+		$statusmessage = $paste->error;
 	} else {
-		$sth = $dbh->prepare("SELECT id from paste where sha1 = '$digest'");
-		$sth->execute();
-		if ($dbh->errstr) {
-			$error = 1; 
-			$statusmessage .= "Could not retrieve your entry from the paste database: " . $dbh->errstr;
-		} else {
-			while ( my @row = $sth->fetchrow_array ) {
-				$id = $row[0];
-			}
-			$statusmessage = "Your entry has been added to the database\n";
-			$statusmessage .= "To download your entry use: $base_url/$id\n";
-			$statusmessage .= "To delete your entry use: $base_url/$digest\n";
-		}
+		$statusmessage = "Your entry has been added to the database\n";
+		$statusmessage .= "To download your entry use: $base_url/$id\n";
+		$statusmessage .= "To delete your entry use: $base_url/$digest\n";
 	}
-    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error} ;
+    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest} ;
 }
 
 sub deletePaste {
-	my ($digest) = @_; 
-
-
+	my ($digest) = @_;
+	my $error = 0; 
+	my ($statusmessage, $id);
+	if ($digest !~ /[0-9a-f]{40}/i) {
+		$error = 1;
+		$statusmessage = "Invalid digest ('$digest')"; 
+	} else {
+		$id = $paste->delete_paste($digest); 
+		if ($paste->error) {
+			$error = 1; 
+			$statusmessage = $paste->error; 
+		} else {
+			$statusmessage = "Entry $id deleted"; 
+		}
+	}
+	return {'rc' => $error, 'statusmessage' => $statusmessage, 'id' => $id }; 
 }
-process_cgi_call({'paste.addPaste' => \&addPaste});
+
+process_cgi_call({'paste.addPaste' => \&addPaste, 
+			      'paste.deletePaste' => \&deletePaste,
+				});
 
 
 #==========================================================================
