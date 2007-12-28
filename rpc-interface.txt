@@ -68,6 +68,8 @@ paste.deletePaste(digest) returns rc, statusmessage
 - *statusmessage* `(string)`: This string either contains an error message
 or some other informations. 
 
+- *id* `(integer)`: The id of the deleted entry. 
+
 Getting entries (getPaste)
 --------------------------
 
