@@ -3,6 +3,7 @@ package Paste::Template::Plugin::Highlight;
 use Template::Plugin::Filter;
 use base qw( Template::Plugin::Filter );
 use Text::VimColor;
+use Digest::SHA1 qw( sha1_hex );
 use File::Temp qw / tempfile /;
 
 use strict;
@@ -447,11 +448,21 @@ sub filter {
     $config = $self->merge_config($config);
     #then for arguments
     $args = $self->merge_args($args);
-    
+
     if ( ! grep { lc($_) eq lc(@{$args}[0]) } @langs ) {
 	die Template::Exception->new( highlight => "@$args[0] is not supported" );
     }
-    
+
+    if (%$config->{'cache'}) {
+    	my $digest = sha1_hex($text);
+	die Template::Exception->new( highlight => "cache_dir not found") unless -d %$config->{'cache_dir'};
+	if (-f %$config->{'cache_dir'} . "/$digest") {
+		open (my $fh, '<', %$config->{'cache_dir'} . "/$digest") or die Template::Exception->new( highlight => "Could not opencache file: $!");
+		$text = <$fh>; 
+		return $text;
+	}
+    }
+
     my $fh = tempfile(UNLINK => 1);
     print $fh "$text"; 
     my $syntax = Text::VimColor->new(
@@ -460,20 +471,25 @@ sub filter {
 	filetype => @$args[0],
     );
     close ($fh); 
-    my $text;  
     if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
-	$text .= "<ol style='list-style-type:decimal' class='synline'>\n";
+	$text = "<ol style='list-style-type:decimal' class='synline'>\n";
 	foreach my $line (split(/\n/, $syntax->html)) {
 	    $text .= "<li class='synline'>$line</li>\n";
 	}
 	$text .= "</ol>";
     } else {
-	    print "<br>";
+	    $text = "<br>";
 	    foreach my $line (split(/\n/, $syntax->html)) {
 		    $text .= "$line<br>\n";
 	    }
-	    print "<br>";
+	    $text .= "<br>";
     }
+    if (%$config->{'cache'} && -d %$config->{'cache_dir'} && -w %$config->{'cache_dir'}) {
+	    my $digest = sha1_hex($text);
+	    open (my $fh, '>', %$config->{'cache_dir'} . "/$digest") or die Template::Exception->new( highlight => "Could not opencache file: $!");
+	    print $fh $text;
+	    close($fh);
+    }	
     return $text;
 }
 
