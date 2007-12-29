@@ -95,5 +95,21 @@ or some other informations.
 
 - *expiredate* `(string)`: A timestamp when the entry expires
 
+
+Getting Languages (getLanguages)
+--------------------------------
+
+paste.getLanguagesreturns rc, statusmessage, langs
+
+.returns 
+
+- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+  is an error in getting the entry. See *statusmessage* for details. 
+
+- *statusmessage* `(string)`: This string either contains an error message
+or some other informations. 
+
+- *langs* `(arrayref)`: returns a list a supported languages
+
 // vim: ft=asciidoc autoindent textwidth=75 formatoptions=tcqn
 
