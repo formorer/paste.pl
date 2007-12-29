@@ -1,0 +1,11 @@
+RewriteRule /plain/([0-9]+)$ /paste.pl/?plain=$1 [R]
+RewriteRule /plain/([0-9]+)/$ /paste.pl/?plain=$1 [R]
+RewriteRule /delete/([0-9a-f]+)$ /paste.pl/?delete=$1 [R]
+RewriteRule /delete/([0-9a-f]+)/$ /paste.pl/?delete=$1 [R]
+
+
+RewriteRule /download/([0-9]+)$ /paste.pl/?download=$1 [R]
+RewriteRule /download/([0-9]+)/$ /paste.pl/?download=$1 [R]
+
+RewriteRule /([0-9]+)$  /paste.pl?show=$1 [R]
+
