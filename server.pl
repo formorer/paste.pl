@@ -14,18 +14,24 @@ sub addPaste {
     my ($code, $name, $expire, $lang) = @_;
     $name = $name || 'anonymous';
 	$expire = $expire || 72000;
-	$lang = $lang || -1;
-
+	$lang = $lang || "Plain";
 	my $error = 0; 
 	my $statusmessage;
-	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang); 
+	my $lang_id = -1;
+
+	if ($lang ne "Plain") {
+		$lang_id = $paste->get_lang($lang) || -1; 
+		die "$lang_id";
+	}
+
+	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id); 
 	if ($paste->error) {
 		$error = 1; 
 		$statusmessage = $paste->error;
 	} else {
 		$statusmessage = "Your entry has been added to the database\n";
-		$statusmessage .= "To download your entry use: $base_url/$id\n";
-		$statusmessage .= "To delete your entry use: $base_url/$digest\n";
+		$statusmessage .= "To download your entry use: $base_url/download/$id\n";
+		$statusmessage .= "To delete your entry use: $base_url/delete/$digest\n";
 	}
     return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest} ;
 }
