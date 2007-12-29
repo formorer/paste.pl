@@ -21,7 +21,6 @@ sub addPaste {
 
 	if ($lang ne "Plain") {
 		$lang_id = $paste->get_lang($lang) || -1; 
-		die "$lang_id";
 	}
 
 	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id); 
