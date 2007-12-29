@@ -13,7 +13,7 @@ use Carp;
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
 
-@EXPORT = qw ( new add_paste delete_paste );
+@EXPORT = qw ( new add_paste delete_paste get_paste get_config_key);
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;	
@@ -48,6 +48,15 @@ sub new {
 
 	bless ($self, $class);
 	return $self;
+}
+
+sub get_config_key () {
+	my ($self, $section, $key) = @_; 
+	if ($self->{config}->val($section, $key)) {
+		return $self->{config}->val($section, $key);
+	} else {
+		return undef;
+	}
 }
 
 sub error {
@@ -238,6 +247,25 @@ sub get_langs () {
 		return 0;
 	}
 	return $ary_ref;
+}
+
+sub get_lang ($) {
+	my ($self, $lang) = @_; 
+	my $dbh = $self->{dbh};
+
+	my $lang_id_ref = $dbh->selectall_arrayref("SELECT lang_id from lang where \"desc\" = '$lang'");
+
+    if ($dbh->errstr) {
+        $self->{error} = "Could not execute db statement: " . $dbh->errstr;
+        return 0;
+    }
+	
+    if (! @{$lang_id_ref}) {
+        $self->{error} = "Language $lang not found";
+        return 0;
+    }
+    my $id = @{@{$lang_id_ref}[0]}[0];
+	return $id;
 }
 1;
 

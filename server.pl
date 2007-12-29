@@ -2,21 +2,13 @@
 
 use strict;
 use Frontier::RPC2;
-use Config::IniFiles;
 use lib 'lib/'; 
 use Paste;
 
 my $config_file = 'paste.conf';
-my $config = Config::IniFiles->new( -file => $config_file );
-unless ($config) {
-    my $error = "$!\n";
-    $error .= join "\n", @Config::IniFiles::errors;
-    die "Could not load configfile '$config_file': $error";
-}
-
-my $base_url = $config->val('www', 'base_url');
-
 my $paste = new Paste($config_file); 
+
+my $base_url = $paste->get_config_key('www', 'base_url');
 
 sub addPaste {
     my ($code, $name, $expire, $lang) = @_;
@@ -72,6 +64,7 @@ sub getLanguages {
 	}
 	return {'rc' => $error, 'statusmessage' => $statusmessage, 'langs' => \@langs,};
 }
+
 process_cgi_call({'paste.addPaste' => \&addPaste, 
 			      'paste.deletePaste' => \&deletePaste,
 				  'paste.getLanguages' => \&getLanguages, 

@@ -6,32 +6,22 @@ use warnings;
 use CGI qw(:standard);
 use Template;
 use POSIX;
-use DBI;
 use CGI::Carp qw(fatalsToBrowser); 
 use CGI::Cookie;
-use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
-use Config::IniFiles;
-use Encode;
 use Paste;
 
 my $config_file = 'paste.conf'; 
-my $config = Config::IniFiles->new( -file => $config_file ); 
-unless ($config) {
-	my $error = "$!\n"; 
-	$error .= join "\n", @Config::IniFiles::errors;
-	die "Could not load configfile '$config_file': $error";
-}
+my $paste = new Paste($config_file);
 
-my $dbname = $config->val('database', 'dbname') || die "Databasename not specified";  
-my $dbuser = $config->val('database', 'dbuser') || die "Databaseuser not specified"; 
-my $dbpass = $config->val('database', 'dbpassword') || ''; 
+my $dbname = $paste->get_config_key('database', 'dbname') || die "Databasename not specified";  
+my $dbuser = $paste->get_config_key('database', 'dbuser') || die "Databaseuser not specified"; 
+my $dbpass = $paste->get_config_key('database', 'dbpassword') || ''; 
 
 my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
 
 #config 
-my $base_url = $config->val('www', 'base_url');
+my $base_url = $paste->get_config_key('www', 'base_url');
 
-my $paste = new Paste($config_file);
 
 my $cgi = new CGI();
 if ($cgi->param("plain")) {
