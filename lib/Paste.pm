@@ -17,13 +17,14 @@ use vars qw(@ISA @EXPORT);
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;	
-	my $config_file = shift; 
+	my $config_file = shift || ''; 
+	croak ("Need a configfile") unless -f $config_file; 
 	my $config = Config::IniFiles->new( -file => $config_file );	
 
 	unless ($config) {
 		my $error = "$!\n"; 
 		$error .= join("\n", @Config::IniFiles::errors);
-		carp "Could not load configfile '$config_file': $error"; 
+		croak "Could not load configfile '$config_file': $error"; 
 	}
 
 	my $dbname = $config->val('database', 'dbname') || carp "Databasename not specified in config";
@@ -165,11 +166,11 @@ sub delete_paste ($) {
 
 	my $deleted_id_ref = $dbh->selectall_arrayref("SELECT id from paste where sha1 = '$sha1'"); 
 
-	my $id = @{@{$deleted_id_ref}[0]}[0];
-	if (!$id) {
+	if (! @{$deleted_id_ref}) {
 		$self->{error} = "No entry with digest '$sha1' found"; 
 		return 0;
 	}
+	my $id = @{@{$deleted_id_ref}[0]}[0];
 	my $sth = $dbh->prepare("DELETE from paste where sha1 = ?");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
