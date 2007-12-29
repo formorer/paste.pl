@@ -9,11 +9,11 @@
 [% END %]
 
 [% TRY -%]
-	[% entry = mydb.query ("SELECT id,poster,lang_id,code,expires as expiredate,posted as postedate from paste where id = '$show'") %]
+	[% entry = mydb.query ("SELECT id,poster,lang_id,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate,date_trunc('second', posted) as postedate from paste where id = '$show'") %]
 	[% IF entry.size != 1 %] 
 		[%THROW notfound "Entry was not found in database" %]
 	[% END %]
-	[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,posted as postedate,code,expires as expiredate from paste where id = '$show'") %]
+	[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,date_trunc('second', posted) as postedate,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate from paste where id = '$show'") %]
 	[% END %]
 	[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
 	[% END %]
