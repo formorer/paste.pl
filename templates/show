@@ -26,7 +26,7 @@
 
 [% END %]
 
-<h1>Posting [% entry.id %] from [% entry.0.poster %] posted at [% entry.postedate %] expires: 
+<h1>Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% entry.expiredate %]
 </h1>
 
