@@ -12,6 +12,7 @@ use CGI::Cookie;
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use Config::IniFiles;
 use Encode;
+use Paste;
 
 my $config_file = 'paste.conf'; 
 my $config = Config::IniFiles->new( -file => $config_file ); 
@@ -30,6 +31,8 @@ my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Pa
 #config 
 my $base_url = $config->val('www', 'base_url');
 
+my $paste = new Paste($config_file);
+
 my $cgi = new CGI();
 if ($cgi->param("plain")) {
 	print_plain($cgi);
@@ -47,71 +50,52 @@ exit;
 
 sub print_plain {
 	my ($cgi,$status) = (@_);
-	my $show = ''; 
+	my $id = ''; 
 	if ($cgi->param("plain")) {
-		 $show = $cgi->param("plain");
+		 $id = $cgi->param("plain");
 	}
-	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error ("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
-	my $sth = $dbh->prepare("SELECT code from paste where id = '$show'");
-	$sth->execute() or error ("Could not execute query", "Error in executing query: " . $DBI::errstr);
+	my $paste = $paste->get_paste($id);
+	if (! $paste) {
+		 error("Entry not found", "Your requested paste entry '$id' could not be found");
+	}
 	print "Content-type: text/plain\r\n\r\n";
-	my $code;
-	while ( my @row = $sth->fetchrow_array ) {
-		$code = $row[0];
-	}
-	if ($code) {
-		print $code;
-	} else {
-		error("Entry not found", "Your requested paste entry '$show' could not be found");
-	}
+	print $paste->{code} . "\n";
 }
 
 sub print_download {
 	my ($cgi,$status) = (@_);
-	my $show = ''; 
+	my $id = ''; 
 	if ($cgi->param("download")) {
-		 $show = $cgi->param("download");
+		 $id = $cgi->param("download");
 	} else {
 		print_paste($cgi);
 	}
-	my $dbh = DBI->connect('dbi:Pg:dbname=paste', 'postgres') or error("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
-	my $sth = $dbh->prepare("SELECT code from paste where id = '$show'");
-	$sth->execute() or error ("Error in executing query", "Error in executing query: " . $DBI::errstr);
+
+	my $paste = $paste->get_paste($id);
+
+	if (! $paste) {
+        error("Entry not found", "Your requested paste entry '$id' could not be found");
+    }
 	print "Content-type: text/plain\n";
 	print "Content-Transfer-Encoding: text\n";
-	print "Content-Disposition: attachment; filename=paste_$show\n";
+	print "Content-Disposition: attachment; filename=paste_$id\n";
 	print "\r\n";
-	my $code; 
-	while ( my @row = $sth->fetchrow_array ) {
-		$code = $row[0];
-	}
-   if ($code) {
-        print $code;
-    } else {
-        error("Entry not found", "Your requested paste entry '$show' could not be found");
-    }
+	print $paste->{code} . "\n";
 }
 
 sub print_delete {
 	my ($cgi) = (@_);
-	my $sha1 = '';
+	my $digest = '';
 	if ($cgi->param("delete")) {
-		$sha1 = $cgi->param("delete"); 
+		$digest = $cgi->param("delete"); 
 	} else {
 		print_paste($cgi);
 	}
-	my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error("Could not connect to DB", "Could not connect to DB: " . $DBI::errstr);
-	my $sth = $dbh->prepare("SELECT id from paste where sha1 = '$sha1'"); 
-	$sth->execute() or error ("Error", "Error in executing query: " . $DBI::errstr);
-	my $id;
-	while ( my @row = $sth->fetchrow_array ) {
-		$id = $row[0];
-	}
-	if ($id) {
-		my $sth = $dbh->prepare("DELETE from paste where id = ?"); 
-		$sth->execute($id) or error ("Error", "Error in executing query: " . $DBI::errstr); 
+
+	my $id = $paste->delete_paste($digest); 
+	if (! $paste->error) {
 		print_header();
-		$template->process('show_message', {    "db" => "dbi:Pg:dbname=$dbname",
+		$template->process('show_message', {    "dbname" => "dbi:Pg:dbname=$dbname",
 				"dbuser" => $dbuser,
 				"dbpass" => $dbpass,
 				"title" => "Entry $id deleted",
@@ -121,16 +105,16 @@ sub print_delete {
 			}
 		) or die $template->error() . "\n";
 	} else {
-		error("Entry not found", "The entry with the digest '$sha1' could not be found");
+		error("Entry could not be deleted", $paste->error);
 	}
 }
 
 sub print_show {
     my ($cgi,$status) = (@_);
-	my $show = '';
+	my $id = '';
 	my $lines = 1;
 	if ($cgi->param("show")) {
-		$show = $cgi->param("show");
+		$id = $cgi->param("show");
 	}
 	if (defined($cgi->param("lines"))) {
 		$lines = $cgi->param("lines"); 
@@ -139,7 +123,7 @@ sub print_show {
     $template->process('show', {	"dbname" => "dbi:Pg:dbname=$dbname", 
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
-									"show" => $show,
+									"show" => $id,
 									"status" => $status, 
 									"lines" => $lines,
 									"round" => sub { return floor(@_); }, 
@@ -174,36 +158,10 @@ sub print_paste {
 			$name = $cgi->param("poster"); 
 		}
 
-		my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass) or error("Could not connect to db", "Could not connect to DB: " . $DBI::errstr);
-		my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
-		my $code = $cgi->param("code");
-		$code =~ s/\r\n/\n/g;
-
-		#even if it already should be valid UTF-8 encoding again won't harm. Postgresql is a little bit picky about clean UTF-8
-		$code = encode_utf8($code);
-
-		#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry. 
-		#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
-
-		my $digest = sha1_hex($code . time()); 
-
-		$sth->execute($name,$code,$cgi->param("lang"),$cgi->param("expire"),$digest); 
-			
-		my $id;
-		if ($dbh->errstr) {
+		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"));
+		if ($paste->error) {
 			$statusmessage .= "Could not add your entry to the paste database:<br>\n";
-			$statusmessage .= "<b>" . $dbh->errstr . "<b><br>\n";
-		} else {
-			$sth = $dbh->prepare("SELECT id from paste where sha1 = '$digest'");
-			$sth->execute();
-			if ($dbh->errstr) {
-				$statusmessage .= "Could not retrieve your entry from the paste database:<br>\n";
-				$statusmessage .= "<b>" . $dbh->errstr . "<b><br>\n";
-			} else {
-				while ( my @row = $sth->fetchrow_array ) {
-					$id = $row[0];
-				}
-			}
+			$statusmessage .= "<b>" . $paste->error . "<b><br>\n";
 		}
 		if ($cgi->param("remember")) {
 			my $cookie_lang = new CGI::Cookie(-name=>'paste_lang',
