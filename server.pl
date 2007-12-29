@@ -55,6 +55,21 @@ sub deletePaste {
 	return {'rc' => $error, 'statusmessage' => $statusmessage, 'id' => $id }; 
 }
 
+sub getPaste {
+	my ($id) = @_; 
+	my $error = 0; 
+	my $entry = $paste->get_paste($id);
+	my $statusmessage;
+	if (! $entry) {
+		$error = 1; 
+		$statusmessage = "Entry $id could not be found"; 
+		return {'rc' => $error, 'statusmessage' => $statusmessage, 'code' => '', submitter => '', submitdate => '', expiredate => ''}; 
+	} else {
+		return {'rc' => $error, 'statusmessage' => $statusmessage,
+				'code' => $entry->{code}, 'submitter' => $entry->{poster},
+				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, };
+	}
+}
 sub getLanguages {
 	my $error = 0; 
 	my $statusmessage;
@@ -74,6 +89,7 @@ sub getLanguages {
 process_cgi_call({'paste.addPaste' => \&addPaste, 
 			      'paste.deletePaste' => \&deletePaste,
 				  'paste.getLanguages' => \&getLanguages, 
+				  'paste.getPaste' => \&getPaste,
 				});
 
 
