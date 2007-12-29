@@ -57,8 +57,24 @@ sub deletePaste {
 	return {'rc' => $error, 'statusmessage' => $statusmessage, 'id' => $id }; 
 }
 
+sub getLanguages {
+	my $error = 0; 
+	my $statusmessage;
+	my $lang_ref = $paste->get_langs();
+	my @langs;
+	if ($paste->error) {
+		$error = 1; 
+		$statusmessage = $paste->error; 
+	} else { 
+		foreach my $lang (@{$lang_ref}) {
+			push @langs, $lang->{desc};
+		}
+	}
+	return {'rc' => $error, 'statusmessage' => $statusmessage, 'langs' => \@langs,};
+}
 process_cgi_call({'paste.addPaste' => \&addPaste, 
 			      'paste.deletePaste' => \&deletePaste,
+				  'paste.getLanguages' => \&getLanguages, 
 				});
 
 
