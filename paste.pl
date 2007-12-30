@@ -10,15 +10,20 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
 use Paste;
 
+
+my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
+
+
 my $config_file = 'paste.conf'; 
-my $paste = new Paste($config_file);
+my $paste;
+eval {
+	$paste = new Paste($config_file);
+};
+error("Fatal Error", $@) if $@;
 
 my $dbname = $paste->get_config_key('database', 'dbname') || die "Databasename not specified";  
 my $dbuser = $paste->get_config_key('database', 'dbuser') || die "Databaseuser not specified"; 
 my $dbpass = $paste->get_config_key('database', 'dbpassword') || ''; 
-
-my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
-
 #config 
 my $base_url = $paste->get_config_key('www', 'base_url');
 

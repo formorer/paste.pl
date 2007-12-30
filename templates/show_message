@@ -1,9 +1,10 @@
-[% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
-<h1>[% title %]</h1>
+[% INCLUDE common_htmltop %]
 <br> 
+<div id="content">
 [% message %]
 <br>
-[% END %]
+[% INCLUDE common_htmlbottom %]
+
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 
