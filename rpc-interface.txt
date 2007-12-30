@@ -89,7 +89,8 @@ or some other informations.
 
 - *code* `(string)`: The pasteentry with lines separated by \n
 
-- *submitter* `(string)`: The name of the submitter 
+- *submitter* `(string)`: The name of the submitter. Maximum length
+  allowed is 30 chars. Some special chars like <>,:; are also not allowed.  
 
 - *submitdate* `(string)`: A timestamp when the entry has been submitted
 
