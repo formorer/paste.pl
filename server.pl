@@ -38,7 +38,12 @@ sub addPaste {
 	my $lang_id = -1;
 
 	if ($lang ne "Plain") {
-		$lang_id = $paste->get_lang($lang) || -1; 
+		$lang_id = $paste->get_lang($lang); 
+		if ($paste->error) {
+			$error = 1;
+			$statusmessage = $paste->error;
+			return {'id' => '', 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => ''} ;
+		}
 	}
 
 	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id); 
