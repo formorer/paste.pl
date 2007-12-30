@@ -5,7 +5,10 @@ Preface
 -------
 
 paste.debian.net supports submitting, retrival and deleting of paste
-entries via XML-RPC. This documents describes the available methods. An example
+entries via XML-RPC. This documents describes the available methods. 
+The Server can be reached via
+link:http://paste.debian.net/server.pl[http://paste.debian.net/server.pl].
+An example
 implementation of a client (written in Perl) can be found in the 
 link:http://git.snow-crash.org/?p=paste.pl.git;a=blob_plain;f=client.pl;hb=HEAD[git
 repository].
