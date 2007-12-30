@@ -4,6 +4,10 @@
 <li><a href='http://channel.debian.de/faq'>#debian.de FAQ</a><br /></li>
 <li><a href='http://www.debian.org'>Debian</a><br /></li>
 </ul>
+<h1>About</h1>
+<li><a href='[% base_url %]/paste.pl?about=1'>About</a></br></li>
+<li><a href='http://git.snow-crash.org/?p=paste.pl.git;a=summary'>Code</a><br /></li>
+<li><a href='[% base_url %]/rpc-interface.html'>XML-RPC Interface</a></br></li>
 <h1>Admin</h1>
 <a href='mailto:formorer@debian.org'>Alexander Wirt</a>
 
