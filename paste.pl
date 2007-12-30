@@ -151,29 +151,30 @@ sub print_paste {
 		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"));
 		if ($paste->error) {
 			$statusmessage .= "Could not add your entry to the paste database:<br>\n";
-			$statusmessage .= "<b>" . $paste->error . "<b><br>\n";
-		}
-		if ($cgi->param("remember")) {
-			my $cookie_lang = new CGI::Cookie(-name=>'paste_lang',
-				-value=> $cgi->param("lang"));
-		    my $cookie_name = new CGI::Cookie(-name=>'paste_name', 
-				-value=> $name);
-			my %header = (-cookie=>[$cookie_lang, $cookie_name]);
-			print_header(\%header); 
+			$statusmessage .= "<b>" . $paste->error . "</b><br>\n";
 		} else {
-			print_header();
+			if ($cgi->param("remember")) {
+				my $cookie_lang = new CGI::Cookie(-name=>'paste_lang',
+					-value=> $cgi->param("lang"));
+				my $cookie_name = new CGI::Cookie(-name=>'paste_name', 
+					-value=> $name);
+				my %header = (-cookie=>[$cookie_lang, $cookie_name]);
+				print_header(\%header); 
+			} else {
+				print_header();
+			}
+			$template->process('after_paste', { "dbname" => "dbi:Pg:dbname=$dbname",
+					"dbuser" => $dbuser, 
+					"dbpass" => $dbpass, 
+					"status" => $statusmessage,
+					"round" => sub { return floor(@_); },
+					"id" => $id, 
+					"digest" => $digest,
+					"base_url" => $base_url, 
+				}) or die $template->error() . "\n";								
+
+			return;
 		}
-		$template->process('after_paste', { "dbname" => "dbi:Pg:dbname=$dbname",
-											"dbuser" => $dbuser, 
-											"dbpass" => $dbpass, 
-											"status" => $statusmessage,
-											"round" => sub { return floor(@_); },
-											"id" => $id, 
-											"digest" => $digest,
-											"base_url" => $base_url, 
-										}) or die $template->error() . "\n";								
-			
-										return;
 	}
 	print_header();	
     $template->process('paste', {	"dbname" => "dbi:Pg:dbname=$dbname", 
