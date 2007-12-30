@@ -36,15 +36,13 @@
 	[% language.desc = "Plain" %]
 	[% END %]
 	[% IF lines == 0 %]
-		[% FILTER $Highlight "$language.desc" linenumbers = 0 -%]
+		[% FILTER $Highlight "$language.desc" linenumbers = 0 cache=1 cache_dir="cache/" -%]
 			[% entry.code -%]
 		[% END -%]
 	[% ELSE %]
-		<p>
-		[% FILTER $Highlight "$language.desc" linenumbers = 1 -%]
+		[% FILTER $Highlight "$language.desc" linenumbers = 1 cache=1 cache_dir="cache/" -%]
 			[% entry.code -%]
 		[% END -%]
-		</p>
 	[% END %]
 
 	<br/>
