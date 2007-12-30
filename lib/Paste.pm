@@ -99,6 +99,17 @@ ID of the language for highlight. If 0 highlighting is disabled.
 sub add_paste ($$$$) {
 	my ($self, $code, $name, $expire, $lang) = @_;
 	my $dbh = $self->{dbh}; 
+	$name = $name || 'anonymous';
+
+	if ($name !~ /^[^;,'"]{1,30}/i) {
+		$self->{error} = "Please don't enter names that contain non-alphanumeric chars. The maximum lenght for names is 30 chars";
+		return 0;
+	}
+
+	if ($expire !~ /^[0-9]+/) {
+		$self->error = "Expire must be an integer"; 
+		return 0;
+	}
 
 	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
 	if ($dbh->errstr) {
@@ -173,6 +184,10 @@ sub delete_paste ($) {
 	my ($self, $sha1) = @_;
 	my $dbh = $self->{dbh}; 
 
+	if ($sha1 !~ /^[0-9a-f]{40}$/i ) {
+		$self->{error} = "Digest does not look like a sha1 hex"; 
+		return 0;
+	}
 	my $deleted_id_ref = $dbh->selectall_arrayref("SELECT id from paste where sha1 = '$sha1'"); 
 
 	if (! @{$deleted_id_ref}) {
