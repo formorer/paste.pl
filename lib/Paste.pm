@@ -102,7 +102,7 @@ sub add_paste ($$$$) {
 	$name = $name || 'anonymous';
 
 	if ($name !~ /^[^;,'"]{1,30}/i) {
-		$self->{error} = "Please don't enter names that contain non-alphanumeric chars. The maximum lenght for names is 30 chars";
+		$self->{error} = "Invalid format for name (no special chars, max 30 chars)";
 		return 0;
 	}
 
