@@ -453,12 +453,16 @@ sub filter {
 	die Template::Exception->new( highlight => "@$args[0] is not supported" );
     }
 
+    my $digest = sha1_hex($text);
+    my $lines = %$config->{'linenumbers'} || 0; 
+
     if (%$config->{'cache'}) {
-    	my $digest = sha1_hex($text);
 	die Template::Exception->new( highlight => "cache_dir not found") unless -d %$config->{'cache_dir'};
-	if (-f %$config->{'cache_dir'} . "/$digest") {
-		open (my $fh, '<', %$config->{'cache_dir'} . "/$digest") or die Template::Exception->new( highlight => "Could not opencache file: $!");
-		$text = <$fh>; 
+
+	if (-f %$config->{'cache_dir'} . "/$digest-$lines") {
+		open (my $fh, '<', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
+		$text = join("\n", <$fh>); 
+		close ($fh);
 		return $text;
 	}
     }
@@ -484,9 +488,9 @@ sub filter {
 	    }
 	    $text .= "<br>";
     }
+
     if (%$config->{'cache'} && -d %$config->{'cache_dir'} && -w %$config->{'cache_dir'}) {
-	    my $digest = sha1_hex($text);
-	    open (my $fh, '>', %$config->{'cache_dir'} . "/$digest") or die Template::Exception->new( highlight => "Could not opencache file: $!");
+	    open (my $fh, '>', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
 	    print $fh $text;
 	    close($fh);
     }	
