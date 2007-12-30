@@ -1,5 +1,15 @@
 [% INCLUDE common_htmltop %]
+<div id="menu">
+<h1>Menu</h1>
+<ul> 
+<li><a href="[% base_url %]">Make new post</a></li>
+</ul>
+
+[% INCLUDE links %]
+</div>
+
 <br> 
+
 <div id="content">
 [% message %]
 <br>
