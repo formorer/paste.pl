@@ -11,8 +11,11 @@
 <br> 
 
 <div id="content">
-[% message %]
 <br>
+<b>[% message %]</b>
+<br>
+<br>
+[% INCLUDE include_show %]
 [% INCLUDE common_htmlbottom %]
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
