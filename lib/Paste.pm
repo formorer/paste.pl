@@ -177,6 +177,83 @@ sub add_paste ($$$$) {
 
 =pod
 
+=head2 add_comment( B<comment>, B<name>, B<paste_id> )
+
+=over 4
+
+Adds a new comment to the paste database. 
+
+=over 4 
+
+=item B<comment> 
+
+A string with \n or \r\n which represents the comment
+
+=item B<name>
+
+The name of the submitter, anonymous if empty
+
+=item B<paste_id>
+
+The ID of the paste entry where the comment belongs to. 
+
+=back 
+
+=back
+
+=cut
+
+sub add_comment ($$$) {
+	my ($self, $comment, $name, $paste_id) = @_;
+	my $dbh = $self->{dbh}; 
+	$name = $name || 'anonymous';
+
+	if ($name !~ /^[^;,'"]{1,30}/i) {
+		$self->{error} = "Invalid format for name (no special chars, max 30 chars)";
+		return 0;
+	}
+	
+	#id must be an integer
+	if ($paste_id !~ /^[0-9]+$/) {
+		$self->{error} = "Invalid id format (must be an integer)";
+	}
+
+	my $paste_id_ref = $dbh->selectall_arrayref("SELECT id FROM paste  WHERE id = '$paste_id'"); 
+	if ($dbh->errstr) {
+		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+		return 0;
+	}
+	
+	if (! @{$paste_id_ref}) {
+		$self->{error} = "No entry with id '$paste_id' found"; 
+		return 0;
+	}
+
+	my $sth = $dbh->prepare("INSERT INTO comments(name,text,paste_id,date) VALUES(?,?,?,now())");
+	if ($dbh->errstr) {
+		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+		return 0;
+	}	
+	
+	#replace \r\n with \n
+	$comment =~ s/\r\n/\n/g;
+
+	#even if it already should be valid UTF-8 encoding again won't harm. 
+	#Postgresql is a little bit picky about clean UTF-8
+	$comment = encode_utf8($comment);
+	
+	$sth->execute($name,$comment,$paste_id);
+
+	if ($dbh->errstr) {
+        $self->{error} = "Could not insert comment into db: " . $dbh->errstr;
+        return 0;
+    }
+	
+	return 1;;
+}
+
+=pod
+
 =head2 delete_paste( B<digest> )
 
 =over 4
@@ -221,6 +298,57 @@ sub delete_paste ($) {
 
 	if ($dbh->errstr) {
         $self->{error} = "Could not delete paste from db: " . $dbh->errstr;
+        return 0;
+    }
+	return $id;
+}
+
+=pod
+
+=head2 delete_comment( B<id> )
+
+=over 4
+
+Deletes a comment from the database. 
+
+=over 4 
+
+=item B<id> 
+
+The id of the comment you want to delete
+
+=back 
+
+=back
+
+=cut
+
+
+sub delete_comment ($) {
+	my ($self, $id) = @_;
+	my $dbh = $self->{dbh}; 
+
+	if ($id !~ /^[0-9]+$/i ) {
+		$self->{error} = "ID does not look like an integer"; 
+		return 0;
+	}
+	my $deleted_comment_ref = $dbh->selectall_arrayref("SELECT id from comments where id = '$id'"); 
+
+	if (! @{$deleted_comment_ref}) {
+		$self->{error} = "No entry with id '$id' found"; 
+		return 0;
+	}
+	$id = @{@{$deleted_comment_ref}[0]}[0];
+	my $sth = $dbh->prepare("DELETE from comments where id = ?");
+	if ($dbh->errstr) {
+		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+		return 0;
+	}	
+	
+	$sth->execute($id);
+
+	if ($dbh->errstr) {
+        $self->{error} = "Could not delete comment from db: " . $dbh->errstr;
         return 0;
     }
 	return $id;
