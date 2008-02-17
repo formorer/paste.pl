@@ -62,7 +62,29 @@
 [% entry.code %]
 <pre>
 [% END %]
-
+[% comments = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$show'") %]
+[% IF comments.size >= 1 %]
+<p>
+<b>Comments:</b><br>
+[% FOREACH comment  = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$show'") %]
+<div id="comment">
+Pasted on [% comment.postedate %] by [% comment.name %]: <br>
+<nbsp>[% comment.text %]<br>
+</div>
+[% END %]
+[% END %]
+<div id="add_comment">
+Add Comment: 
+<form name="add_comment" method="post" action="./">
+<b>Name</b><br/><input type="hidden" name="paste_id" value="[% show %]"/>
+<input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
+<br>
+<b>Comment</b>
+<br>
+<textarea id="comment" class="codeedit" name="comment" rows="2" cols="80" onkeydown="checkTab(this)"></textarea>
+<input type="submit" name="paste" value="Send"/>
+</form>
+</div>
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
