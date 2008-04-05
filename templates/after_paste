@@ -10,11 +10,13 @@
 <h1>Your entry has been added to the database</h1><br>
 <ul>
 <li>To link to your entry use: <a href="[% id %]">[% base_url %]/[% id %]</a></li>
-<li>To download your entry use: <a href="[% id %]">[% base_url %]/download/[% id %]</a></li>
-<li>To see your entry as plain text use: <a href="[% id %]">[% base_url %]/plain/[% id %]</a></li>
+<li>To download your entry use: <a href="download/[% id %]">[% base_url %]/download/[% id %]</a></li>
+<li>To see your entry as plain text use: <a href="plain/[% id %]">[% base_url %]/plain/[% id %]</a></li>
 <li>To delete your entry use: <a href="delete/[% digest %]">[% base_url %]/delete/[% digest %]</a></li>
 </ul>
+[% INCLUDE include_show %]
 [% END %]
+
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 
