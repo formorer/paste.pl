@@ -127,6 +127,11 @@ sub add_paste ($$$$) {
 		return 0;
 	}
 
+	if ($expire > 604800) {
+		$self->error = "Expiration time can not be longer than 604800 seconds (7 days)"; 
+		return 0;
+	}
+
 	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
