@@ -54,6 +54,8 @@ if ($cgi->param("plain")) {
 	print_show($cgi);
 } elsif ($cgi->param("delete")){
 	print_delete($cgi); 
+} elsif ($cgi->param("comment")) {
+	print_add_comment($cgi); 
 } else {
 	print_paste($cgi);
 }
@@ -65,6 +67,8 @@ sub print_plain {
 	my $id = ''; 
 	if ($cgi->param("plain")) {
 		 $id = $cgi->param("plain");
+		 #sanitizing
+		 $id =~ s/[^0-9]+//g;
 	}
 	my $paste = $paste->get_paste($id);
 	if (! $paste) {
@@ -79,6 +83,8 @@ sub print_download {
 	my $id = ''; 
 	if ($cgi->param("download")) {
 		 $id = $cgi->param("download");
+		 #sanitizing
+		 $id =~ s/[^0-9]+//g;
 	} else {
 		print_paste($cgi);
 	}
@@ -121,12 +127,46 @@ sub print_delete {
 	}
 }
 
+
+sub print_add_comment {
+	my ($cgi) = (@_);
+
+	my $error; 
+	my $comment = $cgi->param("comment") or $error = "Please add a comment"; 
+	my $paste_id = $cgi->param("paste_id") or $error = "No Paste id found";
+	my $name = $cgi->param("poster") || "anonymous";
+
+	if ($error) {
+		error ("Could not add comment: <br>\n". $error);
+	}
+
+	my $digest;
+
+	$paste->add_comment($comment, $name, $paste_id); 
+	if (! $paste->error) {
+		print_header();
+		$template->process('show', {    "dbname" => "dbi:Pg:dbname=$dbname",
+				"dbuser" => $dbuser,
+				"dbpass" => $dbpass,
+				"show" => $paste_id, 
+				"status" => "Your comment has been added to paste entry $paste_id.",
+				"round" => sub { return floor(@_); },
+				"base_url" => $base_url,
+			}
+		) or die $template->error() . "\n";
+	} else {
+		error("Comment could not be added", $paste->error);
+	}
+}
+
 sub print_show {
     my ($cgi,$status) = (@_);
 	my $id = '';
 	my $lines = 1;
 	if ($cgi->param("show")) {
 		$id = $cgi->param("show");
+		#sanitizing
+		$id =~ s/[^0-9]+//g;
 	}
 	if (defined($cgi->param("lines"))) {
 		$lines = $cgi->param("lines"); 
@@ -150,7 +190,6 @@ sub print_paste {
 	my $code;
 	if ($cgi->param("upload")) {
 		my $filename = $cgi->upload("upload");
-		print_header();
 		while (<$filename>) {
 			$code .= $_;
 		}
@@ -159,6 +198,13 @@ sub print_paste {
 	}
 
 	my $statusmessage;
+
+	my $pnew;
+	if ($cgi->param("pnew")) {
+		$pnew = $cgi->param("pnew"); 
+		#sanitizing 
+		$pnew =~ s/[^0-9]//g;
+	}
 
 	if ($code) {
 		#okay we have a new entry
@@ -203,6 +249,7 @@ sub print_paste {
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
 									"status" => $statusmessage, 
+									"pnew"  => $pnew, 
 									"base_url" => $base_url,
 									"round" => sub { return floor(@_); }, 
 								} 

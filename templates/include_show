@@ -16,15 +16,18 @@
 	[% END %]
 	[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
 	[% END %]
-[% CATCH DBI %]
-	[% INCLUDE dberror %]
-[% STOP %]
 [% CATCH %]
 	[% INCLUDE common_error %]
 [% STOP %]
 
 [% END %]
 
+[%IF status -%]
+<div id="status"> 
+[% status %]
+</div>
+
+[% END %]
 <h1>Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% entry.expiredate %]
 </h1>
@@ -52,7 +55,8 @@
 	[% ELSE %]
 	<a href='./?show=[% entry.id %];lines=0'>Without linenumbers</a> |
 	[% END %]
-	<a href='./'>Paste new</a> 
+	<a href='./'>Paste new</a> |
+	<a href='./?pnew=[% entry.id %]'>Paste as new</a>
 	<br/>
 	[% END %]
 [% CATCH -%]

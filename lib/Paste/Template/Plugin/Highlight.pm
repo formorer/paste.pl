@@ -483,6 +483,10 @@ sub filter {
 	}
     }
 
+    use Encode qw(from_to);
+
+    my $f = from_to($text, "utf-8", "iso8859-15");
+
     my $fh = tempfile(UNLINK => 1);
     print $fh "$text"; 
     my $syntax = Text::VimColor->new(
@@ -504,7 +508,8 @@ sub filter {
 	    }
 	    $text .= "<br>";
     }
-
+    $f = from_to($text, "iso8859-15", "utf-8");
+    
     if (%$config->{'cache'} && -d %$config->{'cache_dir'} && -w %$config->{'cache_dir'}) {
 	    open (my $fh, '>', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
 	    print $fh $text;
