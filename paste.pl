@@ -260,6 +260,7 @@ sub print_paste {
 					"dbpass" => $dbpass, 
 					"status" => $statusmessage,
 					"round" => sub { return floor(@_); },
+					"show" => $id, 
 					"id" => $id, 
 					"digest" => $digest,
 					"base_url" => $base_url, 
