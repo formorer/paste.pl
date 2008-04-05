@@ -123,12 +123,12 @@ sub add_paste ($$$$) {
 	}
 
 	if ($expire !~ /^[0-9]+/) {
-		$self->error = "Expire must be an integer"; 
+		$self->{error} = "Expire must be an integer"; 
 		return 0;
 	}
 
 	if ($expire > 604800) {
-		$self->error = "Expiration time can not be longer than 604800 seconds (7 days)"; 
+		$self->{error} = 'Expiration time can not be longer than 604800 seconds (7 days)'; 
 		return 0;
 	}
 
