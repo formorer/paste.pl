@@ -13,6 +13,8 @@
 
 <h1>Recent Posts</h1>
 <ul> 
+<li><a href="[% base_url %]">Make new paste</a></li>
+<br>
 [% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
 							  posted as postdate 
 							  from paste order by posted desc, id desc limit 10") -%]
@@ -33,7 +35,6 @@
 [% END %]
 </li>
 [% END %]
-<li><a href="[% base_url %]">Make new post</a></li>
 </li>
 </ul>
 [% INCLUDE links %]
