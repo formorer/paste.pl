@@ -56,6 +56,8 @@ if ($cgi->param("plain")) {
 	print_delete($cgi); 
 } elsif ($cgi->param("comment")) {
 	print_add_comment($cgi); 
+} elsif ($cgi->param("show_template")) {
+	print_template($cgi);
 } else {
 	print_paste($cgi);
 }
@@ -158,6 +160,28 @@ sub print_add_comment {
 		error("Comment could not be added", $paste->error);
 	}
 }
+
+sub print_template {
+    my ($cgi,$status) = (@_);
+	my $tmpl;
+	my @templates = qw(about clients);
+
+	if ($cgi->param("show_template")) {
+		$tmpl = $cgi->param("show_template");
+		if (! grep /^$tmpl$/, @templates)
+		{
+			error("Page not found", "Page not found");
+		}
+	}
+	print_header();
+    $template->process($tmpl, {	"dbname" => "dbi:Pg:dbname=$dbname", 
+									"dbuser" => $dbuser, 
+									"dbpass" => $dbpass,
+									"base_url" => $base_url, 
+								} 
+						) or die $template->error() . "\n";
+}
+
 
 sub print_show {
     my ($cgi,$status) = (@_);
