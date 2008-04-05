@@ -50,7 +50,7 @@
 </select>
 <b>Expiration</b>
 <select name="expire" id=expire">
-<option value="172800">72h</option>
+<option value="259200">72h</option>
 <option value="86400">24h</option>
 <option value="43200">12h</option>
 <option value="3600">1h</option>
