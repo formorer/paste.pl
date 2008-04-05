@@ -218,7 +218,7 @@ sub print_paste {
 
 		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"));
 		if ($paste->error) {
-			$statusmessage .= "Could not add your entry to the paste database:<br>\n";
+			$statusmessage .= "Could not add your entry to the paste database:<br><br>\n";
 			$statusmessage .= "<b>" . $paste->error . "</b><br>\n";
 		} else {
 			if ($cgi->param("remember")) {

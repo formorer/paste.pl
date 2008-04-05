@@ -61,7 +61,7 @@ a.code:link {color:#0000FF;}
 a.code:visited {color:#800080;}
 a.code:hover {text-decoration:underline;}
 
-#status {
+.status {
     width: 400px;
     padding: 5px;
     margin-top: 5px;
@@ -71,7 +71,6 @@ a.code:hover {text-decoration:underline;}
     border-right: 1px solid #000000; 
     border-bottom: 1px solid #000000;
     font-size: 14px;
-    font-weight: bold;
 }
 
 
