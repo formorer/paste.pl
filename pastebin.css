@@ -75,6 +75,23 @@ a.code:hover {text-decoration:underline;}
 }
 
 
+#comment {
+	padding-left:10px;
+	font-size: 12px;
+
+}
+
+#comment_header {
+	font-size: 12px;
+	font-weight: bold;
+	padding-top: 4px;
+	padding-bottom: 4px;
+
+}
+
+#comment_add {
+	padding-top: 6px;
+}
 code { font-size:12px;}
 
 .codeedit {	font-size:12px;}

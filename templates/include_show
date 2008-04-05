@@ -46,7 +46,6 @@
 			[% entry.code -%]
 		[% END -%]
 	[% END %]
-
 	<br/>
 	<a href='plain/[% entry.id %]'>Show as text</a> | 
 	<a href='download/[% entry.id %]'>Download</a> |
@@ -68,16 +67,16 @@
 [% comments = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$show'") %]
 [% IF comments.size >= 1 %]
 <p>
-<b>Comments:</b><br>
 [% FOREACH comment  = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$show'") %]
+<div id="comment_header">
+Posted on [% comment.postedate %] by [% comment.name %]:</div>
 <div id="comment">
-Pasted on [% comment.postedate %] by [% comment.name %]: <br>
-<nbsp>[% comment.text %]<br>
+[% comment.text %]<br>
 </div>
 [% END %]
 [% END %]
-<div id="add_comment">
-Add Comment: 
+<div id="comment_add">
+<b>Add Comment:</b>
 <form name="add_comment" method="post" action="./">
 <b>Name</b><br/><input type="hidden" name="paste_id" value="[% show %]"/>
 <input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
