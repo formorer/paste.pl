@@ -498,15 +498,17 @@ sub filter {
     if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
 	$text = "<ol style='list-style-type:decimal' class='synline'>\n";
 	foreach my $line (split(/\n/, $syntax->html)) {
+	    $line =~ s/ /&nbsp;/g;
 	    $text .= "<li class='synline'>$line</li>\n";
 	}
 	$text .= "</ol>";
     } else {
-	    $text = "<br>";
+	    $text = "<ol style='list-style-type:none' class='synline'>\n";
 	    foreach my $line (split(/\n/, $syntax->html)) {
-		    $text .= "$line<br>\n";
+		    $line =~ s/ /&nbsp;/g;
+		    $text .= "<li class='synline'>$line</li>\n";
 	    }
-	    $text .= "<br>";
+	    $text .= "</ol>";
     }
     $f = from_to($text, "iso8859-15", "utf-8");
     
