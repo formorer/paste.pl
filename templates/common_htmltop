@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <title>[% title %]</title>
-  <link rel="stylesheet" type="text/css" href="pastebin.css" />
+  <link rel="stylesheet" type="text/css" href="/pastebin.css" />
 </head>
 
 <body>
