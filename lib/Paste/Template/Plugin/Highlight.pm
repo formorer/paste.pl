@@ -477,7 +477,7 @@ sub filter {
 
 	if (-f %$config->{'cache_dir'} . "/$digest-$lines") {
 		open (my $fh, '<', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
-		$text = join("\n", <$fh>); 
+		$text = join("", <$fh>); 
 		close ($fh);
 		return $text;
 	}
@@ -498,14 +498,12 @@ sub filter {
     if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
 	$text = "<ol style='list-style-type:decimal' class='synline'>\n";
 	foreach my $line (split(/\n/, $syntax->html)) {
-	    $line =~ s/ /&nbsp;/g;
 	    $text .= "<li class='synline'>$line</li>\n";
 	}
 	$text .= "</ol>";
     } else {
 	    $text = "<ol style='list-style-type:none' class='synline'>\n";
 	    foreach my $line (split(/\n/, $syntax->html)) {
-		    $line =~ s/ /&nbsp;/g;
 		    $text .= "<li class='synline'>$line</li>\n";
 	    }
 	    $text .= "</ol>";
