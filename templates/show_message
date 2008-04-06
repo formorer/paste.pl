@@ -1,25 +1,9 @@
-[% INCLUDE common_htmltop %]
-<div id="menu">
-<h1>Menu</h1>
-<ul> 
-<li><a href="[% base_url %]">Make new post</a></li>
-</ul>
+[% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
+<h1>[% message %]</h1><br />
 
-[% INCLUDE links %]
-</div>
-
-<br /> 
-
-<div id="content">
-<br />
-<b>[% message %]</b>
-<br />
-<br />
-[% IF show %]
-[% INCLUDE include_show %]
+<p>
+[% message %]
 [% END %]
-[% INCLUDE common_htmlbottom %]
-
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 
