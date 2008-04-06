@@ -33,7 +33,7 @@
 [% END %]
 <b>[% CGI.cookie('lang') | html %]</b>
 
-<form name="editor" method="post" action="./" ENCTYPE="multipart/form-data">
+<form name="editor" method="post" action="./" enctype="multipart/form-data">
 <input type="hidden" name="parent_pid" value="[% entry.parent %]"/>
 <b>Name</b><br />
 <input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
@@ -79,7 +79,7 @@
 Include comments to indicate what you need feedback on.<br />
 <script type="text/javascript" src="pastebin.js"></script>
 <textarea id="code" class="codeedit" name="code" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
-<br>
+<br />
 <input type="file" name="upload" />
 </form>
 

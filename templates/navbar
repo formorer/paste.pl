@@ -13,7 +13,7 @@
 
 <h1>Recent Posts</h1>
 <a href="[% base_url %]">Make new paste</a>
-<br>
+<br />
 <ul>
 [% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
 							  posted as postdate 

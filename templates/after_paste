@@ -7,7 +7,7 @@
 </div>
 [% STOP %]
 [% END %]
-<h1>Your entry has been added to the database</h1><br>
+<h1>Your entry has been added to the database</h1><br />
 <ul>
 <li>To link to your entry use: <a href="[% id %]">[% base_url %]/[% id %]</a></li>
 <li>To download your entry use: <a href="download/[% id %]">[% base_url %]/download/[% id %]</a></li>

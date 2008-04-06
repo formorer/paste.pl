@@ -9,7 +9,7 @@
 
 <body>
 
-<center><img src="images/debian.de.png" alt="" border="0" hspace="0" vspace="0" width="368" height="61"></center><br>
+	<center><img src="images/debian.de.png" alt="" border="0" hspace="0" vspace="0" width="368" height="61" /></center><br />
 <div id="titlebar">[% title %]</div>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

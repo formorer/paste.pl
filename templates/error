@@ -1,7 +1,7 @@
 [% WRAPPER common_htmlpage title="#debian.de Pastezone error" %]
 <center>
 <h2>[% heading %]</h2>
-A error has occurred: <br> [% text %]<br>
+A error has occurred: <br /> [% text %]<br />
 </center>
 [% END %]
 [% WRAPPER common_htmlbottom %]

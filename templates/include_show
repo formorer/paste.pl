@@ -71,7 +71,7 @@
 <div id="comment_header">
 Posted on [% comment.postedate %] by [% comment.name %]:</div>
 <div id="comment">
-[% comment.text %]<br>
+[% comment.text %]<br />
 </div>
 [% END %]
 [% END %]
@@ -80,9 +80,9 @@ Posted on [% comment.postedate %] by [% comment.name %]:</div>
 <form name="add_comment" method="post" action="./">
 <b>Name</b><br/><input type="hidden" name="paste_id" value="[% show %]"/>
 <input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
-<br>
+<br />
 <b>Comment</b>
-<br>
+<br />
 <textarea id="comment" class="codeedit" name="comment" rows="2" cols="80" onkeydown="checkTab(this)"></textarea>
 <input type="submit" name="comment" value="Send"/>
 </form>

@@ -1,13 +1,12 @@
 [% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
-<h1>XML-RPC Clients for paste.debian.net</h1><br>
+<h1>XML-RPC Clients for paste.debian.net</h1><br />
 
 <p>
 There are some clients available for the XML-RPC interface of 
 <a href='http://paste.debian.net'>paste.debian.net</a>:
 
 <ul>
-<li>foo</li>
-<li>bar</li>
+<li><a href='http://git.einsteinmg.dyndns.org/?p=own/debianpaste-clients.git'>paste.py</a>by Michael Gebetsroither</li>
 </ul>
 
 If you have any additions please drop me a mail. 

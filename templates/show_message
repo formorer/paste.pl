@@ -8,13 +8,13 @@
 [% INCLUDE links %]
 </div>
 
-<br> 
+<br /> 
 
 <div id="content">
-<br>
+<br />
 <b>[% message %]</b>
-<br>
-<br>
+<br />
+<br />
 [% IF show %]
 [% INCLUDE include_show %]
 [% END %]
