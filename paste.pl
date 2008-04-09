@@ -247,9 +247,13 @@ sub print_paste {
 		} else {
 			if ($cgi->param("remember")) {
 				my $cookie_lang = new CGI::Cookie(-name=>'paste_lang',
-					-value=> $cgi->param("lang"));
+					-value=> $cgi->param("lang"),
+					-expires=> '+2M', 
+				);
 				my $cookie_name = new CGI::Cookie(-name=>'paste_name', 
-					-value=> $name);
+					-value=> $name, 
+					-expires=> '+2M',
+				);
 				my %header = (-cookie=>[$cookie_lang, $cookie_name]);
 				print_header(\%header); 
 			} else {
