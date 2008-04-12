@@ -43,7 +43,7 @@
 [% session_id = CGI.cookie('session_id') %]
 [% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
 posted AS postedate from paste WHERE sessionid = '$session_id' 
-order by posted DESC, id desc limit 10") %]
+order by posted DESC, id desc limit 5") %]
 <li><a href='[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
 [% days = post.age / (3600*24) %]
