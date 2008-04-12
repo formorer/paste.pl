@@ -261,27 +261,16 @@ sub print_paste {
 					-expires=> '+1M',
 					-value=> $session_id,
 				);
-				my %header = (-cookie=>[$cookie_lang, $cookie_name, $session]);
+				my %header = (-cookie=>[$cookie_lang, $cookie_name, $session], -location => "$id/");
 				print_header(\%header); 
 			} else {
 				my $session = new CGI::Cookie(-name=>'session_id',
 					-expires=> '+1M',
 					-value=> $session_id,
 				);
-				my %header = (-cookie=>[$session]);
+				my %header = (-cookie=>[$session], -location=>"$id/");
 				print_header(\%header);
 			}
-			$template->process('show', { "dbname" => "dbi:Pg:dbname=$dbname",
-					"dbuser" => $dbuser, 
-					"dbpass" => $dbpass, 
-					"status" => $statusmessage,
-					"round" => sub { return floor(@_); },
-					"show" => $id, 
-					"id" => $id, 
-					"digest" => $digest,
-					"base_url" => $base_url, 
-				}) or die $template->error() . "\n";								
-
 			return;
 		}
 	}
