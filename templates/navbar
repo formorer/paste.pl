@@ -39,12 +39,11 @@
 </ul>
 [% IF CGI.cookie('session_id') -%]
 [% pastes = mydb.query("SELECT * from paste WHERE sessionid = '$session_id'") %]
-[% IF pastes.size >= 1 %]
 <h1>Your pastes</h1>
 <ul>
 [% session_id = CGI.cookie('session_id') %]
 [% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
-posted AS postedate from paste WHERE sessionid = '$session_id' 
+posted AS postedate,code from paste WHERE sessionid = '$session_id' 
 order by posted DESC, id desc limit 5") %]
 <li><a href='/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
@@ -60,10 +59,11 @@ order by posted DESC, id desc limit 5") %]
 [% ELSE %]
 [% round(post.age) %] second(s) ago
 [% END %]
+<br />
+"[% post.code | truncate(20) %]"
 </li>
 [% END %]
 </ul>
-[% END %]
 [% END %]
 [% INCLUDE links %]
 </div>
