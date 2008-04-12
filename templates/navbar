@@ -20,7 +20,7 @@
 							  posted as postdate 
 							  from paste order by posted desc, id desc limit 10") -%]
 
-<li><a href='[% post.id %]'>[% post.poster %]</a><br />
+<li><a href='/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
 [% days = post.age / (3600*24) %]
 [% hours = post.age / 3600 %]
@@ -38,13 +38,15 @@
 [% END %]
 </ul>
 [% IF CGI.cookie('session_id') -%]
-<h1>Your posts</h1>
+[% pastes = mydb.query("SELECT * from paste WHERE sessionid = '$session_id'") %]
+[% IF pastes.size >= 1 %]
+<h1>Your pastes</h1>
 <ul>
 [% session_id = CGI.cookie('session_id') %]
 [% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
 posted AS postedate from paste WHERE sessionid = '$session_id' 
 order by posted DESC, id desc limit 5") %]
-<li><a href='[% post.id %]'>[% post.poster %]</a><br />
+<li><a href='/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
 [% days = post.age / (3600*24) %]
 [% hours = post.age / 3600 %]
@@ -61,6 +63,7 @@ order by posted DESC, id desc limit 5") %]
 </li>
 [% END %]
 </ul>
+[% END %]
 [% END %]
 [% INCLUDE links %]
 </div>
