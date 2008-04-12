@@ -1,5 +1,6 @@
 [% USE format %]
 [% USE Highlight %]
+[% USE CGI %]
 [% TRY %]
 	[% USE mydb = DBI(dbname, dbuser, dbpass) %]
 	[% CATCH %]
@@ -26,8 +27,22 @@
 <div id="status"> 
 [% status %]
 </div>
-
 [% END %]
+
+[% IF CGI.cookie('session_id') -%]
+[% session_id =  CGI.cookie('session_id') %]
+[% FOREACH post = mydb.query("SELECT sha1 from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
+
+<h1>Informations about your entry</h1>
+<ul>
+<li>To link to your entry use: <a href="[% id %]">[% base_url %]/[% id %]</a></li>
+<li>To download your entry use: <a href="download/[% id %]">[% base_url %]/download/[% id %]</a></li>
+<li>To see your entry as plain text use: <a href="plain/[% id %]">[% base_url %]/plain/[% id %]</a></li>
+<li>To delete your entry use: <a href="delete/[% digest %]">[% base_url %]/delete/[% digest %]</a></li>
+</ul>
+[% END -%]
+[% END -%]
+
 <h1>Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% entry.expiredate %]
 </h1>

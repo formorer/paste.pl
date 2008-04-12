@@ -82,7 +82,7 @@ sub error {
 
 =pod
 
-=head2 add_paste( B<code>, B<name>, B<expire>, B<lang> )
+=head2 add_paste( B<code>, B<name>, B<expire>, B<lang> [B<session_id>])
 
 =over 4
 
@@ -106,16 +106,21 @@ Expire time in seconds from now()
 
 ID of the language for highlight. If 0 highlighting is disabled. 
 
+=item B<sessionid> 
+
+SHA1 of the sessionid which will be used to identify a special user. (optional) 
+
 =back 
 
 =back
 
 =cut
 
-sub add_paste ($$$$) {
-	my ($self, $code, $name, $expire, $lang) = @_;
+sub add_paste ($$$$;$) {
+	my ($self, $code, $name, $expire, $lang, $sessionid) = @_;
 	my $dbh = $self->{dbh}; 
 	$name = $name || 'anonymous';
+	$sessionid = $sessionid || '';
 
 	if ($name !~ /^[^;,'"]{1,30}/i) {
 		$self->{error} = "Invalid format for name (no special chars, max 30 chars)";
@@ -127,12 +132,17 @@ sub add_paste ($$$$) {
 		return 0;
 	}
 
+	if ($sessionid && $sessionid !~ /^[0-9a-f]{40}$/i ) {
+		$self->{error} = "Sessionid does not look like a sha1 hex";
+		return 0;
+ 	}
 	if ($expire > 604800) {
 		$self->{error} = 'Expiration time can not be longer than 604800 seconds (7 days)'; 
 		return 0;
 	}
 
-	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1) VALUES(?,now(),?,?,?,?)");
+
+	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid) VALUES(?,now(),?,?,?,?,?)");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
 		return 0;
@@ -151,7 +161,7 @@ sub add_paste ($$$$) {
 	#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
 	my $digest = sha1_hex($code . time() . rand());
 	
-	$sth->execute($name,$code,$lang,$expire,$digest);
+	$sth->execute($name,$code,$lang,$expire,$digest,$sessionid);
 
 	if ($dbh->errstr) {
         $self->{error} = "Could not insert paste into db: " . $dbh->errstr;

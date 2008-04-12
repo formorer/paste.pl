@@ -25,6 +25,7 @@ use Template;
 use POSIX;
 use CGI::Carp qw(fatalsToBrowser); 
 use CGI::Cookie;
+use Digest::SHA1 qw (sha1_hex);
 use Paste;
 
 
@@ -240,7 +241,9 @@ sub print_paste {
 			$name = $cgi->param("poster"); 
 		}
 
-		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"));
+		my $session_id = $cgi->param('session_id') || sha1_hex (rand() . time());
+
+		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"), $session_id);
 		if ($paste->error) {
 			$statusmessage .= "Could not add your entry to the paste database:<br><br>\n";
 			$statusmessage .= "<b>" . $paste->error . "</b><br>\n";
@@ -254,12 +257,21 @@ sub print_paste {
 					-value=> $name, 
 					-expires=> '+2M',
 				);
-				my %header = (-cookie=>[$cookie_lang, $cookie_name]);
+				my $session = new CGI::Cookie(-name=>'session_id',
+					-expires=> '+1M',
+					-value=> $session_id,
+				);
+				my %header = (-cookie=>[$cookie_lang, $cookie_name, $session]);
 				print_header(\%header); 
 			} else {
-				print_header();
+				my $session = new CGI::Cookie(-name=>'session_id',
+					-expires=> '+1M',
+					-value=> $session_id,
+				);
+				my %header = (-cookie=>[$session]);
+				print_header(\%header);
 			}
-			$template->process('after_paste', { "dbname" => "dbi:Pg:dbname=$dbname",
+			$template->process('show', { "dbname" => "dbi:Pg:dbname=$dbname",
 					"dbuser" => $dbuser, 
 					"dbpass" => $dbpass, 
 					"status" => $statusmessage,

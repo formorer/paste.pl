@@ -7,6 +7,7 @@
 [% USE format %]
 [% USE Highlight %]
 
+[% USE CGI %]
 [% f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now()") -%]
 
 <div id="menu">
@@ -36,6 +37,31 @@
 </li>
 [% END %]
 </ul>
+[% IF CGI.cookie('session_id') -%]
+<h1>Your posts</h1>
+<ul>
+[% session_id = CGI.cookie('session_id') %]
+[% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
+posted AS postedate from paste WHERE sessionid = '$session_id' 
+order by posted DESC, id desc limit 10") %]
+<li><a href='[% post.id %]'>[% post.poster %]</a><br />
+[% commented = format(' %s') %]
+[% days = post.age / (3600*24) %]
+[% hours = post.age / 3600 %]
+[% minutes = post.age / 60 %]
+[% IF round(days) > 1 %]
+[% round(days) %] days ago 
+[% ELSIF hours >= 1 %]
+[% round(hours) %] hour(s) ago
+[% ELSIF minutes >= 1 %] 
+[% round(minutes) %] minute(s) ago 
+[% ELSE %]
+[% round(post.age) %] second(s) ago
+[% END %]
+</li>
+[% END %]
+</ul>
+[% END %]
 [% INCLUDE links %]
 </div>
 
