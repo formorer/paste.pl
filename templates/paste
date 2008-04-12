@@ -11,7 +11,7 @@
     [% TRY %]
         [% entry = mydb.query ("SELECT code from paste where id = '$pnew';") %]
         [% IF entry.size != 1 %]
-            [%THROW notfound "Entry $pnew can not be used a base for a new paste" %]
+            [%THROW notfound "Paste $pnew can not be used a base for a new paste" %]
         [% END %]
         [% FOREACH entry = mydb.query ("SELECT code from paste where id = '$pnew';") %]
         [% END %]
@@ -24,7 +24,7 @@
     [% END %]
 [% END %]
 
-<h1>New entry:</h1>
+<h1>New paste:</h1>
 
 [% IF status %]
 <div class=status> 
