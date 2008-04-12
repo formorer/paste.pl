@@ -29,20 +29,6 @@
 </div>
 [% END %]
 
-[% IF CGI.cookie('session_id') -%]
-[% session_id =  CGI.cookie('session_id') %]
-[% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
-
-<h1>Informations about your entry</h1>
-<ul>
-<li>To link to your entry use: <a href="[% id %]">/[% base_url %]/[% post.id %]</a></li>
-<li>To download your entry use: <a href="download/[% id %]">/[% base_url %]/download/[% post.id %]</a></li>
-<li>To see your entry as plain text use: <a href="plain/[% id %]">/[% base_url %]/plain/[% post.id %]</a></li>
-<li>To delete your entry use: <a href="delete/[% digest %]">/[% base_url %]/delete/[% post.sha1 %]</a></li>
-</ul>
-[% END -%]
-[% END -%]
-
 <h1>Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% entry.expiredate %]
 </h1>
@@ -102,6 +88,21 @@ Posted on [% comment.postedate %] by [% comment.name %]:</div>
 <input type="submit" name="comment" value="Send"/>
 </form>
 </div>
+[% IF CGI.cookie('session_id') -%]
+[% session_id =  CGI.cookie('session_id') %]
+[% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
+
+<h1>Informations about your entry</h1>
+<ul>
+<li>To link to your entry use: <a href="/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
+<li>To download your entry use: <a href="/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
+<li>To see your entry as plain text use: <a href="/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
+<li>To delete your entry use: <a href="/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
+</ul>
+[% END -%]
+[% END -%]
+
+
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 
