@@ -51,12 +51,12 @@
 	<a href='plain/[% entry.id %]'>Show as text</a> | 
 	<a href='download/[% entry.id %]'>Download</a> |
 	[% IF lines == 0 %]
-	<a href='./?show=[% entry.id %];lines=1'>With linenumbers</a> |
+	<a href='/?show=[% entry.id %];lines=1'>With linenumbers</a> |
 	[% ELSE %]
-	<a href='./?show=[% entry.id %];lines=0'>Without linenumbers</a> |
+	<a href='/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
 	[% END %]
-	<a href='./'>Paste new</a> |
-	<a href='./?pnew=[% entry.id %]'>Paste as new</a>
+	<a href='/'>Paste new</a> |
+	<a href='/?pnew=[% entry.id %]'>Paste as new</a>
 	<br/>
 	[% END %]
 [% CATCH -%]
