@@ -395,7 +395,7 @@ sub get_paste ($) {
 	my ($self, $id) = @_;
 	my $dbh = $self->{dbh};
 
-	my $sth = $dbh->prepare("SELECT * from paste where id = ?"); 
+	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ?"); 
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
 		return 0;
