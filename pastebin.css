@@ -128,7 +128,7 @@ li {
 #Content>p+p {text-indent:30px;}
 
 #content {
-	margin:0px 5px 50px 170px;
+	margin:0px 5px 50px 185px;
 	padding:5px;
 	background-color: white;
 	border:1px solid black;
@@ -148,7 +148,7 @@ li {
 	/* IE5 Hack */
 	voice-family: "\"}\"";
 	voice-family:inherit;
-	width:140px;
+	width:155px;
 }
 
 /* be nice to Opera 5 */
@@ -185,3 +185,4 @@ A:active { color: #F00; background: white none }
 .synUnderlined { color: #000000 ; text-decoration: underline }
 .synError      { color: #FFFFFF ; background: #FF0000 none }
 .synTodo       { color: #0000FF ; background: #FFFF00 none }
+pre { display: inline; }
