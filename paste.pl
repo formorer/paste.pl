@@ -101,7 +101,7 @@ sub print_download {
 	print "Content-Transfer-Encoding: text\n";
 	print "Content-Disposition: attachment; filename=paste_$id\n";
 	print "\r\n";
-	print $paste->{code} . "\n";
+	print $paste->{code};
 }
 
 sub print_delete {
