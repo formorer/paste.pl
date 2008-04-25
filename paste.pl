@@ -78,7 +78,7 @@ sub print_plain {
 		 error("Entry not found", "Your requested paste entry '$id' could not be found");
 	}
 	print "Content-type: text/plain\r\n\r\n";
-	print $paste->{code} . "\n";
+	print $paste->{code}; 
 }
 
 sub print_download {
