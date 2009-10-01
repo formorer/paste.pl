@@ -253,6 +253,10 @@ sub print_paste {
 					-value=> $cgi->param("lang"),
 					-expires=> '+2M', 
 				);
+				my $cookie_expire = new CGI::Cookie(-name=>'paste_expire', 
+					-value=> $cgi->param("expire"),
+					-expires=> '+2M',
+				);
 				my $cookie_name = new CGI::Cookie(-name=>'paste_name', 
 					-value=> $name, 
 					-expires=> '+2M',
@@ -261,7 +265,7 @@ sub print_paste {
 					-expires=> '+1M',
 					-value=> $session_id,
 				);
-				my %header = (-cookie=>[$cookie_lang, $cookie_name, $session], -location => "$id/");
+				my %header = (-cookie=>[$cookie_lang, $cookie_expire, $cookie_name, $session], -location => "$id/");
 				print_header(\%header); 
 			} else {
 				my $session = new CGI::Cookie(-name=>'session_id',
