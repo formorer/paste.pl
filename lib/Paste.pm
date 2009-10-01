@@ -122,8 +122,8 @@ sub add_paste ($$$$;$) {
 	$name = $name || 'anonymous';
 	$sessionid = $sessionid || '';
 
-	if ($name !~ /^[^;,'"]{1,30}/i) {
-		$self->{error} = "Invalid format for name (no special chars, max 30 chars)";
+	if ($name !~ /^[^;,'"]{1,10}/i) {
+		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
 		return 0;
 	}
 
