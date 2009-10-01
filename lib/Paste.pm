@@ -122,7 +122,7 @@ sub add_paste ($$$$;$) {
 	$name = $name || 'anonymous';
 	$sessionid = $sessionid || '';
 
-	if ($name !~ /^[^;,'"]{1,10}/i) {
+	if ($name !~ /^[^;,'"<>]{1,10}$/i) {
 		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
 		return 0;
 	}
@@ -141,12 +141,21 @@ sub add_paste ($$$$;$) {
 		return 0;
 	}
 
+	my $code_size = length($code); 
+
+	if ($code_size  > 71680) {
+		$self->{error} = 'Length of code is not allowed to exceed 70kb'; 
+		return 0; 
+	}
+
 
 	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid) VALUES(?,now(),?,?,?,?,?)");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
 		return 0;
 	}	
+
+	
 	
 	#replace \r\n with \n
 	$code =~ s/\r\n/\n/g;
