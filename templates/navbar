@@ -18,7 +18,7 @@
 <ul>
 [% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
 							  posted as postdate 
-							  from paste order by posted desc, id desc limit 10") -%]
+							  from paste where hidden is not true order by posted desc, id desc limit 10") -%]
 
 <li><a href='/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]

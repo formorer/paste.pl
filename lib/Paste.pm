@@ -116,11 +116,12 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 
 =cut
 
-sub add_paste ($$$$;$) {
-	my ($self, $code, $name, $expire, $lang, $sessionid) = @_;
+sub add_paste ($$$$;$$) {
+	my ($self, $code, $name, $expire, $lang, $hidden, $sessionid, $hidden) = @_;
 	my $dbh = $self->{dbh}; 
 	$name = $name || 'anonymous';
 	$sessionid = $sessionid || '';
+	$hidden = $hidden || 'f'; 
 
 	if ($name !~ /^[^;,'"<>]{1,10}$/i) {
 		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
@@ -149,7 +150,7 @@ sub add_paste ($$$$;$) {
 	}
 
 
-	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid) VALUES(?,now(),?,?,?,?,?)");
+	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
 		return 0;
@@ -170,7 +171,7 @@ sub add_paste ($$$$;$) {
 	#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
 	my $digest = sha1_hex($code . time() . rand());
 	
-	$sth->execute($name,$code,$lang,$expire,$digest,$sessionid);
+	$sth->execute($name,$code,$lang,$expire,$digest,$sessionid,$hidden);
 
 	if ($dbh->errstr) {
         $self->{error} = "Could not insert paste into db: " . $dbh->errstr;
@@ -404,7 +405,7 @@ sub get_paste ($) {
 	my ($self, $id) = @_;
 	my $dbh = $self->{dbh};
 
-	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ?"); 
+	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ? and hidden is FALSE"); 
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
 		return 0;
