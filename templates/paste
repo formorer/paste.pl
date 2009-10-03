@@ -52,11 +52,11 @@
 </select>
 <b>Expiration</b>
 <select name="expire" id="expire">
-<option value="259200">72h</option>
-<option value="86400">24h</option>
-<option value="43200">12h</option>
-<option value="3600">1h</option>
-<option value="-1">Never</option>
+<option value="259200" [% IF  CGI.cookie('paste_expire') == 259200 %] selected [% END %]>72h</option>
+<option value="86400" [% IF  CGI.cookie('paste_expire') == 86400 %] selected [% END %]>24h</option>
+<option value="43200" [% IF  CGI.cookie('paste_expire') == 43200 %] selected [% END %]>12h</option>
+<option value="3600" [% IF  CGI.cookie('paste_expire') == 3600 %] selected [% END %]>1h</option>
+<option value="-1" [% IF  CGI.cookie('paste_expire') == -1 %] selected [% END %]>Never</option>
 </select>
 <br />
 
