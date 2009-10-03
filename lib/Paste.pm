@@ -127,8 +127,8 @@ sub add_paste ($$$$;$) {
 		return 0;
 	}
 
-	if ($expire !~ /^[0-9]+/) {
-		$self->{error} = "Expire must be an integer"; 
+	if ($expire !~ /^(-1|[0-9]+)/) {
+		$self->{error} = "Expire must be an integer or -1"; 
 		return 0;
 	}
 
