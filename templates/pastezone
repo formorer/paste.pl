@@ -1,5 +1,5 @@
 [% USE mydb = DBI(dbname, dbuser, dbpass) %]
-[% USE Highlight %]
+[% USE HighlightPygments %]
 [% USE CGI %]
 [% IF show %]
 	[% TRY %]
@@ -59,7 +59,7 @@
 [% IF show %]
 [% TRY -%]
 [% IF entry.code %]
-[% FILTER $Highlight "$language.desc" linenumbers = 1 -%]
+[% FILTER highlight "$language.desc" linenumbers = 1 -%]
 [% entry.code %]
 [% END %]
 <br/>

@@ -5,7 +5,7 @@
 	[% STOP %]
 [% END %]
 [% USE format %]
-[% USE Highlight %]
+[% USE HighlightPygments %]
 
 [% USE CGI %]
 [% f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now()") -%]
