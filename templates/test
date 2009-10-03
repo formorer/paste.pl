@@ -1,8 +1,5 @@
 [% USE format %]
 [% USE HighlightPygments %]
-
-foo
-
-[% FILTER highlight "$desc" linenumbers = 0 cache=0 cache_dir="cache/" -%]
+[% FILTER highlight "$desc" linenumbers=1 cache=0 cache_dir="cache/" -%]
 [% code -%]
 [% END -%]

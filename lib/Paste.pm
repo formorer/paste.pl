@@ -29,7 +29,7 @@ use Carp;
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
 
-@EXPORT = qw ( new add_paste delete_paste get_paste get_config_key);
+@EXPORT = qw (new add_paste delete_paste get_paste get_config_key);
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;	
@@ -96,7 +96,7 @@ A string with \n or \r\n which represents the paste entry
 
 =item B<name>
 
-The name of the submitter, anonymousif empty
+The name of the submitter, anonymous if empty
 
 =item B<expire> 
 
@@ -127,8 +127,8 @@ sub add_paste ($$$$;$) {
 		return 0;
 	}
 
-	if ($expire !~ /^[0-9]+/) {
-		$self->{error} = "Expire must be an integer"; 
+	if ($expire !~ /^(-1|[0-9]+)/) {
+		$self->{error} = "Expire must be an integer or -1"; 
 		return 0;
 	}
 

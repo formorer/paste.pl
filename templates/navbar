@@ -8,7 +8,7 @@
 [% USE HighlightPygments %]
 
 [% USE CGI %]
-[% f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now()") -%]
+[% f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now() and expires <> '-1'") -%]
 
 <div id="menu">
 
