@@ -218,3 +218,23 @@ body .pygmentvc { color: #19177C } /* Name.Variable.Class */
 body .pygmentvg { color: #19177C } /* Name.Variable.Global */
 body .pygmentvi { color: #19177C } /* Name.Variable.Instance */
 body .pygmentil { color: #666666 } /* Literal.Number.Integer.Long */
+
+body { color: black; background: white none }
+
+A:link { color: #00F; background: white none }
+A:visited { color: #909; background: white none }
+A:hover { color: #F00; background: white none }
+A:active { color: #F00; background: white none }
+
+.synComment    { color: #0000FF }
+.synConstant   { color: #FF00FF }
+.synIdentifier { color: #008B8B }
+.synStatement  { color: #A52A2A ; font-weight: bold }
+.synPreProc    { color: #A020F0 }
+.synType       { color: #2E8B57 ; font-weight: bold }
+.synSpecial    { color: #6A5ACD }
+.synUnderlined { color: #000000 ; text-decoration: underline }
+.synError      { color: #FFFFFF ; background: #FF0000 none }
+.synTodo       { color: #0000FF ; background: #FFFF00 none }
+pre { display: inline; }
+
