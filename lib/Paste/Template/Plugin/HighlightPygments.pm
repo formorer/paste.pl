@@ -74,7 +74,7 @@ sub filter {
     my $out; 
     my $stderr; 
 
-    my $pygment = '/usr/bin/pygmentize -f html -l ' . @$args[0] . ' -O style=default,classprefix=pygment';  
+    my $pygment = '/usr/bin/pygmentize -f html -l "' . @$args[0] . '" -O style=default,classprefix=pygment';  
     if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
 	    $pygment .= ',linenos=1';
     }
@@ -82,9 +82,15 @@ sub filter {
     if (exists %$config->{'style'}) {
 	    $pygment .= ',style=' . %$config->{'style'};
     }
+
     run3 ($pygment,  \$text, \$out, \$stderr); 
 
-    print "$out"; 
+
+    if ($stderr) {
+    	die Template::Exception->new( highlight => "pymentize error: $out");
+    }
+
+    my $text = $out; 
 
     if (%$config->{'cache'} && -d %$config->{'cache_dir'} && -w %$config->{'cache_dir'}) {
 	    open (my $fh, '>', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
