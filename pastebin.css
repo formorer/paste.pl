@@ -153,36 +153,68 @@ li {
 
 /* be nice to Opera 5 */
 body>#Menu {width:150px;}
-
-
-/*
- * A stylesheet designed to be used with the HTML output of the
- * Perl module Text::Highlight::Vim.
- *
- * This is designed to make the highlighting look like the default gvim
- * colour scheme, with 'background=light'.
- *
- * Geoff Richards (qef@laxan.com)
- *
- * This CSS file (light.css) is public domain.  Do what you want with it.
- * That doesn't mean that HTML with this CSS in is public domain.
- */
-
-body { color: black; background: white none }
-
-A:link { color: #00F; background: white none }
-A:visited { color: #909; background: white none }
-A:hover { color: #F00; background: white none }
-A:active { color: #F00; background: white none }
-
-.synComment    { color: #0000FF }
-.synConstant   { color: #FF00FF }
-.synIdentifier { color: #008B8B }
-.synStatement  { color: #A52A2A ; font-weight: bold }
-.synPreProc    { color: #A020F0 }
-.synType       { color: #2E8B57 ; font-weight: bold }
-.synSpecial    { color: #6A5ACD }
-.synUnderlined { color: #000000 ; text-decoration: underline }
-.synError      { color: #FFFFFF ; background: #FF0000 none }
-.synTodo       { color: #0000FF ; background: #FFFF00 none }
-pre { display: inline; }
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #f8f8f8; }
+body .pygmentc { color: #408080; font-style: italic } /* Comment */
+body .pygmenterr { border: 1px solid #FF0000 } /* Error */
+body .pygmentk { color: #008000; font-weight: bold } /* Keyword */
+body .pygmento { color: #666666 } /* Operator */
+body .pygmentcm { color: #408080; font-style: italic } /* Comment.Multiline */
+body .pygmentcp { color: #BC7A00 } /* Comment.Preproc */
+body .pygmentc1 { color: #408080; font-style: italic } /* Comment.Single */
+body .pygmentcs { color: #408080; font-style: italic } /* Comment.Special */
+body .pygmentgd { color: #A00000 } /* Generic.Deleted */
+body .pygmentge { font-style: italic } /* Generic.Emph */
+body .pygmentgr { color: #FF0000 } /* Generic.Error */
+body .pygmentgh { color: #000080; font-weight: bold } /* Generic.Heading */
+body .pygmentgi { color: #00A000 } /* Generic.Inserted */
+body .pygmentgo { color: #808080 } /* Generic.Output */
+body .pygmentgp { color: #000080; font-weight: bold } /* Generic.Prompt */
+body .pygmentgs { font-weight: bold } /* Generic.Strong */
+body .pygmentgu { color: #800080; font-weight: bold } /* Generic.Subheading */
+body .pygmentgt { color: #0040D0 } /* Generic.Traceback */
+body .pygmentkc { color: #008000; font-weight: bold } /* Keyword.Constant */
+body .pygmentkd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+body .pygmentkn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+body .pygmentkp { color: #008000 } /* Keyword.Pseudo */
+body .pygmentkr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+body .pygmentkt { color: #B00040 } /* Keyword.Type */
+body .pygmentm { color: #666666 } /* Literal.Number */
+body .pygments { color: #BA2121 } /* Literal.String */
+body .pygmentna { color: #7D9029 } /* Name.Attribute */
+body .pygmentnb { color: #008000 } /* Name.Builtin */
+body .pygmentnc { color: #0000FF; font-weight: bold } /* Name.Class */
+body .pygmentno { color: #880000 } /* Name.Constant */
+body .pygmentnd { color: #AA22FF } /* Name.Decorator */
+body .pygmentni { color: #999999; font-weight: bold } /* Name.Entity */
+body .pygmentne { color: #D2413A; font-weight: bold } /* Name.Exception */
+body .pygmentnf { color: #0000FF } /* Name.Function */
+body .pygmentnl { color: #A0A000 } /* Name.Label */
+body .pygmentnn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+body .pygmentnt { color: #008000; font-weight: bold } /* Name.Tag */
+body .pygmentnv { color: #19177C } /* Name.Variable */
+body .pygmentow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+body .pygmentw { color: #bbbbbb } /* Text.Whitespace */
+body .pygmentmf { color: #666666 } /* Literal.Number.Float */
+body .pygmentmh { color: #666666 } /* Literal.Number.Hex */
+body .pygmentmi { color: #666666 } /* Literal.Number.Integer */
+body .pygmentmo { color: #666666 } /* Literal.Number.Oct */
+body .pygmentsb { color: #BA2121 } /* Literal.String.Backtick */
+body .pygmentsc { color: #BA2121 } /* Literal.String.Char */
+body .pygmentsd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+body .pygments2 { color: #BA2121 } /* Literal.String.Double */
+body .pygmentse { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+body .pygmentsh { color: #BA2121 } /* Literal.String.Heredoc */
+body .pygmentsi { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+body .pygmentsx { color: #008000 } /* Literal.String.Other */
+body .pygmentsr { color: #BB6688 } /* Literal.String.Regex */
+body .pygments1 { color: #BA2121 } /* Literal.String.Single */
+body .pygmentss { color: #19177C } /* Literal.String.Symbol */
+body .pygmentbp { color: #008000 } /* Name.Builtin.Pseudo */
+body .pygmentvc { color: #19177C } /* Name.Variable.Class */
+body .pygmentvg { color: #19177C } /* Name.Variable.Global */
+body .pygmentvi { color: #19177C } /* Name.Variable.Instance */
+body .pygmentil { color: #666666 } /* Literal.Number.Integer.Long */
