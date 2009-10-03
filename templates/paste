@@ -56,6 +56,7 @@
 <option value="86400">24h</option>
 <option value="43200">12h</option>
 <option value="3600">1h</option>
+<option value="-1">Never</option>
 </select>
 <br />
 
