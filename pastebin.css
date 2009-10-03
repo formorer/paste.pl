@@ -153,36 +153,65 @@ li {
 
 /* be nice to Opera 5 */
 body>#Menu {width:150px;}
-
-
-/*
- * A stylesheet designed to be used with the HTML output of the
- * Perl module Text::Highlight::Vim.
- *
- * This is designed to make the highlighting look like the default gvim
- * colour scheme, with 'background=light'.
- *
- * Geoff Richards (qef@laxan.com)
- *
- * This CSS file (light.css) is public domain.  Do what you want with it.
- * That doesn't mean that HTML with this CSS in is public domain.
- */
-
-body { color: black; background: white none }
-
-A:link { color: #00F; background: white none }
-A:visited { color: #909; background: white none }
-A:hover { color: #F00; background: white none }
-A:active { color: #F00; background: white none }
-
-.synComment    { color: #0000FF }
-.synConstant   { color: #FF00FF }
-.synIdentifier { color: #008B8B }
-.synStatement  { color: #A52A2A ; font-weight: bold }
-.synPreProc    { color: #A020F0 }
-.synType       { color: #2E8B57 ; font-weight: bold }
-.synSpecial    { color: #6A5ACD }
-.synUnderlined { color: #000000 ; text-decoration: underline }
-.synError      { color: #FFFFFF ; background: #FF0000 none }
-.synTodo       { color: #0000FF ; background: #FFFF00 none }
-pre { display: inline; }
+.syntaxtable .hll { background-color: #ffffcc }
+.syntaxtable  { background: #f8f8f8; }
+.syntaxtable .c { color: #408080; font-style: italic } /* Comment */
+.syntaxtable .err { border: 1px solid #FF0000 } /* Error */
+.syntaxtable .k { color: #008000; font-weight: bold } /* Keyword */
+.syntaxtable .o { color: #666666 } /* Operator */
+.syntaxtable .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.syntaxtable .cp { color: #BC7A00 } /* Comment.Preproc */
+.syntaxtable .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.syntaxtable .cs { color: #408080; font-style: italic } /* Comment.Special */
+.syntaxtable .gd { color: #A00000 } /* Generic.Deleted */
+.syntaxtable .ge { font-style: italic } /* Generic.Emph */
+.syntaxtable .gr { color: #FF0000 } /* Generic.Error */
+.syntaxtable .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.syntaxtable .gi { color: #00A000 } /* Generic.Inserted */
+.syntaxtable .go { color: #808080 } /* Generic.Output */
+.syntaxtable .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.syntaxtable .gs { font-weight: bold } /* Generic.Strong */
+.syntaxtable .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.syntaxtable .gt { color: #0040D0 } /* Generic.Traceback */
+.syntaxtable .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.syntaxtable .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.syntaxtable .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.syntaxtable .kp { color: #008000 } /* Keyword.Pseudo */
+.syntaxtable .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.syntaxtable .kt { color: #B00040 } /* Keyword.Type */
+.syntaxtable .m { color: #666666 } /* Literal.Number */
+.syntaxtable .s { color: #BA2121 } /* Literal.String */
+.syntaxtable .na { color: #7D9029 } /* Name.Attribute */
+.syntaxtable .nb { color: #008000 } /* Name.Builtin */
+.syntaxtable .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.syntaxtable .no { color: #880000 } /* Name.Constant */
+.syntaxtable .nd { color: #AA22FF } /* Name.Decorator */
+.syntaxtable .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.syntaxtable .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.syntaxtable .nf { color: #0000FF } /* Name.Function */
+.syntaxtable .nl { color: #A0A000 } /* Name.Label */
+.syntaxtable .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.syntaxtable .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.syntaxtable .nv { color: #19177C } /* Name.Variable */
+.syntaxtable .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.syntaxtable .w { color: #bbbbbb } /* Text.Whitespace */
+.syntaxtable .mf { color: #666666 } /* Literal.Number.Float */
+.syntaxtable .mh { color: #666666 } /* Literal.Number.Hex */
+.syntaxtable .mi { color: #666666 } /* Literal.Number.Integer */
+.syntaxtable .mo { color: #666666 } /* Literal.Number.Oct */
+.syntaxtable .sb { color: #BA2121 } /* Literal.String.Backtick */
+.syntaxtable .sc { color: #BA2121 } /* Literal.String.Char */
+.syntaxtable .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.syntaxtable .s2 { color: #BA2121 } /* Literal.String.Double */
+.syntaxtable .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.syntaxtable .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.syntaxtable .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.syntaxtable .sx { color: #008000 } /* Literal.String.Other */
+.syntaxtable .sr { color: #BB6688 } /* Literal.String.Regex */
+.syntaxtable .s1 { color: #BA2121 } /* Literal.String.Single */
+.syntaxtable .ss { color: #19177C } /* Literal.String.Symbol */
+.syntaxtable .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.syntaxtable .vc { color: #19177C } /* Name.Variable.Class */
+.syntaxtable .vg { color: #19177C } /* Name.Variable.Global */
+.syntaxtable .vi { color: #19177C } /* Name.Variable.Instance */
+.syntaxtable .il { color: #666666 } /* Literal.Number.Integer.Long */
