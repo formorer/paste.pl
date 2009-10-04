@@ -32,18 +32,17 @@ sub addPaste {
     my ($code, $name, $expire, $lang) = @_;
     $name = $name || 'anonymous';
 	$expire = $expire || 72000;
-	$lang = $lang || "Plain";
+	$lang = $lang || "text";
+	$lang = ($lang eq 'Plain') ? 'text' : $lang; 
 	my $error = 0; 
 	my $statusmessage;
 	my $lang_id = -1;
 
-	if ($lang ne "Plain") {
-		$lang_id = $paste->get_lang($lang); 
-		if ($paste->error) {
-			$error = 1;
-			$statusmessage = $paste->error;
-			return {'id' => '', 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => ''} ;
-		}
+	$lang_id = $paste->get_lang($lang); 
+	if ($paste->error) {
+		$error = 1;
+		$statusmessage = $paste->error;
+		return {'id' => '', 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => ''} ;
 	}
 
 	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id); 

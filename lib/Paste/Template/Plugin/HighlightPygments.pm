@@ -70,11 +70,12 @@ sub filter {
 
     #print $fh "$text"; 
 
+    my $lang = ($lang eq 'Plain') ? 'text' : $lang;
     use IPC::Run3;
     my $out; 
     my $stderr; 
 
-    my $pygment = '/usr/bin/pygmentize -f html -l "' . @$args[0] . '" -O style=default,classprefix=pygment';  
+    my $pygment = '/usr/bin/pygmentize -f html -l "' . $lang . '" -O style=default,classprefix=pygment';  
     if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
 	    $pygment .= ',linenos=1';
     }
