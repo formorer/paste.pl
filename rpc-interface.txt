@@ -32,7 +32,7 @@ choosen. Maximum is 604800 (7 days). Use -1 for post that shouldn't expire.
 choosen for an entry. If not submitted or empty no hilighting happens. 
 
 .returns
-- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
   is an error in submitting the entry. See *statusmessage* for details. 
 
 - *statusmessage* `(string)`: This string either contains an error message
@@ -65,7 +65,7 @@ paste.deletePaste(digest) returns rc, statusmessage
 
 .returns
 
-- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
   is an error in deleting the entry. See *statusmessage* for details. 
 
 - *statusmessage* `(string)`: This string either contains an error message
