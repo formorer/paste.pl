@@ -70,7 +70,8 @@ sub filter {
 
     #print $fh "$text"; 
 
-    my $lang = ($lang eq 'Plain') ? 'text' : $lang;
+    my $lang = @$args[0]; 
+    $lang = ( $lang eq 'Plain') ? 'text' : $lang;
     use IPC::Run3;
     my $out; 
     my $stderr; 
