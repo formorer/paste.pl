@@ -84,7 +84,7 @@ paste.getPaste(id) returnѕ rc, statusmessage, code, submitter, submitdate, expi
 
 .returns 
 
-- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
   is an error in getting the entry. See *statusmessage* for details. 
 
 - *statusmessage* `(string)`: This string either contains an error message
@@ -103,11 +103,11 @@ or some other informations.
 Getting Languages (getLanguages)
 --------------------------------
 
-paste.getLanguagesreturns rc, statusmessage, langs
+paste.getLanguages - returns rc, statusmessage, langs
 
 .returns 
 
-- *rc* `(integer)`: The returncodes- anything nonzero indicates that there
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
   is an error in getting the entry. See *statusmessage* for details. 
 
 - *statusmessage* `(string)`: This string either contains an error message
