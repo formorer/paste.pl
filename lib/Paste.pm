@@ -23,13 +23,16 @@ use Config::IniFiles;
 use DBI; 
 use Encode; 
 use Digest::SHA1  qw(sha1_hex);
+use RPC::XML;
+use RPC::XML::Client;
+
 
 use Carp; 
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
 
-@EXPORT = qw (new add_paste delete_paste get_paste get_config_key);
+@EXPORT = qw (new add_paste delete_paste get_paste get_config_key check_ip);
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;	
@@ -452,6 +455,24 @@ sub get_lang ($) {
     }
     my $id = @{@{$lang_id_ref}[0]}[0];
 	return $id;
+}
+
+sub check_ip ($) {
+	my $ip = shift; 
+	my $rbl = Net::RBLClient->new(
+		max_time => 0.5,
+		lists => [ 'dnsbl.njabl.org',
+		'no-more-funn.moensted.dk',
+		'spammers.v6net.org',
+		'proxies.monkeys.com'
+		],
+
+	);
+	$rbl->lookup($ip);
+	my @listed_by = $rbl->listed_by;
+
+	return 1 if @listed_by; 
+	return 0; 
 }
 1;
 

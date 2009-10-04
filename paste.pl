@@ -47,6 +47,13 @@ my $base_url = $paste->get_config_key('www', 'base_url');
 
 
 my $cgi = new CGI();
+
+my $ip = $ENV{'REMOTE_ADDR'};
+
+if ($paste->check_rbl($ip)) {
+	warn "$ip is listed"; 
+}
+
 if ($cgi->param("plain")) {
 	print_plain($cgi);
 } elsif ($cgi->param("download")) {
