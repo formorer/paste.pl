@@ -1,0 +1,33 @@
+<VirtualHost 78.47.227.179:80>
+	AddDefaultCharset utf-8
+    
+        ServerAdmin formorer@formorer.de
+        DocumentRoot /var/www/XXXXXX
+        ServerName paste.debian.net
+	ServerAlias paste.snow-crash.org
+        ErrorLog /var/log/apache2/paste.debian.net-error.log
+        CustomLog /var/log/apache2/paste.debian.net-access.log common
+        RewriteEngine on
+     	RewriteRule /plain/([0-9]+)$ /paste.pl?plain=$1 
+        RewriteRule /plain/([0-9]+)/$ /paste.pl?plain=$1 
+        RewriteRule /delete/([0-9a-f]+)$ /paste.pl?delete=$1 
+        RewriteRule /delete/([0-9a-f]+)/$ /paste.pl?delete=$1 
+
+
+        RewriteRule /download/([0-9]+)$ /paste.pl?download=$1 
+        RewriteRule /download/([0-9]+)/$ /paste.pl?download=$1
+
+        RewriteRule /([0-9]+)$  /paste.pl?show=$1
+        RewriteRule /([0-9]+)/$  /paste.pl?show=$1 
+
+        <IfModule mod_dir.c>
+            DirectoryIndex paste.pl
+        </IfModule>
+        <Directory /var/www/XXXXX>
+            AllowOverride None
+            Options ExecCGI
+            Order allow,deny
+            Allow from all
+        </Directory>
+</VirtualHost>
+
