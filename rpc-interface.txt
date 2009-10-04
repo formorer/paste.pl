@@ -26,7 +26,7 @@ not submitted or empty "anonymous" is choosen.
 
 - *expire* `(optional)`: an integer which is the time in seconds from now
 when the entry should expire. If not submitted or empty 172800 (72 hours) is
-choosen. Maximum is 604800 (7 days) 
+choosen. Maximum is 604800 (7 days). Use -1 for post that shouldn't expire.  
 
 - *lang* `(optional)`: a string the indicates which hilighting should be
 choosen for an entry. If not submitted or empty no hilighting happens. 
