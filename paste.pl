@@ -27,7 +27,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
 use Digest::SHA1 qw (sha1_hex);
 use Paste;
-use subs qw(errror);
+use subs qw(error);
 
 
 my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
