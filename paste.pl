@@ -60,6 +60,8 @@ if ($cgi->param("plain")) {
 	print_download($cgi);
 } elsif ($cgi->param("show")) {
 	print_show($cgi);
+} elsif ($cgi->param("private")) {
+	print_hidden($cgi); 
 } elsif ($cgi->param("delete")){
 	print_delete($cgi); 
 } elsif ($cgi->param("comment")) {
@@ -215,6 +217,32 @@ sub print_show {
 								} 
 						) or die $template->error() . "\n";
 }
+
+sub print_hidden {
+    my ($cgi,$status) = (@_);
+	my $id = '';
+	my $lines = 1;
+	if ($cgi->param("hidden")) {
+		$id = lc($cgi->param("show"));
+		#sanitizing
+		$id =~ s/[^0-9a-f]+//g;
+	}
+	if (defined($cgi->param("lines"))) {
+		$lines = $cgi->param("lines"); 
+	}
+	print_header();
+    $template->process('hidden', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+									"dbuser" => $dbuser, 
+									"dbpass" => $dbpass,
+									"show" => $id,
+									"status" => $status, 
+									"lines" => $lines,
+									"round" => sub { return floor(@_); }, 
+									"base_url" => $base_url, 
+								} 
+						) or die $template->error() . "\n";
+}
+
 
 sub print_paste {
 	my ($cgi,$status) = (@_);

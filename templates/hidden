@@ -1,0 +1,6 @@
+[% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
+[% INCLUDE include_hidden %]
+[% END %]
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+

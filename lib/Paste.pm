@@ -391,6 +391,7 @@ sub delete_comment ($) {
 =over 4
 
 Returns an entry from the database. Returns undef if the entry couldn't be found. Otherwise a hashref with the entry will be returned. Beware that the digest is included. You should not reveal this to externals, otherwise your entrys can be deleted.  
+This will not get entries marked as hidden. See get_hidden_paste if you want to retreive them. 
 
 =over 4 
 
@@ -409,6 +410,49 @@ sub get_paste ($) {
 	my $dbh = $self->{dbh};
 
 	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ? and hidden is FALSE"); 
+	if ($dbh->errstr) {
+		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+		return 0;
+	}
+
+	$sth->execute($id);
+	if ($dbh->errstr){ 
+		$self->{error} = "Could not get paste from db: " . $dbh->errstr;
+		return 0;
+	}
+	my $hash_ref = $sth->fetchrow_hashref;
+	if (defined($hash_ref->{code})) {
+		return $hash_ref; 
+	} else {
+		return undef;
+	}
+}
+
+=pod
+
+=head2 get_hidden_paste( B<id> )
+
+=over 4
+
+Returns a hidden entry from the database. Returns undef if the entry couldn't be found. Otherwise a hashref with the entry will be returned. Beware that the digest is included. You should not reveal this to externals, otherwise your entrys can be deleted.  
+
+=over 4 
+
+=item B<id> 
+
+The id of the entry you want to retreive
+
+=back 
+
+=back
+
+=cut
+
+sub get_paste ($) {
+	my ($self, $id) = @_;
+	my $dbh = $self->{dbh};
+
+	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where substring(sha1 FROM 1 FOR 8) = ?"); 
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
 		return 0;
