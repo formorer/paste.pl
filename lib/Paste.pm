@@ -448,7 +448,7 @@ The id of the entry you want to retreive
 
 =cut
 
-sub get_paste ($) {
+sub get_hidden_paste ($) {
 	my ($self, $id) = @_;
 	my $dbh = $self->{dbh};
 
