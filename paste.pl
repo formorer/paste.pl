@@ -258,7 +258,7 @@ sub print_paste {
 	if ($cgi->param("private")) {
 		$hidden = 't'; 
 	} else {
-		$hidden = 0; 
+		$hidden = 'f'; 
 	}
 
 	my $pnew;
@@ -303,6 +303,7 @@ sub print_paste {
 					-value=> $session_id,
 				);
 				my %header; 
+				warn "oben $hidden"; 
 				if ($hidden eq 'f') {
 					%header = (-cookie=>[$cookie_lang, $cookie_expire, $cookie_name, $session], -location => "$id/");
 				} else {
@@ -316,6 +317,7 @@ sub print_paste {
 				);
 				my %header;
 
+				warn "unten $hidden"; 
 				if ($hidden eq 'f') {
 					%header = (-cookie=>[$session], -location=>"$id/");
 				} else {
