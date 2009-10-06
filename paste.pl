@@ -241,7 +241,6 @@ sub print_show {
 
 sub print_paste {
 	my ($cgi,$status) = (@_);
-	do_submit($cgi);
 	my $code;
 	if ($cgi->param("upload")) {
 		my $filename = $cgi->upload("upload");
@@ -253,6 +252,14 @@ sub print_paste {
 	}
 
 	my $statusmessage;
+
+	my $hidden; 
+
+	if ($cgi->param("private")) {
+		$hidden = 't'; 
+	} else {
+		$hidden = 0; 
+	}
 
 	my $pnew;
 	if ($cgi->param("pnew")) {
@@ -273,7 +280,7 @@ sub print_paste {
 
 		my $session_id = $cgi->param('session_id') || sha1_hex (rand() . time());
 
-		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"), $session_id);
+		my ($id, $digest) = $paste->add_paste($code,$name,$cgi->param("expire"),$cgi->param("lang"), $session_id, $hidden);
 		if ($paste->error) {
 			$statusmessage .= "Could not add your entry to the paste database:<br><br>\n";
 			$statusmessage .= "<b>" . $paste->error . "</b><br>\n";
@@ -295,14 +302,26 @@ sub print_paste {
 					-expires=> '+1M',
 					-value=> $session_id,
 				);
-				my %header = (-cookie=>[$cookie_lang, $cookie_expire, $cookie_name, $session], -location => "$id/");
+				my %header; 
+				if ($hidden eq 'f') {
+					%header = (-cookie=>[$cookie_lang, $cookie_expire, $cookie_name, $session], -location => "$id/");
+				} else {
+					%header = (-cookie=>[$cookie_lang, $cookie_expire, $cookie_name, $session], -location => "hidden/$id/");
+				}
 				print_header(\%header); 
 			} else {
 				my $session = new CGI::Cookie(-name=>'session_id',
 					-expires=> '+1M',
 					-value=> $session_id,
 				);
-				my %header = (-cookie=>[$session], -location=>"$id/");
+				my %header;
+
+				if ($hidden eq 'f') {
+					%header = (-cookie=>[$session], -location=>"$id/");
+				} else {
+
+					%header = (-cookie=>[$session], -location=>"hidden/$id/");
+				}
 				print_header(\%header);
 			}
 			return;
@@ -320,10 +339,6 @@ sub print_paste {
 						) or die $template->error() . "\n";
 
 }	
-sub do_submit {
-	my $cgi = @_; 
-	warn $cgi;
-}
 
 sub error ($$) {
 	my ($title,$errormessage) = @_;
