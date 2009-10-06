@@ -199,7 +199,7 @@ sub print_show {
 		#sanitizing
 		$id =~ s/[^0-9]+//g;
 	} elsif ($cgi->param("hidden")) {
-		$id = ld($cgi->param("hidden"));
+		$id = lc($cgi->param("hidden"));
 		$id =~ s/[^0-9a-f]//g; 
 	}
 	if (defined($cgi->param("lines"))) {
