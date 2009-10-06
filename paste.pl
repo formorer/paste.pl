@@ -52,8 +52,12 @@ my $cgi = new CGI();
 
 if ($cgi->param("plain")) {
 	print_plain($cgi);
+} elsif ($cgi->param("plainh")) {
+	print_plain($cgi,1); 
 } elsif ($cgi->param("download")) {
 	print_download($cgi);
+} elsif ($cgi->param("downloadh")) {
+	print_download($cgi,1);
 } elsif ($cgi->param("show")) {
 	print_show($cgi);
 } elsif ($cgi->param("hidden")) {
@@ -71,14 +75,21 @@ if ($cgi->param("plain")) {
 exit;
 
 sub print_plain {
-	my ($cgi,$status) = (@_);
+	my ($cgi,$hidden) = (@_);
 	my $id = ''; 
 	if ($cgi->param("plain")) {
 		 $id = $cgi->param("plain");
 		 #sanitizing
 		 $id =~ s/[^0-9]+//g;
+	} elsif ($cgi->param("plainh")) {
+		$id = lc($cgi->param("plainh"));
+		$id =~ s/[^0-9a-f]+//g; 
 	}
-	my $paste = $paste->get_paste($id);
+	if (! $hidden)	{
+		$paste = $paste->get_paste($id);
+	} else {
+		$paste = $paste->get_hidden_paste($id);
+	}
 	if (! $paste) {
 		 error("Entry not found", "Your requested paste entry '$id' could not be found");
 	}
@@ -87,17 +98,25 @@ sub print_plain {
 }
 
 sub print_download {
-	my ($cgi,$status) = (@_);
+	my ($cgi,$hidden) = (@_);
 	my $id = ''; 
 	if ($cgi->param("download")) {
 		 $id = $cgi->param("download");
 		 #sanitizing
 		 $id =~ s/[^0-9]+//g;
+	 } elsif ($cgi->param("downloadh")) {
+		 $id = lc($cgi->param("downloadh"));
+		 $id =~ s/[^0-9a-f]//g;
 	} else {
 		print_paste($cgi);
 	}
 
-	my $paste = $paste->get_paste($id);
+	if (! $hidden) {
+		$paste = $paste->get_paste($id);
+
+	} else {
+		$paste = $paste->get_hidden_paste($id);
+	}
 
 	if (! $paste) {
         error("Entry not found", "Your requested paste entry '$id' could not be found");
