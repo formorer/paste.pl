@@ -163,12 +163,6 @@ sub add_paste ($$$$;$$) {
 	
 	#replace \r\n with \n
 	$code =~ s/\r\n/\n/g;
-	#use CGI qw(:standard);;
-	#print header ( -charset => 'utf-8', -encoding => 'utf-8');
-	#even if it already should be valid UTF-8 encoding again won't harm. 
-	#Postgresql is a little bit picky about clean UTF-8
-	#$code = encode_utf8($code);
-	
 
 	#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry. 
 	#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
