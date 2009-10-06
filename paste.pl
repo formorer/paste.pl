@@ -57,7 +57,7 @@ if ($cgi->param("plain")) {
 } elsif ($cgi->param("show")) {
 	print_show($cgi);
 } elsif ($cgi->param("private")) {
-	print_hidden($cgi); 
+	print_show($cgi,1); 
 } elsif ($cgi->param("delete")){
 	print_delete($cgi); 
 } elsif ($cgi->param("comment")) {
@@ -190,19 +190,24 @@ sub print_template {
 
 
 sub print_show {
-    my ($cgi,$status) = (@_);
+    my ($cgi,$hidden) = (@_);
 	my $id = '';
 	my $lines = 1;
 	if ($cgi->param("show")) {
 		$id = $cgi->param("show");
 		#sanitizing
 		$id =~ s/[^0-9]+//g;
+	} elsif ($cgi->param("hidden")) {
+		$id = ld($cgi->param("hidden"));
+		$id =~ s/[^0-9a-f]//g; 
 	}
 	if (defined($cgi->param("lines"))) {
 		$lines = $cgi->param("lines"); 
 	}
 	print_header();
-    $template->process('show', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+	my $tmpl_name = $hidden ? "hidden" : "show";
+
+    $template->process($tmpl_name, {	"dbname" => "dbi:Pg:dbname=$dbname", 
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
 									"show" => $id,
@@ -213,32 +218,6 @@ sub print_show {
 								} 
 						) or die $template->error() . "\n";
 }
-
-sub print_hidden {
-    my ($cgi,$status) = (@_);
-	my $id = '';
-	my $lines = 1;
-	if ($cgi->param("hidden")) {
-		$id = lc($cgi->param("show"));
-		#sanitizing
-		$id =~ s/[^0-9a-f]+//g;
-	}
-	if (defined($cgi->param("lines"))) {
-		$lines = $cgi->param("lines"); 
-	}
-	print_header();
-    $template->process('hidden', {	"dbname" => "dbi:Pg:dbname=$dbname", 
-									"dbuser" => $dbuser, 
-									"dbpass" => $dbpass,
-									"show" => $id,
-									"status" => $status, 
-									"lines" => $lines,
-									"round" => sub { return floor(@_); }, 
-									"base_url" => $base_url, 
-								} 
-						) or die $template->error() . "\n";
-}
-
 
 sub print_paste {
 	my ($cgi,$status) = (@_);
