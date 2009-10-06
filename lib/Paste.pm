@@ -126,6 +126,7 @@ sub add_paste ($$$$;$$) {
 	$sessionid = $sessionid || '';
 	$hidden = $hidden || 'f'; 
 
+	warn $hidden;
 	if ($name !~ /^[^;,'"<>]{1,10}$/i) {
 		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
 		return 0;
@@ -180,7 +181,7 @@ sub add_paste ($$$$;$$) {
 	#generate the proper URLs
 	my $id; 
 	
-	if (! $hidden) {
+	if ($hidden eq 'f') {
 		$sth = $dbh->prepare("SELECT id from paste where sha1 = ?");
 		if ($dbh->errstr) {
 			$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
