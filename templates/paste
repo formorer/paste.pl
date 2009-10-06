@@ -59,7 +59,12 @@
 <option value="-1" [% IF  CGI.cookie('paste_expire') == -1 %] selected [% END %]>Never</option>
 </select>
 <br />
-
+<br />
+<!--
+<input type="checkbox" name="hidden" value="0" />Create this paste as a non-public (hidden) paste? <b>experimental</b> 
+-->
+<br />
+<br />
 <b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.<br />
 <script type="text/javascript" src="pastebin.js"></script>

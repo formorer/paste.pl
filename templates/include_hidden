@@ -29,7 +29,7 @@
 </div>
 [% END %]
 
-<h1>Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
+<h1><b>hidden</b> Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% IF entry.expires == -1 %]
 never
 [% ELSE %]
@@ -96,6 +96,8 @@ Posted on [% comment.postedate %] by [% comment.name %]:</div>
 [% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND  substring(sha1 FROM 1 FOR 8) = '$show'") %] 
 
 <h1>Informations about your entry</h1>
+<br />
+<b>This entry is hidden. So don't lose your hidden id ([% post.id %])</b>
 <ul>
 <li>To link to your entry use: <a href="/hidden/[% post.id %]">[% base_url %]/hidden/[% show %]</a></li>
 <li>To download your entry use: <a href="/download/[% post.id %]">[% base_url %]/download_h/[% show %]</a></li>
