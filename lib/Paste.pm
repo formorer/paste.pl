@@ -186,21 +186,38 @@ sub add_paste ($$$$;$$) {
 	#generate the proper URLs
 	my $id; 
 	
-	$sth = $dbh->prepare("SELECT id from paste where sha1 = ?");
-    if ($dbh->errstr) {
-        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-        return 0;
-    }  
-	$sth->execute($digest);	
-	if ($dbh->errstr) {
-        $self->{error} = "Could not retrieve your entry from the paste database: "
+	if (! $hidden) {
+		$sth = $dbh->prepare("SELECT id from paste where sha1 = ?");
+		if ($dbh->errstr) {
+			$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+			return 0;
+		}  
+		$sth->execute($digest);	
+		if ($dbh->errstr) {
+			$self->{error} = "Could not retrieve your entry from the paste database: "
 			. $dbh->errstr;
-        return 0;
-    }
-	while ( my @row = $sth->fetchrow_array ) {
-		$id = $row[0];
+			return 0;
+		}
+		while ( my @row = $sth->fetchrow_array ) {
+			$id = $row[0];
+		}
+	} else {
+		$sth = $dbh->prepare("SELECT  substring(sha1 FROM 1 FOR 8) AS id from paste where sha1 = ?");
+			if ($dbh->errstr) {
+				$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+			return 0;
+		}  
+		$sth->execute($digest);	
+		if ($dbh->errstr) {
+			$self->{error} = "Could not retrieve your entry from the paste database: "
+			. $dbh->errstr;
+			return 0;
+		}
+		while ( my @row = $sth->fetchrow_array ) {
+			$id = $row[0];
+		}
 	}
-
+		
 	return $id, $digest;
 	
 }
