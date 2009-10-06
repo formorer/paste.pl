@@ -27,6 +27,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
 use Digest::SHA1 qw (sha1_hex);
 use Paste;
+use subs qw(error);
 
 
 my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
@@ -48,11 +49,6 @@ my $base_url = $paste->get_config_key('www', 'base_url');
 
 my $cgi = new CGI();
 
-my $ip = $ENV{'REMOTE_ADDR'};
-
-if ($paste->check_rbl($ip)) {
-	warn "$ip is listed"; 
-}
 
 if ($cgi->param("plain")) {
 	print_plain($cgi);

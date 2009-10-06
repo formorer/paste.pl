@@ -120,7 +120,7 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 =cut
 
 sub add_paste ($$$$;$$) {
-	my ($self, $code, $name, $expire, $lang, $hidden, $sessionid, $hidden) = @_;
+	my ($self, $code, $name, $expire, $lang, $sessionid, $hidden) = @_;
 	my $dbh = $self->{dbh}; 
 	$name = $name || 'anonymous';
 	$sessionid = $sessionid || '';
@@ -448,7 +448,7 @@ The id of the entry you want to retreive
 
 =cut
 
-sub get_paste ($) {
+sub get_hidden_paste ($) {
 	my ($self, $id) = @_;
 	my $dbh = $self->{dbh};
 
