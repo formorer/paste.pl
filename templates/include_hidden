@@ -9,11 +9,11 @@
 [% END %]
 
 [% TRY -%]
-	[% entry = mydb.query ("SELECT substring(sha1 FROM 1 FOR 8) as id, id as paste_id poster,lang_id,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate,date_trunc('second', posted) as postedate, expires from paste where substring(sha1 FROM 1 FOR 8) = '$show'") %]
+	[% entry = mydb.query ("SELECT substring(sha1 FROM 1 FOR 8) AS id, id as paste_id, poster,lang_id,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate,date_trunc('second', posted) as postedate, expires from paste where substring(sha1 FROM 1 FOR 8) = '$show'") %]
 	[% IF entry.size != 1 %] 
 		[%THROW notfound "Entry was not found in database" %]
 	[% END %]
-	[% FOREACH entry = mydb.query ("SELECT substring(sha1 FROM 1 FOR 8) as id, id as paste_id, lang_id,poster,code,date_trunc('second', posted) as postedate,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate, expires from paste where substring(sha1 FROM 1 FOR 8) = '$show'") %]
+	[% FOREACH entry = mydb.query ("SELECT substring(sha1 FROM 1 FOR 8) AS id, id as paste_id, lang_id,poster,code,date_trunc('second', posted) as postedate,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate, expires from paste where substring(sha1 FROM 1 FOR 8) = '$show'") %]
 	[% END %]
 	[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
 	[% END %]
@@ -52,12 +52,12 @@ never
 [% END -%]
 	[% END %]
 	<br/>
-	<a href='hidden/[% entry.id %]'>Show as text</a> | 
-	<a href='downloadh/[% entry.id %]'>Download</a> |
+	<a href='/plainh/[% entry.id %]'>Show as text</a> | 
+	<a href='/downloadh/[% entry.id %]'>Download</a> |
 	[% IF lines == 0 %]
-	<a href='/?private=[% entry.id %];lines=1'>With linenumbers</a> |
+	<a href='/?hidden=[% entry.id %];lines=1'>With linenumbers</a> |
 	[% ELSE %]
-	<a href='/?private=[% entry.id %];lines=0'>Without linenumbers</a> |
+	<a href='/?hidden=[% entry.id %];lines=0'>Without linenumbers</a> |
 	[% END %]
 	<a href='/'>Paste new</a> |
 	<br/>
