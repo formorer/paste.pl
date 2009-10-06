@@ -56,7 +56,7 @@ if ($cgi->param("plain")) {
 	print_download($cgi);
 } elsif ($cgi->param("show")) {
 	print_show($cgi);
-} elsif ($cgi->param("private")) {
+} elsif ($cgi->param("hidden")) {
 	print_show($cgi,1); 
 } elsif ($cgi->param("delete")){
 	print_delete($cgi); 
@@ -192,6 +192,7 @@ sub print_template {
 sub print_show {
     my ($cgi,$hidden) = (@_);
 	my $id = '';
+	my $status; 
 	my $lines = 1;
 	if ($cgi->param("show")) {
 		$id = $cgi->param("show");
