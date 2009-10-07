@@ -93,7 +93,8 @@ CREATE TABLE paste (
     lang_id bigint,
     expires bigint,
     sha1 text,
-    sessionid text
+    sessionid text,
+    hidden boolean
 );
 
 
@@ -189,437 +190,235 @@ SET escape_string_warning = off;
 
 SET search_path = public, pg_catalog;
 
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: lang; Type: TABLE; Schema: public; Owner: www-data; Tablespace: 
+--
+
+CREATE TABLE lang (
+    "desc" text,
+    lang_id integer NOT NULL
+);
+
+
+ALTER TABLE public.lang OWNER TO "www-data";
+
+--
+-- Name: lang_lang_id_seq; Type: SEQUENCE; Schema: public; Owner: www-data
+--
+
+CREATE SEQUENCE lang_lang_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.lang_lang_id_seq OWNER TO "www-data";
+
+--
+-- Name: lang_lang_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: www-data
+--
+
+ALTER SEQUENCE lang_lang_id_seq OWNED BY lang.lang_id;
+
+
 --
 -- Name: lang_lang_id_seq; Type: SEQUENCE SET; Schema: public; Owner: www-data
 --
 
-SELECT pg_catalog.setval('lang_lang_id_seq', 421, true);
+SELECT pg_catalog.setval('lang_lang_id_seq', 901, true);
+
+
+--
+-- Name: lang_id; Type: DEFAULT; Schema: public; Owner: www-data
+--
+
+ALTER TABLE lang ALTER COLUMN lang_id SET DEFAULT nextval('lang_lang_id_seq'::regclass);
 
 
 --
 -- Data for Name: lang; Type: TABLE DATA; Schema: public; Owner: www-data
 --
 
-COPY lang ("desc", lang_id) FROM stdin;
-a65	3
-aap	4
-abaqus	5
-abc	6
-abel	7
-acedb	8
-ada	9
-aflex	10
-ahdl	11
-alsaconf	12
-amiga	13
-aml	14
-ampl	15
-antlr	16
-ant	17
-apachestyle	18
-apache	19
-arch	20
-art	21
-asm68k	22
-asmh8300	23
-asm	24
-asn	25
-aspperl	26
-aspvbs	27
-asterisk	28
-atlas	29
-automake	30
-ave	31
-awk	32
-ayacc	33
-baan	34
-basic	35
-bc	36
-bdf	37
-bib	38
-bindzone	39
-blank	40
-btm	41
-b	42
-calendar	43
-catalog	44
-cdl	45
-cfg	46
-cf	47
-changelog	48
-change	49
-chaskell	50
-cheetah	51
-chill	52
-ch	53
-clean	54
-clipper	55
-cl	56
-cobol	57
-colortest	58
-config	59
-conf	60
-cpp	61
-crm	62
-crontab	63
-csc	64
-csh	65
-csp	66
-css	67
-cs	68
-cterm	69
-ctrlh	70
-cuplsim	71
-cupl	72
-c	73
-cvsrc	74
-cvs	75
-cweb	76
-cynlib	77
-cynpp	78
-dcd	79
-dcl	80
-debchangelog	81
-debcontrol	82
-debsources	83
-def	84
-desc	85
-desktop	86
-diff	87
-dircolors	88
-diva	89
-dns	90
-docbksgml	91
-docbk	92
-docbkxml	93
-dosbatch	94
-dosini	95
-dot	96
-dracula	97
-dsl	98
-dtd	99
-dtml	100
-d	101
-dylanintr	102
-dylanlid	103
-dylan	104
-ecd	105
-edif	106
-eiffel	107
-elf	108
-elinks	109
-elmfilt	110
-erlang	111
-eruby	112
-esmtprc	113
-esqlc	114
-esterel	115
-eterm	116
-exim	117
-expect	118
-exports	119
-fasm	120
-fdcc	121
-fetchmail	122
-fgl	123
-focexec	124
-form	125
-forth	126
-fortran	127
-foxpro	128
-fstab	129
-fvwm2m4	130
-fvwm	131
-gdb	132
-gdmo	133
-gedcom	134
-gkrellmrc	135
-gnuplot	136
-gpg	137
-gp	138
-grads	139
-groff	140
-grub	141
-gsp	142
-gtkrc	143
-haskell	144
-hb	145
-help	146
-hercules	147
-hex	148
-hitest	149
-hog	150
-htmlcheetah	151
-htmlm4	152
-htmlos	153
-html	154
-ia64	155
-icemenu	156
-icon	157
-idlang	158
-idl	159
-indent	160
-inform	161
-inittab	162
-ipfilter	163
-ishd	164
-iss	165
-ist	166
-jal	167
-jam	168
-jargon	169
-javacc	170
-javascript	171
-java	172
-jess	173
-jgraph	174
-jproperties	175
-jsp	176
-kix	177
-kscript	178
-kwt	179
-lace	180
-latte	181
-ldif	182
-lex	183
-lftp	184
-lhaskell	185
-libao	186
-lifelines	187
-lilo	188
-lisp	189
-lite	190
-logtalk	191
-lotos	192
-lout	193
-lpc	194
-lprolog	195
-lscript	196
-lss	197
-lua	198
-lynx	199
-m4	200
-mailcap	201
-mail	202
-make	203
-manual	204
-man	205
-maple	206
-masm	207
-mason	208
-master	209
-matlab	210
-mel	211
-mf	212
-mgp	213
-mib	214
-mma	215
-mmix	216
-modconf	217
-model	218
-modsim3	219
-modula2	220
-modula3	221
-monk	222
-moo	223
-mplayerconf	224
-mp	225
-msidl	226
-msql	227
-mush	228
-muttrc	229
-mysql	230
-named	231
-nasm	232
-nastran	233
-natural	234
-ncf	235
-netrc	236
-nosyntax	237
-nqc	238
-nroff	239
-nsis	240
-objcpp	241
-objc	242
-ocaml	243
-occam	244
-omnimark	245
-openroad	246
-opl	247
-ora	248
-papp	249
-pascal	250
-pcap	251
-pccts	252
-perl	253
-pfmain	254
-pf	255
-php	256
-phtml	257
-pic	258
-pike	259
-pilrc	260
-pine	261
-pinfo	262
-plm	263
-plp	264
-plsql	265
-pod	266
-postscr	267
-po	268
-povini	269
-pov	270
-ppd	271
-ppwiz	272
-prescribe	273
-procmail	274
-progress	275
-prolog	276
-psf	277
-ptcap	278
-purifylog	279
-pyrex	280
-python	281
-qf	282
-quake	283
-radiance	284
-ratpoison	285
-rcslog	286
-rcs	287
-rc	288
-readline	289
-rebol	291
-registry	292
-remind	293
-resolv	294
-rexx	295
-rib	296
-rnc	297
-robots	298
-rpcgen	299
-rpl	300
-rst	301
-rtf	302
-ruby	303
-r	304
-samba	305
-sas	306
-sather	307
-scheme	308
-scilab	309
-screen	310
-sdl	311
-sed	312
-sendpr	313
-sgmldecl	314
-sgmllnx	315
-sgml	316
-sh	317
-sicad	318
-simula	319
-sindacmp	320
-sindaout	321
-sinda	322
-skill	323
-slang	324
-slice	325
-slrnrc	326
-slrnsc	327
-sl	328
-smarty	329
-smil	330
-smith	331
-sml	332
-sm	333
-snnsnet	334
-snnspat	335
-snnsres	336
-snobol4	337
-specman	338
-spec	339
-spice	340
-splint	341
-spup	342
-spyce	343
-sqlforms	344
-sqlj	345
-sql	346
-sqr	347
-squid	348
-sshconfig	349
-sshdconfig	350
-stp	351
-strace	352
-st	353
-sudoers	354
-svn	355
-syncolor	356
-synload	357
-syntax	358
-tads	359
-tags	360
-takcmp	361
-takout	362
-tak	363
-tasm	364
-tcl	365
-tcsh	366
-terminfo	367
-texinfo	368
-texmf	369
-tex	370
-tf	371
-tidy	372
-tilde	373
-tli	374
-tpp	375
-trasys	376
-tsalt	377
-tsscl	378
-tssgm	379
-tssop	380
-uc	381
-uil	382
-valgrind	383
-vb	384
-verilogams	385
-verilog	386
-vgrindefs	387
-vhdl	388
-viminfo	389
-vim	390
-virata	391
-vmasm	392
-vrml	393
-vsejcl	394
-wdiff	395
-webmacro	396
-web	397
-wget	398
-whitespace	399
-winbatch	400
-wml	401
-wsh	402
-wvdial	403
-xdefaults	404
-xf86conf	405
-xhtml	406
-xkb	407
-xmath	408
-xml	409
-xmodmap	410
-xpm2	411
-xpm	412
-xsd	413
-xslt	414
-xs	415
-xxd	416
-yacc	417
-yaml	418
-z8a	419
-zsh	420
-Plain	421
-\.
+INSERT INTO lang VALUES ('sourceslist', 742);
+INSERT INTO lang VALUES ('delphi', 743);
+INSERT INTO lang VALUES ('js+mako', 744);
+INSERT INTO lang VALUES ('brainfuck', 745);
+INSERT INTO lang VALUES ('html+cheetah', 746);
+INSERT INTO lang VALUES ('html+evoque', 747);
+INSERT INTO lang VALUES ('numpy', 748);
+INSERT INTO lang VALUES ('bash', 749);
+INSERT INTO lang VALUES ('html+django', 750);
+INSERT INTO lang VALUES ('css+php', 751);
+INSERT INTO lang VALUES ('vim', 752);
+INSERT INTO lang VALUES ('css+genshitext', 753);
+INSERT INTO lang VALUES ('css+myghty', 754);
+INSERT INTO lang VALUES ('ragel', 755);
+INSERT INTO lang VALUES ('smarty', 756);
+INSERT INTO lang VALUES ('xml+evoque', 757);
+INSERT INTO lang VALUES ('redcode', 758);
+INSERT INTO lang VALUES ('django', 759);
+INSERT INTO lang VALUES ('apacheconf', 760);
+INSERT INTO lang VALUES ('scala', 761);
+INSERT INTO lang VALUES ('lighty', 762);
+INSERT INTO lang VALUES ('java', 763);
+INSERT INTO lang VALUES ('js+genshitext', 764);
+INSERT INTO lang VALUES ('scheme', 765);
+INSERT INTO lang VALUES ('rhtml', 766);
+INSERT INTO lang VALUES ('ragel-java', 767);
+INSERT INTO lang VALUES ('dpatch', 768);
+INSERT INTO lang VALUES ('ragel-d', 769);
+INSERT INTO lang VALUES ('html+myghty', 770);
+INSERT INTO lang VALUES ('rbcon', 771);
+INSERT INTO lang VALUES ('css', 772);
+INSERT INTO lang VALUES ('js+smarty', 773);
+INSERT INTO lang VALUES ('d-objdump', 774);
+INSERT INTO lang VALUES ('xml+php', 775);
+INSERT INTO lang VALUES ('css+erb', 776);
+INSERT INTO lang VALUES ('fortran', 777);
+INSERT INTO lang VALUES ('gnuplot', 778);
+INSERT INTO lang VALUES ('mysql', 779);
+INSERT INTO lang VALUES ('rebol', 780);
+INSERT INTO lang VALUES ('cpp', 781);
+INSERT INTO lang VALUES ('pot', 782);
+INSERT INTO lang VALUES ('evoque', 783);
+INSERT INTO lang VALUES ('xml+smarty', 784);
+INSERT INTO lang VALUES ('dylan', 785);
+INSERT INTO lang VALUES ('trac-wiki', 786);
+INSERT INTO lang VALUES ('matlab', 787);
+INSERT INTO lang VALUES ('c', 788);
+INSERT INTO lang VALUES ('html', 789);
+INSERT INTO lang VALUES ('genshi', 790);
+INSERT INTO lang VALUES ('rst', 791);
+INSERT INTO lang VALUES ('mako', 792);
+INSERT INTO lang VALUES ('irc', 793);
+INSERT INTO lang VALUES ('prolog', 794);
+INSERT INTO lang VALUES ('python', 795);
+INSERT INTO lang VALUES ('css+django', 796);
+INSERT INTO lang VALUES ('smalltalk', 797);
+INSERT INTO lang VALUES ('js+myghty', 798);
+INSERT INTO lang VALUES ('yaml', 799);
+INSERT INTO lang VALUES ('antlr-as', 800);
+INSERT INTO lang VALUES ('xml+mako', 801);
+INSERT INTO lang VALUES ('xslt', 802);
+INSERT INTO lang VALUES ('splus', 803);
+INSERT INTO lang VALUES ('sqlite3', 804);
+INSERT INTO lang VALUES ('boo', 805);
+INSERT INTO lang VALUES ('ocaml', 806);
+INSERT INTO lang VALUES ('as', 807);
+INSERT INTO lang VALUES ('vb.net', 808);
+INSERT INTO lang VALUES ('squidconf', 809);
+INSERT INTO lang VALUES ('d', 810);
+INSERT INTO lang VALUES ('logtalk', 811);
+INSERT INTO lang VALUES ('erb', 812);
+INSERT INTO lang VALUES ('bbcode', 813);
+INSERT INTO lang VALUES ('rb', 814);
+INSERT INTO lang VALUES ('py3tb', 815);
+INSERT INTO lang VALUES ('mupad', 816);
+INSERT INTO lang VALUES ('xml+erb', 817);
+INSERT INTO lang VALUES ('control', 818);
+INSERT INTO lang VALUES ('ragel-cpp', 819);
+INSERT INTO lang VALUES ('befunge', 820);
+INSERT INTO lang VALUES ('c-objdump', 821);
+INSERT INTO lang VALUES ('jsp', 822);
+INSERT INTO lang VALUES ('abap', 823);
+INSERT INTO lang VALUES ('js+cheetah', 824);
+INSERT INTO lang VALUES ('html+mako', 825);
+INSERT INTO lang VALUES ('diff', 826);
+INSERT INTO lang VALUES ('matlabsession', 827);
+INSERT INTO lang VALUES ('objdump', 828);
+INSERT INTO lang VALUES ('css+mako', 829);
+INSERT INTO lang VALUES ('html+php', 830);
+INSERT INTO lang VALUES ('make', 831);
+INSERT INTO lang VALUES ('io', 832);
+INSERT INTO lang VALUES ('vala', 833);
+INSERT INTO lang VALUES ('haskell', 834);
+INSERT INTO lang VALUES ('lua', 835);
+INSERT INTO lang VALUES ('pov', 836);
+INSERT INTO lang VALUES ('antlr-java', 837);
+INSERT INTO lang VALUES ('antlr-objc', 838);
+INSERT INTO lang VALUES ('js+erb', 839);
+INSERT INTO lang VALUES ('xml', 840);
+INSERT INTO lang VALUES ('basemake', 841);
+INSERT INTO lang VALUES ('antlr-python', 842);
+INSERT INTO lang VALUES ('glsl', 843);
+INSERT INTO lang VALUES ('genshitext', 844);
+INSERT INTO lang VALUES ('python3', 845);
+INSERT INTO lang VALUES ('gas', 846);
+INSERT INTO lang VALUES ('bat', 847);
+INSERT INTO lang VALUES ('pycon', 848);
+INSERT INTO lang VALUES ('antlr', 849);
+INSERT INTO lang VALUES ('xml+cheetah', 850);
+INSERT INTO lang VALUES ('js+django', 851);
+INSERT INTO lang VALUES ('minid', 852);
+INSERT INTO lang VALUES ('cython', 853);
+INSERT INTO lang VALUES ('ragel-c', 854);
+INSERT INTO lang VALUES ('erlang', 855);
+INSERT INTO lang VALUES ('erl', 856);
+INSERT INTO lang VALUES ('aspx-vb', 857);
+INSERT INTO lang VALUES ('aspx-cs', 858);
+INSERT INTO lang VALUES ('groff', 859);
+INSERT INTO lang VALUES ('clojure', 860);
+INSERT INTO lang VALUES ('modelica', 861);
+INSERT INTO lang VALUES ('antlr-perl', 862);
+INSERT INTO lang VALUES ('ragel-ruby', 863);
+INSERT INTO lang VALUES ('myghty', 864);
+INSERT INTO lang VALUES ('html+genshi', 865);
+INSERT INTO lang VALUES ('tcl', 866);
+INSERT INTO lang VALUES ('perl', 867);
+INSERT INTO lang VALUES ('ini', 868);
+INSERT INTO lang VALUES ('moocode', 869);
+INSERT INTO lang VALUES ('newspeak', 870);
+INSERT INTO lang VALUES ('console', 871);
+INSERT INTO lang VALUES ('cpp-objdump', 872);
+INSERT INTO lang VALUES ('raw', 873);
+INSERT INTO lang VALUES ('tcsh', 874);
+INSERT INTO lang VALUES ('csharp', 875);
+INSERT INTO lang VALUES ('tex', 876);
+INSERT INTO lang VALUES ('css+smarty', 877);
+INSERT INTO lang VALUES ('text', 878);
+INSERT INTO lang VALUES ('antlr-csharp', 879);
+INSERT INTO lang VALUES ('cheetah', 880);
+INSERT INTO lang VALUES ('llvm', 881);
+INSERT INTO lang VALUES ('nginx', 882);
+INSERT INTO lang VALUES ('applescript', 883);
+INSERT INTO lang VALUES ('html+smarty', 884);
+INSERT INTO lang VALUES ('objective-c', 885);
+INSERT INTO lang VALUES ('js', 886);
+INSERT INTO lang VALUES ('common-lisp', 887);
+INSERT INTO lang VALUES ('ragel-em', 888);
+INSERT INTO lang VALUES ('as3', 889);
+INSERT INTO lang VALUES ('lhs', 890);
+INSERT INTO lang VALUES ('pytb', 891);
+INSERT INTO lang VALUES ('php', 892);
+INSERT INTO lang VALUES ('antlr-cpp', 893);
+INSERT INTO lang VALUES ('js+php', 894);
+INSERT INTO lang VALUES ('sql', 895);
+INSERT INTO lang VALUES ('ragel-objc', 896);
+INSERT INTO lang VALUES ('xml+django', 897);
+INSERT INTO lang VALUES ('mxml', 898);
+INSERT INTO lang VALUES ('nasm', 899);
+INSERT INTO lang VALUES ('antlr-ruby', 900);
+INSERT INTO lang VALUES ('xml+myghty', 901);
+
+
+--
+-- Name: lang_pkey; Type: CONSTRAINT; Schema: public; Owner: www-data; Tablespace: 
+--
+
+ALTER TABLE ONLY lang
+    ADD CONSTRAINT lang_pkey PRIMARY KEY (lang_id);
+
+
+--
+-- Name: index_id; Type: INDEX; Schema: public; Owner: www-data; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_id ON lang USING btree (lang_id);
 
 
 --
