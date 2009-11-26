@@ -29,9 +29,11 @@ my $paste = new Paste($config_file);
 my $base_url = $paste->get_config_key('www', 'base_url');
 
 sub addPaste {
-    my ($code, $name, $expire, $lang) = @_;
+    my ($code, $name, $expire, $lang, $hidden) = @_;
     $name = $name || 'anonymous';
 	$expire = $expire || 72000;
+	$hidden = $hidden ? 't' : 'f'; 
+
 	$lang = $lang || "text";
 	$lang = ($lang eq 'Plain') ? 'text' : $lang; 
 	my $error = 0; 
