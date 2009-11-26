@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="#debian.de Pastezone" %]
+[% WRAPPER common_htmlpage title="Debian Pastezone" %]
 <h1>About this Site</h1><br />
 
 <p>

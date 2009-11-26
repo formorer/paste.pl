@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="#debian.de paste error" %]
+[% WRAPPER common_htmlpage title="Debian paste error" %]
 <center>
 <h2>Some Error</h2>
 Some strange error has been occurred: <br /> [% error.info %]<br />
