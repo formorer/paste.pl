@@ -59,7 +59,7 @@ never
 	[% ELSE %]
 	<a href='/?hidden=[% entry.id %];lines=0'>Without linenumbers</a> |
 	[% END %]
-	<a href='/'>Paste new</a> |
+	<a href='/?as_hidden=1'>Paste new</a> |
 	<br/>
 	[% END %]
 [% CATCH -%]

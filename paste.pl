@@ -330,12 +330,14 @@ sub print_paste {
 		}
 	}
 	print_header();	
+    my $as_hidden = $cgi->param("as_hidden") ? 1 : 0 ; 
     $template->process('paste', {	"dbname" => "dbi:Pg:dbname=$dbname", 
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
 									"status" => $statusmessage, 
 									"pnew"  => $pnew, 
 									"base_url" => $base_url,
+									"as_hidden" => $as_hidden, 
 									"round" => sub { return floor(@_); }, 
 								} 
 						) or die $template->error() . "\n";

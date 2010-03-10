@@ -60,7 +60,7 @@
 </select>
 <br />
 <br />
-<input type="checkbox" name="private" value=1 />Create this paste as a non-public (hidden) paste? <b>experimental</b> 
+<input type="checkbox" name="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>Create this paste as a non-public (hidden) paste? <b>experimental</b> 
 <br />
 <br />
 <b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
