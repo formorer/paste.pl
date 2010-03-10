@@ -148,8 +148,8 @@ sub add_paste ($$$$;$$) {
 
 	my $code_size = length($code); 
 
-	if ($code_size  > 71680) {
-		$self->{error} = 'Length of code is not allowed to exceed 70kb'; 
+	if ($code_size  > 91080) {
+		$self->{error} = 'Length of code is not allowed to exceed 90kb'; 
 		return 0; 
 	}
 
