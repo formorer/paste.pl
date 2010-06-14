@@ -47,16 +47,23 @@ sub addPaste {
 		return {'id' => '', 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => ''} ;
 	}
 
-	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id); 
+	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id, $hidden); 
 	if ($paste->error) {
 		$error = 1; 
 		$statusmessage = $paste->error;
 	} else {
-		$statusmessage = "Your entry has been added to the database\n";
-		$statusmessage .= "To download your entry use: $base_url/download/$id\n";
-		$statusmessage .= "To delete your entry use: $base_url/delete/$digest\n";
+		if ($hidden eq 'f') {
+			$statusmessage = "Your entry has been added to the database\n";
+			$statusmessage .= "To download your entry use: $base_url/download/$id\n";
+			$statusmessage .= "To delete your entry use: $base_url/delete/$digest\n";
+		} else {
+			$statusmessage = "Your entry has been added to the database\n";
+			$statusmessage .= "This entry is hidden. So don't lose your hidden id ($id)\n";
+			$statusmessage .= "To download your entry use: $base_url/downloadh/$id\n";
+			$statusmessage .= "To delete your entry use: $base_url/delete/delete/$digest\n";
+		}
 	}
-    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest} ;
+    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden} ;
 }
 
 sub deletePaste {
