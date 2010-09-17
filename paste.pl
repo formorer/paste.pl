@@ -54,6 +54,7 @@ my $dbuser = $paste->get_config_key('database', 'dbuser') || die "Databaseuser n
 my $dbpass = $paste->get_config_key('database', 'dbpassword') || ''; 
 #config 
 my $base_url = $paste->get_config_key('www', 'base_url');
+my $short_base = $paste->get_config_key('shorturl', 'base_url');
 
 
 my $cgi = new CGI();
@@ -216,7 +217,7 @@ sub print_add_comment {
 sub print_template {
     my ($cgi,$status) = (@_);
 	my $tmpl;
-	my @templates = qw(about clients);
+	my @templates = qw(about clients shorturl_info);
 
 	if ($cgi->param("show_template")) {
 		$tmpl = $cgi->param("show_template");
@@ -230,6 +231,8 @@ sub print_template {
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
 									"base_url" => $base_url, 
+									"short_base" => $short_base,
+									"cgi" => $cgi
 								} 
 						) or die $template->error() . "\n";
 }

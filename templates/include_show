@@ -52,15 +52,15 @@ never
 [% END -%]
 	[% END %]
 	<br/>
-	<a href='plain/[% entry.id %]'>Show as text</a> | 
-	<a href='download/[% entry.id %]'>Download</a> |
+	<a href='[% base_url %]/plain/[% entry.id %]'>Show as text</a> | 
+	<a href='[% base_url %]/download/[% entry.id %]'>Download</a> |
 	[% IF lines == 0 %]
-	<a href='/?show=[% entry.id %];lines=1'>With linenumbers</a> |
+	<a href='[% base_url %]/?show=[% entry.id %];lines=1'>With linenumbers</a> |
 	[% ELSE %]
-	<a href='/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
+	<a href='[% base_url %]/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
 	[% END %]
-	<a href='/'>Paste new</a> |
-	<a href='/?pnew=[% entry.id %]'>Paste as new</a>
+	<a href='[% base_url %]/'>Paste new</a> |
+	<a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
 	<br/>
 	[% END %]
 [% CATCH -%]
@@ -76,10 +76,11 @@ never
 <br>
 <h1>Informations about your entry</h1>
 <ul>
-<li>To link to your entry use: <a href="/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
-<li>To download your entry use: <a href="/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
-<li>To see your entry as plain text use: <a href="/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
-<li>To delete your entry use: <a href="/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
+<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
+
+<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
+<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
 </ul>
 [% END -%]
 [% END -%]

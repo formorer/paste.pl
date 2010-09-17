@@ -35,6 +35,7 @@ eval {
 error("Fatal Error", $@) if $@;
 
 my $base_url = $paste->get_config_key('www', 'base_url');
+my $short_url = $paste->get_config_key('shorturl', 'base_url'); 
 
 sub addPaste {
     my ($code, $name, $expire, $lang, $hidden) = @_;
@@ -117,7 +118,7 @@ sub add_shorturl {
 	if ($shorturl->error) {
 		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => ''};
 	} else {
-		return { 'rc' => 1, 'statusmessage' => '', 'hash' => $hash, 'url' => "http://paste.debian.net/s/$hash" }; 
+		return { 'rc' => 1, 'statusmessage' => '', 'hash' => $hash, 'url' => "$short_url/$hash" }; 
 	}
 }
 

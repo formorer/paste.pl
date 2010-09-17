@@ -69,7 +69,7 @@ never
 [% entry.code %]
 [% END %]
 <br/>
-<a href='plain/[% entry.id %]'>Show as text</a>
+<a href='[% base_url %]/plain/[% entry.id %]'>Show as text</a>
 <br/>
 [% END %]
 <br />
