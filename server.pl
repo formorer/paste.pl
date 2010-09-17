@@ -22,9 +22,17 @@ use strict;
 use Frontier::RPC2;
 use lib 'lib/'; 
 use Paste;
+use ShortURL;
 
 my $config_file = 'paste.conf';
 my $paste = new Paste($config_file); 
+
+my $shorturl;
+
+eval {
+    $shorturl = new ShortURL($config_file);
+};
+error("Fatal Error", $@) if $@;
 
 my $base_url = $paste->get_config_key('www', 'base_url');
 
@@ -100,6 +108,34 @@ sub getPaste {
 				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, };
 	}
 }
+
+sub add_shorturl {
+	my ($url) = @_; 
+
+	my $hash = $shorturl->add_url($url);
+
+	if ($shorturl->error) {
+		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => ''};
+	} else {
+		return { 'rc' => 1, 'statusmessage' => '', 'hash' => $hash, 'url' => "http://paste.debian.net/s/$hash" }; 
+	}
+}
+
+sub resolve_shorturl {
+	my ($hash) = @_; 
+
+	my $url = $shorturl->get_url($hash);
+
+	if ($shorturl->error) {
+		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
+	} elsif ($url) {
+		return { 'rc' => 1, 'statusmessage' => '', 'hash' => $hash, 'url' => "$url" }; 
+	} else {
+		return { 'rc' => 0, 'statusmessage' => "Hash $hash not found", 'hash' => $hash, 'url' => '' }; 
+	}
+
+}
+
 sub getLanguages {
 	my $error = 0; 
 	my $statusmessage;
@@ -120,6 +156,8 @@ process_cgi_call({'paste.addPaste' => \&addPaste,
 			      'paste.deletePaste' => \&deletePaste,
 				  'paste.getLanguages' => \&getLanguages, 
 				  'paste.getPaste' => \&getPaste,
+				  'paste.addShortURL' => \&add_shorturl, 
+				  'paste.resolveShortURL' => \&resolve_shorturl,
 				});
 
 
@@ -140,6 +178,7 @@ sub process_cgi_call ($) {
     my $length = $ENV{'CONTENT_LENGTH'};
 
     # Perform some sanity checks.
+    http_error(405, "Method Not Allowed") unless $method;
     http_error(405, "Method Not Allowed") unless $method eq "POST";
     http_error(400, "Bad Request") unless $type eq "text/xml";
     http_error(411, "Length Required") unless $length > 0;

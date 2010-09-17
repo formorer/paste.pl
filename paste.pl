@@ -27,6 +27,8 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
 use Digest::SHA1 qw (sha1_hex);
 use Paste;
+use ShortURL;
+
 use subs qw(error);
 
 
@@ -37,6 +39,13 @@ my $config_file = 'paste.conf';
 my $paste;
 eval {
 	$paste = new Paste($config_file);
+};
+error("Fatal Error", $@) if $@;
+
+my $shorturl; 
+
+eval {
+	$shorturl = new ShortURL($config_file); 
 };
 error("Fatal Error", $@) if $@;
 
@@ -68,12 +77,29 @@ if ($cgi->param("plain")) {
 	print_add_comment($cgi); 
 } elsif ($cgi->param("show_template")) {
 	print_template($cgi);
+} elsif ($cgi->param("shorturl")) {
+	print_shorturl($cgi); 	
 } else {
 	print_paste($cgi);
 }
 
 exit;
 
+sub print_shorturl {
+	my ($cgi) = @_; 
+	my $hash = $cgi->param("shorturl"); 
+	my $url = $shorturl->get_url($hash);
+	if ($shorturl->error) {
+		print header('text/plain', '500 Internal Server Error'); 
+		print "Something went wrong: \n"; 
+		print $shorturl->error;
+	} elsif ($url) {
+		print $cgi->redirect($url);
+	} else {
+		print header('text/plain', '404 Not Found'); 
+		print "Move along, nothing to see here...\n";
+	}
+}
 sub print_plain {
 	my ($cgi,$hidden) = (@_);
 	my $id = ''; 
