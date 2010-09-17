@@ -94,6 +94,7 @@ sub print_shorturl {
 		print "Something went wrong: \n"; 
 		print $shorturl->error;
 	} elsif ($url) {
+		$shorturl->update_counter($hash);
 		print $cgi->redirect($url);
 	} else {
 		print header('text/plain', '404 Not Found'); 

@@ -1,31 +1,30 @@
 #!/usr/bin/perl -w
 
 use Frontier::Client;
-use Getopt::Long;
+use strict; 
 
-# Make an object to represent the XML-RPC server.
-$server_url = 'http://localhost/paste.pl/server.pl';
-$server = Frontier::Client->new(url => $server_url);
+my $server_url = 'http://paste.debian.net/server.pl';
+my $server = Frontier::Client->new(url => $server_url);
 
-my ($code); 
-$name = "anonymous";
-
-GetOptions(
-	"name" => \$name, 
-);
-
-if (@ARGV) {
-	$code = join("\n", $code); 
-} else {
-	while (<>) {
-		$code .= $_;
-	}
-}
 # Call the remote server and get our result.
-$result = $server->call('paste.addPaste', "$code", "$name");
-#$id = $result->{'id'};
-$statusmessage = $result->{'statusmessage'};
-#$rc = $result->{'rc'};
+my $result = $server->call('paste.addShortURL', "http://www.spiegel.de/");
+my $statusmessage = $result->{'statusmessage'};
+my $hash = $result->{'hash'}; 
+my $new_url =  $result->{'url'}; 
+my $rc = $result->{'rc'};
 
-print "$statusmessage\n";
+print "$rc - $statusmessage - $hash - $new_url\n";
+
+$result = $server->call('paste.resolveShortURL', $hash);
+$statusmessage = $result->{'statusmessage'};
+$hash = $result->{'hash'};
+my $url =  $result->{'url'};
+$rc = $result->{'rc'};
+print "$rc - $statusmessage - $hash - $url\n";
+
+$result = $server->call('paste.ShortURLClicks', '7g2R5v');
+$statusmessage = $result->{'statusmessage'};
+my $count = $result->{'count'};
+$rc = $result->{'rc'};
+print "$rc - $count - $url\n";
 

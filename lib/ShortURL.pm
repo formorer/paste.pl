@@ -137,6 +137,31 @@ sub add_url ($$) {
 	return $hash;
 }
 
+sub update_counter ($$) {
+	my ($self, $hash) = @_;
+	my $dbh = $self->{dbh}; 
+
+	my $rc = $dbh->do('UPDATE shorturl SET clicks = clicks +1 where hash = ?;', undef, $hash); 
+}
+
+sub get_counter ($$) {
+	my ($self, $hash) = @_;
+	my $dbh = $self->{dbh}; 
+
+	my  $count = $dbh->selectall_arrayref("SELECT clicks from shorturl where hash = ?", undef, $hash);
+
+	if ($dbh->err) {
+		$self->{error} = "Could not create db statement: " . $dbh->errstr;
+		return 0;
+	}
+
+	if (! @{$count}) {
+		return 0; 
+	}
+
+	return @{@{$count}[0]}[0];
+}
+
 sub get_url ($$) {
 	my ($self, $hash) = @_;
 	my $dbh = $self->{dbh};
@@ -149,11 +174,11 @@ sub get_url ($$) {
 	}
 
 	if (! @{$url_ref}) {
+		$self->{error} = "Hash not found"; 
 		return 0; 
 	}
 
 	return @{@{$url_ref}[0]}[0];
-
 }
 
 1;

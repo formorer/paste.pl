@@ -118,4 +118,56 @@ or some other informations.
 
 - *langs* `(arrayref)`: returns a list a supported languages
 
+Add short url (addShortURL)
+---------------------------
+
+paste.addShortURL (url) returns rc, statusmessage, hash, url 
+
+.returns
+
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
+  is an error in getting the entry. See *statusmessage* for details.
+
+- *statusmessage* `(string)`: This string either contains an error message
+  or some other informations.
+
+- *hash* `(string)`: The hash computed for the url. 
+
+- *url* `(string)`: The new short url 
+
+Resolve short url (resolveShortURL)
+------------------------------------
+
+paste.addShortURL (hash) returns rc, statusmessage, hash, url
+
+.returns 
+
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
+    is an error in getting the entry. See *statusmessage* for details.
+       
+- *statusmessage* `(string)`: This string either contains an error message
+    or some other informations.
+
+- *hash* `(string)`: The hash for the url.
+
+- *url* `(string)`: The original url of the hash 
+
+Get click counter for ShortURL (paste.ShortURLClicks)
+-----------------------------------------------------
+
+paste.ShortURLClicks (hash) returns rc, statusmessage, count
+
+.returns 
+
+- *rc* `(integer)`: The returncode - anything nonzero indicates that there
+    is an error in getting the entry. See *statusmessage* for details.
+       
+- *statusmessage* `(string)`: This string either contains an error message
+    or some other informations.
+
+- *hash* `(string)`: The hash you feeded.
+
+- *count* `(integer)`: The click counter for the url
+
+
 // vim: ft=asciidoc autoindent textwidth=75 formatoptions=tcqn

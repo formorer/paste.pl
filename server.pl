@@ -136,6 +136,18 @@ sub resolve_shorturl {
 
 }
 
+sub shorturl_clicks {
+	my ($hash) = @_; 
+
+	my $count = $shorturl->get_counter($hash);
+
+	if ($shorturl->error) {
+		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
+	} else {
+		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'count' => $count }; 
+	}
+
+}
 sub getLanguages {
 	my $error = 0; 
 	my $statusmessage;
@@ -158,6 +170,7 @@ process_cgi_call({'paste.addPaste' => \&addPaste,
 				  'paste.getPaste' => \&getPaste,
 				  'paste.addShortURL' => \&add_shorturl, 
 				  'paste.resolveShortURL' => \&resolve_shorturl,
+				  'paste.ShortURLClicks' => \&shorturl_clicks, 
 				});
 
 
