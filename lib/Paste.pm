@@ -32,12 +32,13 @@ use Carp;
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
 
-@EXPORT = qw (new add_paste delete_paste get_paste get_config_key check_ip);
+@EXPORT = qw ();
+
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;	
 	my $config_file = shift || ''; 
-	croak ("Need a configfile") unless -f $config_file; 
+	croak ("Need a configfile ($config_file)") unless -f $config_file; 
 	my $config = Config::IniFiles->new( -file => $config_file );	
 
 	unless ($config) {
@@ -127,6 +128,7 @@ sub add_paste ($$$$;$$) {
 	$hidden = $hidden || 'f'; 
 
 	warn $hidden;
+
 	if ($name !~ /^[^;,'"<>]{1,10}$/i) {
 		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
 		return 0;
@@ -153,6 +155,20 @@ sub add_paste ($$$$;$$) {
 		return 0; 
 	}
 
+
+	my $newlines = 0; 
+	my $pos = 0; 
+	while (1) {
+		$pos = index($code, "\n", $pos);
+		last if($pos < 0);
+		$newlines++;
+		$pos++;
+	}
+
+	if ($newlines <= 1) {
+		$self->{error} = 'Thanks to some spammers you need to provide at least 3 or two linebreaks';
+		return 0; 
+	}
 
 	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)");
 	if ($dbh->errstr) {
