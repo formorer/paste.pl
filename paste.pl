@@ -80,11 +80,33 @@ if ($cgi->param("plain")) {
 	print_template($cgi);
 } elsif ($cgi->param("shorturl")) {
 	print_shorturl($cgi); 	
+} elsif ($cgi->param("addurl")) {
+	add_shorturl($cgi); 
 } else {
 	print_paste($cgi);
 }
 
 exit;
+
+sub add_shorturl {
+	my ($cgi) = @_; 
+	my $url = $cgi->param("addurl");
+	
+	my $hash = $shorturl->add_url($url);
+	if ($shorturl->error) {
+		error("Could not add url", "Could not add url $url: " . $shorturl->error() );
+	}
+	print_header();
+	$template->process('shorturl_info', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+									"dbuser" => $dbuser, 
+									"dbpass" => $dbpass,
+									"base_url" => $base_url, 
+									"short_base" => $short_base,
+									"hash" => $hash, 
+									"cgi" => $cgi
+								} 
+						) or die $template->error() . "\n";
+}
 
 sub print_shorturl {
 	my ($cgi) = @_; 
@@ -217,7 +239,7 @@ sub print_add_comment {
 sub print_template {
     my ($cgi,$status) = (@_);
 	my $tmpl;
-	my @templates = qw(about clients shorturl_info);
+	my @templates = qw(about clients shorturl_info shorturl_add);
 
 	if ($cgi->param("show_template")) {
 		$tmpl = $cgi->param("show_template");
@@ -232,6 +254,7 @@ sub print_template {
 									"dbpass" => $dbpass,
 									"base_url" => $base_url, 
 									"short_base" => $short_base,
+									"round" => sub { return floor(@_); },
 									"cgi" => $cgi
 								} 
 						) or die $template->error() . "\n";
