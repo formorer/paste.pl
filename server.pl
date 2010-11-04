@@ -56,7 +56,7 @@ sub addPaste {
 		return {'id' => '', 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => ''} ;
 	}
 
-	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id, $hidden); 
+	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id, '', $hidden); 
 	if ($paste->error) {
 		$error = 1; 
 		$statusmessage = $paste->error;
@@ -72,6 +72,11 @@ sub addPaste {
 			$statusmessage .= "To delete your entry use: $base_url/delete/delete/$digest\n";
 		}
 	}
+    if ($hidden eq 't') {
+	    $hidden = 1; 
+    } else {
+	    $hidden = 0; 
+    }
     return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden} ;
 }
 
@@ -116,23 +121,27 @@ sub add_shorturl {
 	my $hash = $shorturl->add_url($url);
 
 	if ($shorturl->error) {
-		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => ''};
+		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => ''};
 	} else {
-		return { 'rc' => 1, 'statusmessage' => '', 'hash' => $hash, 'url' => "$short_url/$hash" }; 
+		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'url' => "$short_url/$hash" }; 
 	}
 }
 
 sub resolve_shorturl {
 	my ($hash) = @_; 
+	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
+		$hash = $1;
+	}
+
 
 	my $url = $shorturl->get_url($hash);
 
 	if ($shorturl->error) {
-		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
+		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
 	} elsif ($url) {
-		return { 'rc' => 1, 'statusmessage' => '', 'hash' => $hash, 'url' => "$url" }; 
+		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'url' => "$url" }; 
 	} else {
-		return { 'rc' => 0, 'statusmessage' => "Hash $hash not found", 'hash' => $hash, 'url' => '' }; 
+		return { 'rc' => 1, 'statusmessage' => "Hash $hash not found", 'hash' => $hash, 'url' => '' }; 
 	}
 
 }
@@ -141,9 +150,13 @@ sub shorturl_clicks {
 	my ($hash) = @_; 
 
 	my $count = $shorturl->get_counter($hash);
+	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
+		$hash = $1;
+	}
+
 
 	if ($shorturl->error) {
-		return {'rc' => 0, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
+		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
 	} else {
 		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'count' => $count }; 
 	}
