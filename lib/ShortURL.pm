@@ -109,7 +109,14 @@ sub add_url ($$) {
 	if ($url !~ /^https?/) {
 		$self->{'error'} = "Does not look like an URL",
 		return 0; 
+	} elsif ($url =~ /https?:\/\/frm\.li/) {
+		$self->{'error'} = "Please don't do recursive URLs"; 
+		return 0; 
+	} elsif ($url =~ /https?:\/\/paste\.debian\.net/) {
+		$self->{'error'} = "Please don't do recursive URLs"; 
+		return 0; 
 	}
+
 	my $hash = encode_base58(Digest::JHash::jhash("$url" . time())); 
 
 	my $sth = $dbh->prepare("INSERT INTO shorturl (url, hash) VALUES (?,?)"); 
@@ -148,6 +155,10 @@ sub get_counter ($$) {
 	my ($self, $hash) = @_;
 	my $dbh = $self->{dbh}; 
 
+	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
+		$hash = $1; 
+	}
+
 	my  $count = $dbh->selectall_arrayref("SELECT clicks from shorturl where hash = ?", undef, $hash);
 
 	if ($dbh->err) {
@@ -156,7 +167,8 @@ sub get_counter ($$) {
 	}
 
 	if (! @{$count}) {
-		return 0; 
+		$self->{error} = "Hash '$hash' not found in database.";
+		return 1; 
 	}
 
 	return @{@{$count}[0]}[0];
@@ -166,6 +178,10 @@ sub get_url ($$) {
 	my ($self, $hash) = @_;
 	my $dbh = $self->{dbh};
 
+	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
+		$hash = $1; 
+	}
+
 	my  $url_ref = $dbh->selectall_arrayref("SELECT url from shorturl where hash = ?", undef, $hash); 
 
 	if ($dbh->err) {
@@ -174,7 +190,7 @@ sub get_url ($$) {
 	}
 
 	if (! @{$url_ref}) {
-		$self->{error} = "Hash not found"; 
+		$self->{error} = "Hash '$hash' not found in database."; 
 		return 0; 
 	}
 
