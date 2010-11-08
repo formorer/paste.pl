@@ -16,7 +16,7 @@ repository].
 Submitting entries (addPaste)
 -----------------------------
 
-paste.addPaste(pastetext[,name,expire,lang,hidden]) returns rc, id, statusmessage, digest
+paste.addPaste(pastetext[,name,expire,lang,hidden]) returns rc, id, statusmessage, digest, base_url
 
 .expects
 - *pastetext*: a string that contains the pastetext including \n or \r\n.
@@ -57,6 +57,8 @@ You can use this message in your application.
 - *digest* `(sha1 hex)`: The digest of the entry. This can be used for
   deleting an entry (see deletePaste).
  
+- *base_url* `(string)`: This string is the url_base of the paste. Use base_url+id to call the paste. 
+
 
 Deleting entries (deletePaste)
 -----------------------------
@@ -101,6 +103,9 @@ or some other informations.
 - *submitdate* `(string)`: A timestamp when the entry has been submitted
 
 - *expiredate* `(string)`: A timestamp when the entry expires
+  
+- *base_url* `(string)`: This string is the url_base of the paste. Use base_url+id to call the paste. 
+
 
 
 Getting Languages (getLanguages)
@@ -138,7 +143,7 @@ paste.addShortURL (url) returns rc, statusmessage, hash, url
 Resolve short url (resolveShortURL)
 ------------------------------------
 
-paste.addShortURL (hash) returns rc, statusmessage, hash, url
+paste.resolveShortURL (hash) returns rc, statusmessage, hash, url
 
 .returns 
 

@@ -77,7 +77,7 @@ sub addPaste {
     } else {
 	    $hidden = 0; 
     }
-    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden} ;
+    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden, 'base_url' => $base_url } ;
 }
 
 sub deletePaste {
@@ -102,7 +102,13 @@ sub deletePaste {
 sub getPaste {
 	my ($id) = @_; 
 	my $error = 0; 
-	my $entry = $paste->get_paste($id);
+
+	my $entry = '';
+	if ($id =~ /^[0-8a-f]{8}$/) {
+		$entry = $paste->get_hidden_paste($id);
+	} else {
+		$entry = $paste->get_paste($id);
+	}
 	my $statusmessage;
 	if (! $entry) {
 		$error = 1; 
@@ -111,7 +117,7 @@ sub getPaste {
 	} else {
 		return {'rc' => $error, 'statusmessage' => $statusmessage,
 				'code' => $entry->{code}, 'submitter' => $entry->{poster},
-				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, };
+				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, base_url => $base_url };
 	}
 }
 
