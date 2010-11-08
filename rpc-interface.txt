@@ -76,7 +76,7 @@ or some other informations.
 Getting entries (getPaste)
 --------------------------
 
-paste.getPaste(id) returnѕ rc, statusmessage, code, submitter, submitdate, expiredate
+paste.getPaste(id) return rc, statusmessage, code, submitter, submitdate, expiredate
 
 .expects 
 

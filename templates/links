@@ -1,12 +1,12 @@
 <h1>Links</h1>
 <ul>
-<li><a href='http://www.debian.org'>Debian</a><br /></li>
+<li><a href='http://www.grml.org'>Grml</a><br /></li>
 <li><a href='/paste.pl?show_template=about'>About</a><br /></li>
 <li><a href='[% base_url %]/rpc-interface.html'>XML-RPC Interface</a><br /></li>
 <li><a href='/paste.pl?show_template=clients'>Clients</a><br /></li>
 </ul>
 <h1>Admin</h1>
-<a href='mailto:formorer@debian.org'>Alexander Wirt</a>
+<a href='mailto:formorer@grml.org'>Alexander Wirt</a>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]

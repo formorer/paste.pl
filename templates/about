@@ -1,8 +1,8 @@
-[% WRAPPER common_htmlpage title="Debian Pastezone" %]
+[% WRAPPER common_htmlpage title="Grml Pastezone" %]
 <h1>About this Site</h1><br />
 
 <p>
-paste.debian.net has been written by Alexander Wirt <formorer@debian.org> and
+paste.grml.org has been written by Alexander Wirt <formorer@grml.org> and
 is relased under the <a
 href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'> AGPL 3.0</a>. <br />
 The code can be found in my git repository under <a

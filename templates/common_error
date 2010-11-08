@@ -1,7 +1,7 @@
-[% WRAPPER common_htmlpage title="Debian paste error" %]
+[% WRAPPER common_htmlpage title="Grml paste error" %]
 <center>
 <h2>Some Error</h2>
 Some strange error has been occurred: <br /> [% error.info %]<br />
-<b>Please contact the <a href=mailto:formorer@debian.org>admin</a> about the problem</b>
+<b>Please contact the <a href=mailto:formorer@grml.org>admin</a> about the problem</b>
 </center>
 [% END %]
