@@ -1,6 +1,10 @@
 [% WRAPPER common_htmlpage title="Debian Pastezone" %]
 [% USE CGI %]
 
+[% IF CGI.param('hash') %]
+[% hash = CGI.param('hash') %]
+[% END %]
+
 [% TRY %]
         [% USE mydb = DBI(dbname, dbuser, dbpass) %]
         [% CATCH %]
@@ -9,11 +13,11 @@
 [% END %]
 
 [% TRY -%]
-	[% entry = mydb.query ("SELECT url, date, hash, clicks FROM shorturl where hash = ?", CGI.param('hash')) %]
+	[% entry = mydb.query ("SELECT url, date, hash, clicks FROM shorturl where hash = ?", hash) %]
 	[% IF entry.size != 1 %]
 		[%THROW notfound "Hash was not found in database" %]
 	[% END %]
-	[% FOREACH entry = mydb.query ("SELECT url, date, hash, clicks FROM shorturl where hash = ?", CGI.param('hash')) %]
+	[% FOREACH entry = mydb.query ("SELECT url, date, hash, clicks FROM shorturl where hash = ?", hash) %]
 	[% END %]
 [% CATCH %]
         [% INCLUDE common_error %]
@@ -25,6 +29,7 @@
 
 <ul>
 <li><b>ShortURL:</b> <a href='[% short_base %]/[% entry.hash %]'>[% short_base %]/[% entry.hash %]</a></li>
+<li><b>InfoURL:</b> <a href='[% short_base %]/info/[% entry.hash %]'>[% short_base %]/info/[% entry.hash %]</a></li>
 <li><b>Target:</b> <a href='[% entry.url | html%]'>[% entry.url |html %]</a></li>
 <li><b>Created</b>:  [% entry.date %]
 <li><b>Clicks:</b> [% entry.clicks %]</li>
