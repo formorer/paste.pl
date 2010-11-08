@@ -20,7 +20,7 @@
 							  posted as postdate 
 							  from paste where hidden is not true order by posted desc, id desc limit 10") -%]
 
-<li><a href='/[% post.id %]'>[% post.poster %]</a><br />
+<li><a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
 [% days = post.age / (3600*24) %]
 [% hours = post.age / 3600 %]
@@ -45,7 +45,7 @@
 [% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
 posted AS postedate,code from paste WHERE sessionid = '$session_id' 
 order by posted DESC, id desc limit 5") %]
-<li><a href='/[% post.id %]'>[% post.poster %]</a><br />
+<li><a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
 [% days = post.age / (3600*24) %]
 [% hours = post.age / 3600 %]
@@ -66,6 +66,10 @@ order by posted DESC, id desc limit 5") %]
 </ul>
 [% END %]
 [% INCLUDE links %]
+
+<br />
+<a href="http://flattr.com/thing/63347/debian-net-pastebin" target="_blank">
+<img src="http://api.flattr.com/button/button-compact-static-100x17.png" alt="Flattr this" title="Flattr this" border="0" /></a>
 </div>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

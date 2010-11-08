@@ -22,11 +22,20 @@ use strict;
 use Frontier::RPC2;
 use lib 'lib/'; 
 use Paste;
+use ShortURL;
 
 my $config_file = 'paste.conf';
 my $paste = new Paste($config_file); 
 
+my $shorturl;
+
+eval {
+    $shorturl = new ShortURL($config_file);
+};
+error("Fatal Error", $@) if $@;
+
 my $base_url = $paste->get_config_key('www', 'base_url');
+my $short_url = $paste->get_config_key('shorturl', 'base_url'); 
 
 sub addPaste {
     my ($code, $name, $expire, $lang, $hidden) = @_;
@@ -64,7 +73,12 @@ sub addPaste {
 			$statusmessage .= "To delete your entry use: $base_url/delete/delete/$digest\n";
 		}
 	}
-    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden} ;
+    if ($hidden eq 't') {
+	    $hidden = 1; 
+    } else {
+	    $hidden = 0; 
+    }
+    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden, 'base_url' => $base_url } ;
 }
 
 sub deletePaste {
@@ -89,7 +103,13 @@ sub deletePaste {
 sub getPaste {
 	my ($id) = @_; 
 	my $error = 0; 
-	my $entry = $paste->get_paste($id);
+
+	my $entry = '';
+	if ($id =~ /^[0-8a-f]{8}$/) {
+		$entry = $paste->get_hidden_paste($id);
+	} else {
+		$entry = $paste->get_paste($id);
+	}
 	my $statusmessage;
 	if (! $entry) {
 		$error = 1; 
@@ -98,8 +118,56 @@ sub getPaste {
 	} else {
 		return {'rc' => $error, 'statusmessage' => $statusmessage,
 				'code' => $entry->{code}, 'submitter' => $entry->{poster},
-				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, };
+				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, base_url => $base_url };
 	}
+}
+
+sub add_shorturl {
+	my ($url) = @_; 
+
+	my $hash = $shorturl->add_url($url);
+
+	if ($shorturl->error) {
+		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => ''};
+	} else {
+		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'url' => "$short_url/$hash" }; 
+	}
+}
+
+sub resolve_shorturl {
+	my ($hash) = @_; 
+	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
+		$hash = $1;
+	}
+
+
+	my $url = $shorturl->get_url($hash);
+
+	if ($shorturl->error) {
+		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
+	} elsif ($url) {
+		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'url' => "$url" }; 
+	} else {
+		return { 'rc' => 1, 'statusmessage' => "Hash $hash not found", 'hash' => $hash, 'url' => '' }; 
+	}
+
+}
+
+sub shorturl_clicks {
+	my ($hash) = @_; 
+
+	my $count = $shorturl->get_counter($hash);
+	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
+		$hash = $1;
+	}
+
+
+	if ($shorturl->error) {
+		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
+	} else {
+		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'count' => $count }; 
+	}
+
 }
 sub getLanguages {
 	my $error = 0; 
@@ -121,6 +189,9 @@ process_cgi_call({'paste.addPaste' => \&addPaste,
 			      'paste.deletePaste' => \&deletePaste,
 				  'paste.getLanguages' => \&getLanguages, 
 				  'paste.getPaste' => \&getPaste,
+				  'paste.addShortURL' => \&add_shorturl, 
+				  'paste.resolveShortURL' => \&resolve_shorturl,
+				  'paste.ShortURLClicks' => \&shorturl_clicks, 
 				});
 
 
@@ -141,6 +212,7 @@ sub process_cgi_call ($) {
     my $length = $ENV{'CONTENT_LENGTH'};
 
     # Perform some sanity checks.
+    http_error(405, "Method Not Allowed") unless $method;
     http_error(405, "Method Not Allowed") unless $method eq "POST";
     http_error(400, "Bad Request") unless $type eq "text/xml";
     http_error(411, "Length Required") unless $length > 0;

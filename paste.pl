@@ -27,6 +27,8 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
 use Digest::SHA1 qw (sha1_hex);
 use Paste;
+use ShortURL;
+
 use subs qw(error);
 
 
@@ -40,11 +42,19 @@ eval {
 };
 error("Fatal Error", $@) if $@;
 
+my $shorturl; 
+
+eval {
+	$shorturl = new ShortURL($config_file); 
+};
+error("Fatal Error", $@) if $@;
+
 my $dbname = $paste->get_config_key('database', 'dbname') || die "Databasename not specified";  
 my $dbuser = $paste->get_config_key('database', 'dbuser') || die "Databaseuser not specified"; 
 my $dbpass = $paste->get_config_key('database', 'dbpassword') || ''; 
 #config 
 my $base_url = $paste->get_config_key('www', 'base_url');
+my $short_base = $paste->get_config_key('shorturl', 'base_url');
 
 
 my $cgi = new CGI();
@@ -68,12 +78,52 @@ if ($cgi->param("plain")) {
 	print_add_comment($cgi); 
 } elsif ($cgi->param("show_template")) {
 	print_template($cgi);
+} elsif ($cgi->param("shorturl")) {
+	print_shorturl($cgi); 	
+} elsif ($cgi->param("addurl")) {
+	add_shorturl($cgi); 
 } else {
 	print_paste($cgi);
 }
 
 exit;
 
+sub add_shorturl {
+	my ($cgi) = @_; 
+	my $url = $cgi->param("addurl");
+	
+	my $hash = $shorturl->add_url($url);
+	if ($shorturl->error) {
+		error("Could not add url", "Could not add url $url: " . $shorturl->error() );
+	}
+	print_header();
+	$template->process('shorturl_info', {	"dbname" => "dbi:Pg:dbname=$dbname", 
+									"dbuser" => $dbuser, 
+									"dbpass" => $dbpass,
+									"base_url" => $base_url, 
+									"short_base" => $short_base,
+									"hash" => $hash, 
+									"cgi" => $cgi
+								} 
+						) or die $template->error() . "\n";
+}
+
+sub print_shorturl {
+	my ($cgi) = @_; 
+	my $hash = $cgi->param("shorturl"); 
+	my $url = $shorturl->get_url($hash);
+	if ($shorturl->error) {
+		print header('text/plain', '500 Internal Server Error'); 
+		print "Something went wrong: \n"; 
+		print $shorturl->error;
+	} elsif ($url) {
+		$shorturl->update_counter($hash);
+		print $cgi->redirect($url);
+	} else {
+		print header('text/plain', '404 Not Found'); 
+		print "Move along, nothing to see here...\n";
+	}
+}
 sub print_plain {
 	my ($cgi,$hidden) = (@_);
 	my $id = ''; 
@@ -189,7 +239,7 @@ sub print_add_comment {
 sub print_template {
     my ($cgi,$status) = (@_);
 	my $tmpl;
-	my @templates = qw(about clients);
+	my @templates = qw(about clients shorturl_info shorturl_add);
 
 	if ($cgi->param("show_template")) {
 		$tmpl = $cgi->param("show_template");
@@ -203,6 +253,9 @@ sub print_template {
 									"dbuser" => $dbuser, 
 									"dbpass" => $dbpass,
 									"base_url" => $base_url, 
+									"short_base" => $short_base,
+									"round" => sub { return floor(@_); },
+									"cgi" => $cgi
 								} 
 						) or die $template->error() . "\n";
 }

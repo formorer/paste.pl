@@ -52,15 +52,15 @@ never
 [% END -%]
 	[% END %]
 	<br/>
-	<a href='plain/[% entry.id %]'>Show as text</a> | 
-	<a href='download/[% entry.id %]'>Download</a> |
+	<a href='[% base_url %]/plain/[% entry.id %]'>Show as text</a> | 
+	<a href='[% base_url %]/download/[% entry.id %]'>Download</a> |
 	[% IF lines == 0 %]
-	<a href='/?show=[% entry.id %];lines=1'>With linenumbers</a> |
+	<a href='[% base_url %]/?show=[% entry.id %];lines=1'>With linenumbers</a> |
 	[% ELSE %]
-	<a href='/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
+	<a href='[% base_url %]/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
 	[% END %]
-	<a href='/'>Paste new</a> |
-	<a href='/?pnew=[% entry.id %]'>Paste as new</a>
+	<a href='[% base_url %]/'>Paste new</a> |
+	<a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
 	<br/>
 	[% END %]
 [% CATCH -%]
@@ -69,39 +69,18 @@ never
 [% entry.code %]
 <pre>
 [% END %]
-[% comments = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$show'") %]
-[% IF comments.size >= 1 %]
-<p>
-[% FOREACH comment  = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$show'") %]
-<div id="comment_header">
-Posted on [% comment.postedate %] by [% comment.name %]:</div>
-<div id="comment">
-[% comment.text %]<br />
-</div>
-[% END %]
-[% END %]
-<div id="comment_add">
-<b>Add Comment:</b>
-<form name="add_comment" method="post" action="./">
-<b>Name</b><br/><input type="hidden" name="paste_id" value="[% show %]"/>
-<input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
-<br />
-<b>Comment</b>
-<br />
-<textarea id="comment" class="codeedit" name="comment" rows="2" cols="80" onkeydown="checkTab(this)"></textarea>
-<input type="submit" name="comment" value="Send"/>
-</form>
-</div>
 [% IF CGI.cookie('session_id') -%]
 [% session_id =  CGI.cookie('session_id') %]
 [% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
 
+<br>
 <h1>Informations about your entry</h1>
 <ul>
-<li>To link to your entry use: <a href="/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
-<li>To download your entry use: <a href="/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
-<li>To see your entry as plain text use: <a href="/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
-<li>To delete your entry use: <a href="/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
+<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
+
+<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
+<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
 </ul>
 [% END -%]
 [% END -%]

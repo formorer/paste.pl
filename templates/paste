@@ -65,7 +65,6 @@
 <br />
 <b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.<br />
-<script type="text/javascript" src="pastebin.js"></script>
 <textarea id="code" class="codeedit" name="code" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
 <br />
 <input type="file" name="upload" /><input type="submit" name="paste" value="Send"/>

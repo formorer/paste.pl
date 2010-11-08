@@ -23,6 +23,7 @@ use Config::IniFiles;
 use DBI; 
 use Encode; 
 use Digest::SHA1  qw(sha1_hex);
+use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 use RPC::XML;
 use RPC::XML::Client;
 
@@ -32,12 +33,13 @@ use Carp;
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
 
-@EXPORT = qw (new add_paste delete_paste get_paste get_config_key check_ip);
+@EXPORT = qw ();
+
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;	
 	my $config_file = shift || ''; 
-	croak ("Need a configfile") unless -f $config_file; 
+	croak ("Need a configfile ($config_file)") unless -f $config_file; 
 	my $config = Config::IniFiles->new( -file => $config_file );	
 
 	unless ($config) {
@@ -154,6 +156,20 @@ sub add_paste ($$$$;$$) {
 	}
 
 
+	my $newlines = 0; 
+	my $pos = 0; 
+	while (1) {
+		$pos = index($code, "\n", $pos);
+		last if($pos < 0);
+		$newlines++;
+		$pos++;
+	}
+
+	if ($newlines <= 1) {
+		$self->{error} = 'Thanks to some spammers you need to provide at least 3 or two linebreaks';
+		return 0; 
+	}
+
 	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)");
 	if ($dbh->errstr) {
 		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
@@ -167,7 +183,7 @@ sub add_paste ($$$$;$$) {
 
 	#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry. 
 	#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
-	my $digest = sha1_hex($code . time() . rand());
+	my $digest = hmac_sha1_hex($code, sha1_hex(time().rand()));
 	
 	$sth->execute($name,$code,$lang,$expire,$digest,$sessionid,$hidden);
 
