@@ -23,6 +23,7 @@ use Config::IniFiles;
 use DBI; 
 use Encode; 
 use Digest::SHA1  qw(sha1_hex);
+use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 use RPC::XML;
 use RPC::XML::Client;
 
@@ -183,7 +184,7 @@ sub add_paste ($$$$;$$) {
 
 	#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry. 
 	#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
-	my $digest = sha1_hex($code . time() . rand());
+	my $digest = hmac_sha1_hex($code, sha1_hex(time().rand()));
 	
 	$sth->execute($name,$code,$lang,$expire,$digest,$sessionid,$hidden);
 
