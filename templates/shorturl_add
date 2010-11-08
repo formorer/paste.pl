@@ -1,0 +1,20 @@
+[% WRAPPER common_htmlpage title="New ShortURL" %]
+
+<h1>Add new ShortURL</h1><br />
+
+<form name="add_shorturl" method="post" action="./">
+<input type="text" name="addurl" /> 
+<input type="submit" name="shorturl_add" value="Send"/>
+</form> 
+<br>
+<p>
+Or use: http://frm.li/add/<i>url</i> 
+<ul>
+<li>http://frm.li/add/http://heise.de</li>
+<li>http://frm.li/add/http://people.debian.org/
+</ul>
+
+[% END %]
+[%# vim: syntax=html sw=4 ts=4 noet shiftround
+%]
+
