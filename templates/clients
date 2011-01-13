@@ -6,7 +6,7 @@ There are some clients available for the XML-RPC interface of
 <a href='http://paste.debian.net'>paste.debian.net</a>:
 
 <ul>
-<li><a href='http://git.einsteinmg.dyndns.org/?p=own/debianpaste-clients.git'>paste.py</a> by Michael Gebetsroither</li>
+<li><a href="https://github.com/gebi/debianpaste-clients">paste.py</a> by Michael Gebetsroither</li>
 <li><a href='http://ankh-morp.org/~vetinari/tools/paste-dn.pl'>paste-dn.pl</a> by Hanno Hecker</li>
 </ul>
 
