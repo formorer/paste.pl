@@ -6,7 +6,7 @@ There are some clients available for the XML-RPC interface of
 this pasteserver:
 
 <ul>
-<li><a href='http://github.com/gebi/debianpaste-clients'>paste.py</a> by Michael Gebetsroither</li>
+<li><a href="https://github.com/gebi/debianpaste-clients">paste.py</a> by Michael Gebetsroither</li>
 <li><a href='http://ankh-morp.org/~vetinari/tools/paste-dn.pl'>paste-dn.pl</a> by Hanno Hecker</li>
 </ul>
 
