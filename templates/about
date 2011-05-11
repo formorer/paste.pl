@@ -7,7 +7,8 @@ is relased under the <a
 href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'> AGPL 3.0</a>. <br />
 The code can be found in my git repository under <a
 href='http://git.snow-crash.org/?p=paste.pl.git'>
-http://git.snow-crash.org/?p=paste.pl.git</a>. 
+http://git.snow-crash.org/?p=paste.pl.git</a> 
+and can be cloned via <i>git clone git://git.snow-crash.org/paste.pl</i>. 
 
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
