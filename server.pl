@@ -57,19 +57,29 @@ sub addPaste {
 	}
 
 	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id, '', $hidden); 
+	my ($dl_url, $v_url, $d_url);
+
 	if ($paste->error) {
 		$error = 1; 
 		$statusmessage = $paste->error;
 	} else {
 		if ($hidden eq 'f') {
-			$statusmessage = "Your entry has been added to the database\n";
+			$statusmessage = "Your entry has been added to the database:\n";
+			$statusmessage .= "$base_url/$id\n";
 			$statusmessage .= "To download your entry use: $base_url/download/$id\n";
 			$statusmessage .= "To delete your entry use: $base_url/delete/$digest\n";
+			$v_url = "$base_url/$id";
+			$dl_url = "$base_url/download/$id";
+			$d_url = "$base_url/delete/$digest";
 		} else {
 			$statusmessage = "Your entry has been added to the database\n";
 			$statusmessage .= "This entry is hidden. So don't lose your hidden id ($id)\n";
+			$statusmessage .= "To link to your entry use: $base_url/hidden/$id\n";
 			$statusmessage .= "To download your entry use: $base_url/downloadh/$id\n";
 			$statusmessage .= "To delete your entry use: $base_url/delete/delete/$digest\n";
+			$v_url = "$base_url/hidden/$id";
+			$dl_url = "$base_url/downloadh/$id";
+			$d_url = "$base_url/delete/$digest";
 		}
 	}
     if ($hidden eq 't') {
@@ -77,7 +87,8 @@ sub addPaste {
     } else {
 	    $hidden = 0; 
     }
-    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden, 'base_url' => $base_url } ;
+    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden, 'base_url' => $base_url, 
+	    	'view_url' => $v_url, 'download_url' => $dl_url, 'delete_url' => $d_url } ;
 }
 
 sub deletePaste {
