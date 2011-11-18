@@ -26,6 +26,8 @@ use Digest::SHA1 qw(sha1_hex);
 use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 use RPC::XML;
 use RPC::XML::Client;
+use Text::ExtractWords qw (words_list);
+
 
 use Carp;
 
