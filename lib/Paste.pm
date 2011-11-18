@@ -130,7 +130,6 @@ sub add_paste ($$$$;$$) {
     $sessionid = $sessionid || '';
     $hidden    = $hidden    || 'f';
 
-    warn $hidden;
     if ( $name !~ /^[^;,'"<>]{1,10}$/i ) {
         $self->{error} =
             "Invalid format for name (no special chars, max 10 chars)";
@@ -174,6 +173,14 @@ sub add_paste ($$$$;$$) {
         return 0;
     }
 
+	my $spamscore = get_config_key('spam', 'score');
+	if ($spamscore) {
+		my ($hits, $score) = check_wordfilter($code);
+		if ($hits && $score >= $spamscore) {
+			$self->{error} = 'The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.';
+		}
+	}
+			
     my $sth = $dbh->prepare(
         "INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)"
     );
@@ -565,8 +572,34 @@ sub check_ip ($) {
     return 1 if @listed_by;
     return 0;
 }
-1;
 
-# vim: syntax=perl sw=4 ts=4 noet shiftround
+sub check_wordfilter ($) {
+	my $paste = shift;
+
+	my $db = get_config_key('spam', 'db');
+	next unless $db && -f $db;
+
+	open (my $fh, '<', $db) or die "Could not open spamdb: $db";
+
+	my $lkup;
+	while (my $line = <$fh>) {
+		my ($word, $score) = split (/\s+/, $line, 2); 
+		$lkup->{$word} = $score;
+	}
+	close ($fh);
+
+	my $aref = []; 
+	words_list($aref, $paste);
+	my ( $score, $hits ) = 0;
+	foreach my $word (@{$aref}) {
+		if (exists $lkup->{$word}) {
+			$score += $lkup->{$word};
+			$hits++;
+		}  
+	}
+	return $hits, $score;
+}
+
+1;
 
 # vim: syntax=perl sw=4 ts=4 noet shiftround
