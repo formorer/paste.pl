@@ -175,7 +175,7 @@ sub add_paste ($$$$;$$) {
 
 	my $spamscore = $self->get_config_key('spam', 'score');
 	if ($spamscore) {
-		my ($hits, $score) = check_wordfilter($code);
+		my ($hits, $score) = $self->check_wordfilter($code);
 		if ($hits && $score >= $spamscore) {
 			$self->{error} = 'The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.';
 		}
@@ -574,6 +574,7 @@ sub check_ip ($) {
 }
 
 sub check_wordfilter ($) {
+	my $self = shift;
 	my $paste = shift;
 
 	my $db = $self->get_config_key('spam', 'db');
