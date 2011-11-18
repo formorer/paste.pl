@@ -173,7 +173,7 @@ sub add_paste ($$$$;$$) {
         return 0;
     }
 
-	my $spamscore = get_config_key('spam', 'score');
+	my $spamscore = $self->get_config_key('spam', 'score');
 	if ($spamscore) {
 		my ($hits, $score) = check_wordfilter($code);
 		if ($hits && $score >= $spamscore) {
