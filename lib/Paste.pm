@@ -593,7 +593,7 @@ sub check_wordfilter ($) {
 	my ( $score, $hits ) = 0;
 	foreach my $word (@{$aref}) {
 		if (exists $lkup->{$word}) {
-			$score += $lkup->{$word};
+			$score += $lkup->{lc($word)};
 			$hits++;
 		}  
 	}
