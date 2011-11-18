@@ -576,7 +576,7 @@ sub check_ip ($) {
 sub check_wordfilter ($) {
 	my $paste = shift;
 
-	my $db = get_config_key('spam', 'db');
+	my $db = $self->get_config_key('spam', 'db');
 	next unless $db && -f $db;
 
 	open (my $fh, '<', $db) or die "Could not open spamdb: $db";
