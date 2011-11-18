@@ -17,193 +17,262 @@
 
 #The CGI Support has been copied from: http://tldp.org/HOWTO/XML-RPC-HOWTO/xmlrpc-howto-perl.htl
 
-
 use strict;
 use Frontier::RPC2;
-use lib 'lib/'; 
+use lib 'lib/';
 use Paste;
 use ShortURL;
 
 my $config_file = 'paste.conf';
-my $paste = new Paste($config_file); 
+my $paste       = new Paste($config_file);
 
 my $shorturl;
 
-eval {
-    $shorturl = new ShortURL($config_file);
-};
-error("Fatal Error", $@) if $@;
+eval { $shorturl = new ShortURL($config_file); };
+error( "Fatal Error", $@ ) if $@;
 
-my $base_url = $paste->get_config_key('www', 'base_url');
-my $short_url = $paste->get_config_key('shorturl', 'base_url'); 
+my $base_url  = $paste->get_config_key( 'www',      'base_url' );
+my $short_url = $paste->get_config_key( 'shorturl', 'base_url' );
 
 sub addPaste {
-    my ($code, $name, $expire, $lang, $hidden) = @_;
-    $name = $name || 'anonymous';
-	$expire = $expire || 72000;
-	$hidden = $hidden ? 't' : 'f'; 
+    my ( $code, $name, $expire, $lang, $hidden ) = @_;
+    $name   = $name   || 'anonymous';
+    $expire = $expire || 72000;
+    $hidden = $hidden ? 't' : 'f';
 
-	$lang = $lang || "text";
-	$lang = ($lang eq 'Plain') ? 'text' : $lang; 
-	my $error = 0; 
-	my $statusmessage;
-	my $lang_id = -1;
+    $lang = $lang || "text";
+    $lang = ( $lang eq 'Plain' ) ? 'text' : $lang;
+    my $error = 0;
+    my $statusmessage;
+    my $lang_id = -1;
 
-	$lang_id = $paste->get_lang($lang); 
-	if ($paste->error) {
-		$error = 1;
-		$statusmessage = $paste->error;
-		return {'id' => '', 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => ''} ;
-	}
-
-	my ($id, $digest) = $paste->add_paste($code, $name, $expire, $lang_id, '', $hidden); 
-	my ($dl_url, $v_url, $d_url);
-
-	if ($paste->error) {
-		$error = 1; 
-		$statusmessage = $paste->error;
-	} else {
-		if ($hidden eq 'f') {
-			$statusmessage = "Your entry has been added to the database:\n";
-			$statusmessage .= "$base_url/$id\n";
-			$statusmessage .= "To download your entry use: $base_url/download/$id\n";
-			$statusmessage .= "To delete your entry use: $base_url/delete/$digest\n";
-			$v_url = "$base_url/$id";
-			$dl_url = "$base_url/download/$id";
-			$d_url = "$base_url/delete/$digest";
-		} else {
-			$statusmessage = "Your entry has been added to the database\n";
-			$statusmessage .= "This entry is hidden. So don't lose your hidden id ($id)\n";
-			$statusmessage .= "To link to your entry use: $base_url/hidden/$id\n";
-			$statusmessage .= "To download your entry use: $base_url/downloadh/$id\n";
-			$statusmessage .= "To delete your entry use: $base_url/delete/delete/$digest\n";
-			$v_url = "$base_url/hidden/$id";
-			$dl_url = "$base_url/downloadh/$id";
-			$d_url = "$base_url/delete/$digest";
-		}
-	}
-    if ($hidden eq 't') {
-	    $hidden = 1; 
-    } else {
-	    $hidden = 0; 
+    $lang_id = $paste->get_lang($lang);
+    if ( $paste->error ) {
+        $error         = 1;
+        $statusmessage = $paste->error;
+        return {
+            'id'            => '',
+            'statusmessage' => $statusmessage,
+            'rc'            => $error,
+            'digest'        => ''
+        };
     }
-    return {'id' => $id, 'statusmessage' => $statusmessage, 'rc' => $error, 'digest' => $digest, 'hidden' => $hidden, 'base_url' => $base_url, 
-	    	'view_url' => $v_url, 'download_url' => $dl_url, 'delete_url' => $d_url } ;
+
+    my ( $id, $digest ) =
+        $paste->add_paste( $code, $name, $expire, $lang_id, '', $hidden );
+    my ( $dl_url, $v_url, $d_url );
+
+    if ( $paste->error ) {
+        $error         = 1;
+        $statusmessage = $paste->error;
+    } else {
+        if ( $hidden eq 'f' ) {
+            $statusmessage = "Your entry has been added to the database:\n";
+            $statusmessage .= "$base_url/$id\n";
+            $statusmessage
+                .= "To download your entry use: $base_url/download/$id\n";
+            $statusmessage
+                .= "To delete your entry use: $base_url/delete/$digest\n";
+            $v_url  = "$base_url/$id";
+            $dl_url = "$base_url/download/$id";
+            $d_url  = "$base_url/delete/$digest";
+        } else {
+            $statusmessage = "Your entry has been added to the database\n";
+            $statusmessage
+                .= "This entry is hidden. So don't lose your hidden id ($id)\n";
+            $statusmessage
+                .= "To link to your entry use: $base_url/hidden/$id\n";
+            $statusmessage
+                .= "To download your entry use: $base_url/downloadh/$id\n";
+            $statusmessage
+                .= "To delete your entry use: $base_url/delete/delete/$digest\n";
+            $v_url  = "$base_url/hidden/$id";
+            $dl_url = "$base_url/downloadh/$id";
+            $d_url  = "$base_url/delete/$digest";
+        }
+    }
+    if ( $hidden eq 't' ) {
+        $hidden = 1;
+    } else {
+        $hidden = 0;
+    }
+    return {
+        'id'            => $id,
+        'statusmessage' => $statusmessage,
+        'rc'            => $error,
+        'digest'        => $digest,
+        'hidden'        => $hidden,
+        'base_url'      => $base_url,
+        'view_url'      => $v_url,
+        'download_url'  => $dl_url,
+        'delete_url'    => $d_url
+    };
 }
 
 sub deletePaste {
-	my ($digest) = @_;
-	my $error = 0; 
-	my ($statusmessage, $id);
-	if ($digest !~ /[0-9a-f]{40}/i) {
-		$error = 1;
-		$statusmessage = "Invalid digest ('$digest')"; 
-	} else {
-		$id = $paste->delete_paste($digest); 
-		if ($paste->error) {
-			$error = 1; 
-			$statusmessage = $paste->error; 
-		} else {
-			$statusmessage = "Entry $id deleted"; 
-		}
-	}
-	return {'rc' => $error, 'statusmessage' => $statusmessage, 'id' => $id }; 
+    my ($digest) = @_;
+    my $error = 0;
+    my ( $statusmessage, $id );
+    if ( $digest !~ /[0-9a-f]{40}/i ) {
+        $error         = 1;
+        $statusmessage = "Invalid digest ('$digest')";
+    } else {
+        $id = $paste->delete_paste($digest);
+        if ( $paste->error ) {
+            $error         = 1;
+            $statusmessage = $paste->error;
+        } else {
+            $statusmessage = "Entry $id deleted";
+        }
+    }
+    return { 'rc' => $error, 'statusmessage' => $statusmessage, 'id' => $id };
 }
 
 sub getPaste {
-	my ($id) = @_; 
-	my $error = 0; 
+    my ($id) = @_;
+    my $error = 0;
 
-	my $entry = '';
-	if ($id =~ /^[0-8a-f]{8}$/) {
-		$entry = $paste->get_hidden_paste($id);
-	} else {
-		$entry = $paste->get_paste($id);
-	}
-	my $statusmessage;
-	if (! $entry) {
-		$error = 1; 
-		$statusmessage = "Entry $id could not be found"; 
-		return {'rc' => $error, 'statusmessage' => $statusmessage, 'code' => '', submitter => '', submitdate => '', expiredate => ''}; 
-	} else {
-		return {'rc' => $error, 'statusmessage' => $statusmessage,
-				'code' => $entry->{code}, 'submitter' => $entry->{poster},
-				'submitdate' => $entry->{posted}, expiredate => $entry->{expires}, base_url => $base_url };
-	}
+    my $entry = '';
+    if ( $id =~ /^[0-8a-f]{8}$/ ) {
+        $entry = $paste->get_hidden_paste($id);
+    } else {
+        $entry = $paste->get_paste($id);
+    }
+    my $statusmessage;
+    if ( !$entry ) {
+        $error         = 1;
+        $statusmessage = "Entry $id could not be found";
+        return {
+            'rc'            => $error,
+            'statusmessage' => $statusmessage,
+            'code'          => '',
+            submitter       => '',
+            submitdate      => '',
+            expiredate      => ''
+        };
+    } else {
+        return {
+            'rc'            => $error,
+            'statusmessage' => $statusmessage,
+            'code'          => $entry->{code},
+            'submitter'     => $entry->{poster},
+            'submitdate'    => $entry->{posted},
+            expiredate      => $entry->{expires},
+            base_url        => $base_url
+        };
+    }
 }
 
 sub add_shorturl {
-	my ($url) = @_; 
+    my ($url) = @_;
 
-	my $hash = $shorturl->add_url($url);
+    my $hash = $shorturl->add_url($url);
 
-	if ($shorturl->error) {
-		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => ''};
-	} else {
-		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'url' => "$short_url/$hash" }; 
-	}
+    if ( $shorturl->error ) {
+        return {
+            'rc'            => 1,
+            'statusmessage' => $shorturl->error,
+            'url'           => ''
+        };
+    } else {
+        return {
+            'rc'            => 0,
+            'statusmessage' => '',
+            'hash'          => $hash,
+            'url'           => "$short_url/$hash"
+        };
+    }
 }
 
 sub resolve_shorturl {
-	my ($hash) = @_; 
-	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
-		$hash = $1;
-	}
+    my ($hash) = @_;
+    if ( $hash =~ /^https?:\/\/frm\.li\/(.*)/ ) {
+        $hash = $1;
+    }
 
+    my $url = $shorturl->get_url($hash);
 
-	my $url = $shorturl->get_url($hash);
-
-	if ($shorturl->error) {
-		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
-	} elsif ($url) {
-		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'url' => "$url" }; 
-	} else {
-		return { 'rc' => 1, 'statusmessage' => "Hash $hash not found", 'hash' => $hash, 'url' => '' }; 
-	}
+    if ( $shorturl->error ) {
+        return {
+            'rc'            => 1,
+            'statusmessage' => $shorturl->error,
+            'url'           => '',
+            hash            => $hash
+        };
+    } elsif ($url) {
+        return {
+            'rc'            => 0,
+            'statusmessage' => '',
+            'hash'          => $hash,
+            'url'           => "$url"
+        };
+    } else {
+        return {
+            'rc'            => 1,
+            'statusmessage' => "Hash $hash not found",
+            'hash'          => $hash,
+            'url'           => ''
+        };
+    }
 
 }
 
 sub shorturl_clicks {
-	my ($hash) = @_; 
+    my ($hash) = @_;
 
-	my $count = $shorturl->get_counter($hash);
-	if ($hash =~ /^https?:\/\/frm\.li\/(.*)/) {
-		$hash = $1;
-	}
+    my $count = $shorturl->get_counter($hash);
+    if ( $hash =~ /^https?:\/\/frm\.li\/(.*)/ ) {
+        $hash = $1;
+    }
 
-
-	if ($shorturl->error) {
-		return {'rc' => 1, 'statusmessage' => $shorturl->error, 'url' => '', hash => $hash };
-	} else {
-		return { 'rc' => 0, 'statusmessage' => '', 'hash' => $hash, 'count' => $count }; 
-	}
+    if ( $shorturl->error ) {
+        return {
+            'rc'            => 1,
+            'statusmessage' => $shorturl->error,
+            'url'           => '',
+            hash            => $hash
+        };
+    } else {
+        return {
+            'rc'            => 0,
+            'statusmessage' => '',
+            'hash'          => $hash,
+            'count'         => $count
+        };
+    }
 
 }
+
 sub getLanguages {
-	my $error = 0; 
-	my $statusmessage;
-	my $lang_ref = $paste->get_langs();
-	my @langs;
-	if ($paste->error) {
-		$error = 1; 
-		$statusmessage = $paste->error; 
-	} else { 
-		foreach my $lang (@{$lang_ref}) {
-			push @langs, $lang->{desc};
-		}
-	}
-	return {'rc' => $error, 'statusmessage' => $statusmessage, 'langs' => \@langs,};
+    my $error = 0;
+    my $statusmessage;
+    my $lang_ref = $paste->get_langs();
+    my @langs;
+    if ( $paste->error ) {
+        $error         = 1;
+        $statusmessage = $paste->error;
+    } else {
+        foreach my $lang ( @{$lang_ref} ) {
+            push @langs, $lang->{desc};
+        }
+    }
+    return {
+        'rc'            => $error,
+        'statusmessage' => $statusmessage,
+        'langs'         => \@langs,
+    };
 }
 
-process_cgi_call({'paste.addPaste' => \&addPaste, 
-			      'paste.deletePaste' => \&deletePaste,
-				  'paste.getLanguages' => \&getLanguages, 
-				  'paste.getPaste' => \&getPaste,
-				  'paste.addShortURL' => \&add_shorturl, 
-				  'paste.resolveShortURL' => \&resolve_shorturl,
-				  'paste.ShortURLClicks' => \&shorturl_clicks, 
-				});
-
+process_cgi_call(
+    {   'paste.addPaste'        => \&addPaste,
+        'paste.deletePaste'     => \&deletePaste,
+        'paste.getLanguages'    => \&getLanguages,
+        'paste.getPaste'        => \&getPaste,
+        'paste.addShortURL'     => \&add_shorturl,
+        'paste.resolveShortURL' => \&resolve_shorturl,
+        'paste.ShortURLClicks'  => \&shorturl_clicks,
+    }
+);
 
 #==========================================================================
 #  CGI Support
@@ -218,28 +287,28 @@ sub process_cgi_call ($) {
 
     # Get our CGI request information.
     my $method = $ENV{'REQUEST_METHOD'};
-    my $type = $ENV{'CONTENT_TYPE'};
+    my $type   = $ENV{'CONTENT_TYPE'};
     my $length = $ENV{'CONTENT_LENGTH'};
 
     # Perform some sanity checks.
-    http_error(405, "Method Not Allowed") unless $method;
-    http_error(405, "Method Not Allowed") unless $method eq "POST";
-    http_error(400, "Bad Request") unless $type eq "text/xml";
-    http_error(411, "Length Required") unless $length > 0;
+    http_error( 405, "Method Not Allowed" ) unless $method;
+    http_error( 405, "Method Not Allowed" ) unless $method eq "POST";
+    http_error( 400, "Bad Request" )        unless $type eq "text/xml";
+    http_error( 411, "Length Required" )    unless $length > 0;
 
     # Fetch our body.
     my $body;
     my $count = read STDIN, $body, $length;
-    http_error(400, "Bad Request") unless $count == $length; 
+    http_error( 400, "Bad Request" ) unless $count == $length;
 
     # Serve our request.
     my $coder = Frontier::RPC2->new;
-    send_xml($coder->serve($body, $methods));
+    send_xml( $coder->serve( $body, $methods ) );
 }
 
 # Send an HTTP error and exit.
 sub http_error ($$) {
-    my ($code, $message) = @_;
+    my ( $code, $message ) = @_;
     print <<"EOD";
 Status: $code $message
 Content-type: text/html
@@ -261,8 +330,11 @@ Content-type: text/xml
 Content-length: $length
 
 EOD
+
     # We want precise control over whitespace here.
     print $xml_string;
 }
+
 # vim: syntax=perl sw=4 ts=4 noet shiftround
 
+# vim: syntax=perl sw=4 ts=4 noet shiftround

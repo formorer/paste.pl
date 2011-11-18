@@ -1,15 +1,21 @@
-#/usr/bin/perl 
+#/usr/bin/perl
 
-use strict; 
-use Template; 
+use strict;
+use Template;
 
 use lib 'lib/';
 
-my $template = Template->new ( { INCLUDE_PATH => 'templates', PLUGIN_BASE => 'Paste::Template::Plugin', } );
+my $template = Template->new(
+    {   INCLUDE_PATH => 'templates',
+        PLUGIN_BASE  => 'Paste::Template::Plugin',
+    }
+);
 
-$template->process('test', { 
-			'desc' => "perl", 
-			'code' => 'print "foo"; foobar();', 
-		}
-	) ||  die $template->error(), "\n";
+$template->process(
+    'test',
+    {   'desc' => "perl",
+        'code' => 'print "foo"; foobar();',
+    }
+) || die $template->error(), "\n";
 
+# vim: syntax=perl sw=4 ts=4 noet shiftround

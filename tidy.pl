@@ -58,3 +58,5 @@ sub find_files {
     );
     return @files;
 }
+
+# vim: syntax=perl sw=4 ts=4 noet shiftround

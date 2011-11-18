@@ -1,4 +1,4 @@
-#Perl Template toolkit pluginText::VimColor 
+#Perl Template toolkit pluginText::VimColor
 #Copyright (C) 2007  Alexander Wirt <formorer@debian.org>
 #
 #This program is free software: you can redistribute it and/or modify
@@ -446,78 +446,92 @@ my @langs = qw (
 );
 
 push @langs, "Plain";
+
 sub init {
     my $self = shift;
 
-    $self->{ _DYNAMIC } = 1;
+    $self->{_DYNAMIC} = 1;
 
     # first arg can specify filter name
-    $self->install_filter($self->{ _ARGS }->[0] || 'highlight');
+    $self->install_filter( $self->{_ARGS}->[0] || 'highlight' );
 
     return $self;
 }
 
 sub filter {
-    my ($self, $text, $args, $config) = @_;
+    my ( $self, $text, $args, $config ) = @_;
 
     #merge our caller and init configs
     $config = $self->merge_config($config);
+
     #then for arguments
     $args = $self->merge_args($args);
 
-    if ( ! grep { lc($_) eq lc(@{$args}[0]) } @langs ) {
-	die Template::Exception->new( highlight => "@$args[0] is not supported" );
+    if ( !grep { lc($_) eq lc( @{$args}[0] ) } @langs ) {
+        die Template::Exception->new(
+            highlight => "@$args[0] is not supported" );
     }
 
     my $digest = sha1_hex($text);
-    my $lines = %$config->{'linenumbers'} || 0; 
+    my $lines = %$config->{'linenumbers'} || 0;
 
-    if (%$config->{'cache'}) {
-	die Template::Exception->new( highlight => "cache_dir not found") unless -d %$config->{'cache_dir'};
+    if ( %$config->{'cache'} ) {
+        die Template::Exception->new( highlight => "cache_dir not found" )
+            unless -d %$config->{'cache_dir'};
 
-	if (-f %$config->{'cache_dir'} . "/$digest-$lines") {
-		open (my $fh, '<', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
-		$text = join("", <$fh>); 
-		close ($fh);
-		return $text;
-	}
+        if ( -f %$config->{'cache_dir'} . "/$digest-$lines" ) {
+            open( my $fh, '<', %$config->{'cache_dir'} . "/$digest-$lines" )
+                or die Template::Exception->new(
+                highlight => "Could not opencache file: $!" );
+            $text = join( "", <$fh> );
+            close($fh);
+            return $text;
+        }
     }
 
     use Encode qw(from_to);
 
-    my $f = from_to($text, "utf-8", "iso8859-15");
+    my $f = from_to( $text, "utf-8", "iso8859-15" );
 
-    my $fh = tempfile(UNLINK => 1);
-    print $fh "$text"; 
+    my $fh = tempfile( UNLINK => 1 );
+    print $fh "$text";
     my $syntax = Text::VimColor->new(
-	string	=> "$text",
-	filename => $fh,
-	filetype => @$args[0],
+        string   => "$text",
+        filename => $fh,
+        filetype => @$args[0],
     );
-    close ($fh); 
-    if (exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1) {
-	$text = "<ol style='list-style-type:decimal' class='synline'>\n";
-	foreach my $line (split(/\n/, $syntax->html)) {
-	    $line = ' ' if $line eq ''; 
-	    $text .= "<li class='synline'><pre>$line</pre></li>";
-	}
-	$text .= "</ol>";
+    close($fh);
+    if ( exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1 )
+    {
+        $text = "<ol style='list-style-type:decimal' class='synline'>\n";
+        foreach my $line ( split( /\n/, $syntax->html ) ) {
+            $line = ' ' if $line eq '';
+            $text .= "<li class='synline'><pre>$line</pre></li>";
+        }
+        $text .= "</ol>";
     } else {
-	    $text = "<ol style='list-style-type:none' class='synline'>\n";
-	    foreach my $line (split(/\n/, $syntax->html)) {
-		    $line = ' ' if $line eq '';
-		    $text .= "<li class='synline'><pre>$line</pre></li>";
-	    }
-	    $text .= "</ol>";
+        $text = "<ol style='list-style-type:none' class='synline'>\n";
+        foreach my $line ( split( /\n/, $syntax->html ) ) {
+            $line = ' ' if $line eq '';
+            $text .= "<li class='synline'><pre>$line</pre></li>";
+        }
+        $text .= "</ol>";
     }
-    $f = from_to($text, "iso8859-15", "utf-8");
-    
-    if (%$config->{'cache'} && -d %$config->{'cache_dir'} && -w %$config->{'cache_dir'}) {
-	    open (my $fh, '>', %$config->{'cache_dir'} . "/$digest-$lines") or die Template::Exception->new( highlight => "Could not opencache file: $!");
-	    print $fh $text;
-	    close($fh);
-    }	
+    $f = from_to( $text, "iso8859-15", "utf-8" );
+
+    if (   %$config->{'cache'}
+        && -d %$config->{'cache_dir'}
+        && -w %$config->{'cache_dir'} )
+    {
+        open( my $fh, '>', %$config->{'cache_dir'} . "/$digest-$lines" )
+            or die Template::Exception->new(
+            highlight => "Could not opencache file: $!" );
+        print $fh $text;
+        close($fh);
+    }
     return $text;
 }
 
 1;
+
+# vim: syntax=perl sw=4 ts=4 noet shiftround

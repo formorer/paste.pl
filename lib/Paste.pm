@@ -16,19 +16,18 @@
 
 package Paste;
 
-use strict; 
-use warnings; 
-use Exporter; 
+use strict;
+use warnings;
+use Exporter;
 use Config::IniFiles;
-use DBI; 
-use Encode; 
-use Digest::SHA1  qw(sha1_hex);
+use DBI;
+use Encode;
+use Digest::SHA1 qw(sha1_hex);
 use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 use RPC::XML;
 use RPC::XML::Client;
 
-
-use Carp; 
+use Carp;
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
@@ -36,53 +35,56 @@ use vars qw(@ISA @EXPORT);
 @EXPORT = qw ();
 
 sub new {
-	my $invocant = shift;
-	my $class = ref($invocant) || $invocant;	
-	my $config_file = shift || ''; 
-	croak ("Need a configfile ($config_file)") unless -f $config_file; 
-	my $config = Config::IniFiles->new( -file => $config_file );	
+    my $invocant    = shift;
+    my $class       = ref($invocant) || $invocant;
+    my $config_file = shift || '';
+    croak("Need a configfile ($config_file)") unless -f $config_file;
+    my $config = Config::IniFiles->new( -file => $config_file );
 
-	unless ($config) {
-		my $error = "$!\n"; 
-		$error .= join("\n", @Config::IniFiles::errors);
-		croak "Could not load configfile '$config_file': $error"; 
-	}
+    unless ($config) {
+        my $error = "$!\n";
+        $error .= join( "\n", @Config::IniFiles::errors );
+        croak "Could not load configfile '$config_file': $error";
+    }
 
-	my $dbname = $config->val('database', 'dbname') || carp "Databasename not specified in config";
-	my $dbuser = $config->val('database', 'dbuser') || carp "Databaseuser not specified in config";
-	my $dbpass = $config->val('database', 'dbpassword') || '';
-	my $base_url = $config->val('www', 'base_url') || carp "base_url not specified in config";	
+    my $dbname = $config->val( 'database', 'dbname' )
+        || carp "Databasename not specified in config";
+    my $dbuser = $config->val( 'database', 'dbuser' )
+        || carp "Databaseuser not specified in config";
+    my $dbpass = $config->val( 'database', 'dbpassword' ) || '';
+    my $base_url = $config->val( 'www', 'base_url' )
+        || carp "base_url not specified in config";
 
-	my $dbh = 
-		DBI->connect("dbi:Pg:dbname=$dbname", $dbuser, $dbpass,
-			{ RaiseError => 0, PrintError => 0}) or 
-			croak "Could not connect to DB: " . $DBI::errstr;
+    my $dbh =
+        DBI->connect( "dbi:Pg:dbname=$dbname", $dbuser, $dbpass,
+        { RaiseError => 0, PrintError => 0 } )
+        or croak "Could not connect to DB: " . $DBI::errstr;
 
-	my $self = {
-			config => $config, 
-			dbname => $dbname, 
-			dbuser => $dbuser, 
-			dbpass => $dbpass, 
-			dbh => $dbh,
-			@_, 
-		};
+    my $self = {
+        config => $config,
+        dbname => $dbname,
+        dbuser => $dbuser,
+        dbpass => $dbpass,
+        dbh    => $dbh,
+        @_,
+    };
 
-	bless ($self, $class);
-	return $self;
+    bless( $self, $class );
+    return $self;
 }
 
 sub get_config_key () {
-	my ($self, $section, $key) = @_; 
-	if ($self->{config}->val($section, $key)) {
-		return $self->{config}->val($section, $key);
-	} else {
-		return undef;
-	}
+    my ( $self, $section, $key ) = @_;
+    if ( $self->{config}->val( $section, $key ) ) {
+        return $self->{config}->val( $section, $key );
+    } else {
+        return undef;
+    }
 }
 
 sub error {
-	my $self = shift;
-	return $self->{error};
+    my $self = shift;
+    return $self->{error};
 }
 
 =pod
@@ -122,115 +124,123 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 =cut
 
 sub add_paste ($$$$;$$) {
-	my ($self, $code, $name, $expire, $lang, $sessionid, $hidden) = @_;
-	my $dbh = $self->{dbh}; 
-	$name = $name || 'anonymous';
-	$sessionid = $sessionid || '';
-	$hidden = $hidden || 'f'; 
+    my ( $self, $code, $name, $expire, $lang, $sessionid, $hidden ) = @_;
+    my $dbh = $self->{dbh};
+    $name      = $name      || 'anonymous';
+    $sessionid = $sessionid || '';
+    $hidden    = $hidden    || 'f';
 
-	warn $hidden;
-	if ($name !~ /^[^;,'"<>]{1,10}$/i) {
-		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
-		return 0;
-	}
+    warn $hidden;
+    if ( $name !~ /^[^;,'"<>]{1,10}$/i ) {
+        $self->{error} =
+            "Invalid format for name (no special chars, max 10 chars)";
+        return 0;
+    }
 
-	if ($expire !~ /^(-1|[0-9]+)/) {
-		$self->{error} = "Expire must be an integer or -1"; 
-		return 0;
-	}
+    if ( $expire !~ /^(-1|[0-9]+)/ ) {
+        $self->{error} = "Expire must be an integer or -1";
+        return 0;
+    }
 
-	if ($sessionid && $sessionid !~ /^[0-9a-f]{40}$/i ) {
-		$self->{error} = "Sessionid does not look like a sha1 hex";
-		return 0;
- 	}
-	if ($expire > 604800) {
-		$self->{error} = 'Expiration time can not be longer than 604800 seconds (7 days)'; 
-		return 0;
-	}
+    if ( $sessionid && $sessionid !~ /^[0-9a-f]{40}$/i ) {
+        $self->{error} = "Sessionid does not look like a sha1 hex";
+        return 0;
+    }
+    if ( $expire > 604800 ) {
+        $self->{error} =
+            'Expiration time can not be longer than 604800 seconds (7 days)';
+        return 0;
+    }
 
-	my $code_size = length($code); 
+    my $code_size = length($code);
 
-	if ($code_size  > 91080) {
-		$self->{error} = 'Length of code is not allowed to exceed 90kb'; 
-		return 0; 
-	}
+    if ( $code_size > 91080 ) {
+        $self->{error} = 'Length of code is not allowed to exceed 90kb';
+        return 0;
+    }
 
+    my $newlines = 0;
+    my $pos      = 0;
+    while (1) {
+        $pos = index( $code, "\n", $pos );
+        last if ( $pos < 0 );
+        $newlines++;
+        $pos++;
+    }
 
-	my $newlines = 0; 
-	my $pos = 0; 
-	while (1) {
-		$pos = index($code, "\n", $pos);
-		last if($pos < 0);
-		$newlines++;
-		$pos++;
-	}
+    if ( $newlines <= 1 ) {
+        $self->{error} =
+            'Thanks to some spammers you need to provide at least 3 or two linebreaks';
+        return 0;
+    }
 
-	if ($newlines <= 1) {
-		$self->{error} = 'Thanks to some spammers you need to provide at least 3 or two linebreaks';
-		return 0; 
-	}
+    my $sth = $dbh->prepare(
+        "INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)"
+    );
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
 
-	my $sth = $dbh->prepare("INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)");
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}	
+    #replace \r\n with \n
+    $code =~ s/\r\n/\n/g;
 
-	
-	
-	#replace \r\n with \n
-	$code =~ s/\r\n/\n/g;
+#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry.
+#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys.
+    my $digest = hmac_sha1_hex( $code, sha1_hex( time() . rand() ) );
 
-	#we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry. 
-	#in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys. 
-	my $digest = hmac_sha1_hex($code, sha1_hex(time().rand()));
-	
-	$sth->execute($name,$code,$lang,$expire,$digest,$sessionid,$hidden);
+    $sth->execute( $name, $code, $lang, $expire, $digest, $sessionid,
+        $hidden );
 
-	if ($dbh->errstr) {
+    if ( $dbh->errstr ) {
         $self->{error} = "Could not insert paste into db: " . $dbh->errstr;
         return 0;
     }
-	
 
-	#We need to get the id from our database so that the caller is able to
-	#generate the proper URLs
-	my $id; 
-	
-	if ($hidden eq 'f') {
-		$sth = $dbh->prepare("SELECT id from paste where sha1 = ?");
-		if ($dbh->errstr) {
-			$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-			return 0;
-		}  
-		$sth->execute($digest);	
-		if ($dbh->errstr) {
-			$self->{error} = "Could not retrieve your entry from the paste database: "
-			. $dbh->errstr;
-			return 0;
-		}
-		while ( my @row = $sth->fetchrow_array ) {
-			$id = $row[0];
-		}
-	} else {
-		$sth = $dbh->prepare("SELECT  substring(sha1 FROM 1 FOR 8) AS id from paste where sha1 = ?");
-			if ($dbh->errstr) {
-				$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-			return 0;
-		}  
-		$sth->execute($digest);	
-		if ($dbh->errstr) {
-			$self->{error} = "Could not retrieve your entry from the paste database: "
-			. $dbh->errstr;
-			return 0;
-		}
-		while ( my @row = $sth->fetchrow_array ) {
-			$id = $row[0];
-		}
-	}
-		
-	return $id, $digest;
-	
+    #We need to get the id from our database so that the caller is able to
+    #generate the proper URLs
+    my $id;
+
+    if ( $hidden eq 'f' ) {
+        $sth = $dbh->prepare("SELECT id from paste where sha1 = ?");
+        if ( $dbh->errstr ) {
+            $self->{error} =
+                "Could not prepare db statement: " . $dbh->errstr;
+            return 0;
+        }
+        $sth->execute($digest);
+        if ( $dbh->errstr ) {
+            $self->{error} =
+                "Could not retrieve your entry from the paste database: "
+                . $dbh->errstr;
+            return 0;
+        }
+        while ( my @row = $sth->fetchrow_array ) {
+            $id = $row[0];
+        }
+    } else {
+        $sth = $dbh->prepare(
+            "SELECT  substring(sha1 FROM 1 FOR 8) AS id from paste where sha1 = ?"
+        );
+        if ( $dbh->errstr ) {
+            $self->{error} =
+                "Could not prepare db statement: " . $dbh->errstr;
+            return 0;
+        }
+        $sth->execute($digest);
+        if ( $dbh->errstr ) {
+            $self->{error} =
+                "Could not retrieve your entry from the paste database: "
+                . $dbh->errstr;
+            return 0;
+        }
+        while ( my @row = $sth->fetchrow_array ) {
+            $id = $row[0];
+        }
+    }
+
+    return $id, $digest;
+
 }
 
 =pod
@@ -262,52 +272,55 @@ The ID of the paste entry where the comment belongs to.
 =cut
 
 sub add_comment ($$$) {
-	my ($self, $comment, $name, $paste_id) = @_;
-	my $dbh = $self->{dbh}; 
-	$name = $name || 'anonymous';
+    my ( $self, $comment, $name, $paste_id ) = @_;
+    my $dbh = $self->{dbh};
+    $name = $name || 'anonymous';
 
-	if ($name !~ /^[^;,'"]{1,30}/i) {
-		$self->{error} = "Invalid format for name (no special chars, max 30 chars)";
-		return 0;
-	}
-	
-	#id must be an integer
-	if ($paste_id !~ /^[0-9]+$/) {
-		$self->{error} = "Invalid id format (must be an integer)";
-	}
+    if ( $name !~ /^[^;,'"]{1,30}/i ) {
+        $self->{error} =
+            "Invalid format for name (no special chars, max 30 chars)";
+        return 0;
+    }
 
-	my $paste_id_ref = $dbh->selectall_arrayref("SELECT id FROM paste  WHERE id = '$paste_id'"); 
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}
-	
-	if (! @{$paste_id_ref}) {
-		$self->{error} = "No entry with id '$paste_id' found"; 
-		return 0;
-	}
+    #id must be an integer
+    if ( $paste_id !~ /^[0-9]+$/ ) {
+        $self->{error} = "Invalid id format (must be an integer)";
+    }
 
-	my $sth = $dbh->prepare("INSERT INTO comments(name,text,paste_id,date) VALUES(?,?,?,now())");
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}	
-	
-	#replace \r\n with \n
-	$comment =~ s/\r\n/\n/g;
+    my $paste_id_ref = $dbh->selectall_arrayref(
+        "SELECT id FROM paste  WHERE id = '$paste_id'");
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
 
-	#even if it already should be valid UTF-8 encoding again won't harm. 
-	#Postgresql is a little bit picky about clean UTF-8
-	#$comment = encode_utf8($comment);
-	
-	$sth->execute($name,$comment,$paste_id);
+    if ( !@{$paste_id_ref} ) {
+        $self->{error} = "No entry with id '$paste_id' found";
+        return 0;
+    }
 
-	if ($dbh->errstr) {
+    my $sth = $dbh->prepare(
+        "INSERT INTO comments(name,text,paste_id,date) VALUES(?,?,?,now())");
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
+
+    #replace \r\n with \n
+    $comment =~ s/\r\n/\n/g;
+
+    #even if it already should be valid UTF-8 encoding again won't harm.
+    #Postgresql is a little bit picky about clean UTF-8
+    #$comment = encode_utf8($comment);
+
+    $sth->execute( $name, $comment, $paste_id );
+
+    if ( $dbh->errstr ) {
         $self->{error} = "Could not insert comment into db: " . $dbh->errstr;
         return 0;
     }
-	
-	return 1;;
+
+    return 1;
 }
 
 =pod
@@ -330,35 +343,35 @@ The digest of the entry you want to delete
 
 =cut
 
-
 sub delete_paste ($) {
-	my ($self, $sha1) = @_;
-	my $dbh = $self->{dbh}; 
+    my ( $self, $sha1 ) = @_;
+    my $dbh = $self->{dbh};
 
-	if ($sha1 !~ /^[0-9a-f]{40}$/i ) {
-		$self->{error} = "Digest does not look like a sha1 hex"; 
-		return 0;
-	}
-	my $deleted_id_ref = $dbh->selectall_arrayref("SELECT id from paste where sha1 = '$sha1'"); 
+    if ( $sha1 !~ /^[0-9a-f]{40}$/i ) {
+        $self->{error} = "Digest does not look like a sha1 hex";
+        return 0;
+    }
+    my $deleted_id_ref =
+        $dbh->selectall_arrayref("SELECT id from paste where sha1 = '$sha1'");
 
-	if (! @{$deleted_id_ref}) {
-		$self->{error} = "No entry with digest '$sha1' found"; 
-		return 0;
-	}
-	my $id = @{@{$deleted_id_ref}[0]}[0];
-	my $sth = $dbh->prepare("DELETE from paste where sha1 = ?");
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}	
-	
-	$sth->execute($sha1);
+    if ( !@{$deleted_id_ref} ) {
+        $self->{error} = "No entry with digest '$sha1' found";
+        return 0;
+    }
+    my $id  = @{ @{$deleted_id_ref}[0] }[0];
+    my $sth = $dbh->prepare("DELETE from paste where sha1 = ?");
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
 
-	if ($dbh->errstr) {
+    $sth->execute($sha1);
+
+    if ( $dbh->errstr ) {
         $self->{error} = "Could not delete paste from db: " . $dbh->errstr;
         return 0;
     }
-	return $id;
+    return $id;
 }
 
 =pod
@@ -381,35 +394,35 @@ The id of the comment you want to delete
 
 =cut
 
-
 sub delete_comment ($) {
-	my ($self, $id) = @_;
-	my $dbh = $self->{dbh}; 
+    my ( $self, $id ) = @_;
+    my $dbh = $self->{dbh};
 
-	if ($id !~ /^[0-9]+$/i ) {
-		$self->{error} = "ID does not look like an integer"; 
-		return 0;
-	}
-	my $deleted_comment_ref = $dbh->selectall_arrayref("SELECT id from comments where id = '$id'"); 
+    if ( $id !~ /^[0-9]+$/i ) {
+        $self->{error} = "ID does not look like an integer";
+        return 0;
+    }
+    my $deleted_comment_ref =
+        $dbh->selectall_arrayref("SELECT id from comments where id = '$id'");
 
-	if (! @{$deleted_comment_ref}) {
-		$self->{error} = "No entry with id '$id' found"; 
-		return 0;
-	}
-	$id = @{@{$deleted_comment_ref}[0]}[0];
-	my $sth = $dbh->prepare("DELETE from comments where id = ?");
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}	
-	
-	$sth->execute($id);
+    if ( !@{$deleted_comment_ref} ) {
+        $self->{error} = "No entry with id '$id' found";
+        return 0;
+    }
+    $id = @{ @{$deleted_comment_ref}[0] }[0];
+    my $sth = $dbh->prepare("DELETE from comments where id = ?");
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
 
-	if ($dbh->errstr) {
+    $sth->execute($id);
+
+    if ( $dbh->errstr ) {
         $self->{error} = "Could not delete comment from db: " . $dbh->errstr;
         return 0;
     }
-	return $id;
+    return $id;
 }
 
 =pod
@@ -434,26 +447,28 @@ The id of the entry you want to retreive
 =cut
 
 sub get_paste ($) {
-	my ($self, $id) = @_;
-	my $dbh = $self->{dbh};
+    my ( $self, $id ) = @_;
+    my $dbh = $self->{dbh};
 
-	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ? and hidden is FALSE"); 
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}
+    my $sth = $dbh->prepare(
+        "SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ? and hidden is FALSE"
+    );
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
 
-	$sth->execute($id);
-	if ($dbh->errstr){ 
-		$self->{error} = "Could not get paste from db: " . $dbh->errstr;
-		return 0;
-	}
-	my $hash_ref = $sth->fetchrow_hashref;
-	if (defined($hash_ref->{code})) {
-		return $hash_ref; 
-	} else {
-		return undef;
-	}
+    $sth->execute($id);
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not get paste from db: " . $dbh->errstr;
+        return 0;
+    }
+    my $hash_ref = $sth->fetchrow_hashref;
+    if ( defined( $hash_ref->{code} ) ) {
+        return $hash_ref;
+    } else {
+        return undef;
+    }
 }
 
 =pod
@@ -477,76 +492,81 @@ The id of the entry you want to retreive
 =cut
 
 sub get_hidden_paste ($) {
-	my ($self, $id) = @_;
-	my $dbh = $self->{dbh};
+    my ( $self, $id ) = @_;
+    my $dbh = $self->{dbh};
 
-	my $sth = $dbh->prepare("SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where substring(sha1 FROM 1 FOR 8) = ?"); 
-	if ($dbh->errstr) {
-		$self->{error} = "Could not prepare db statement: " . $dbh->errstr;
-		return 0;
-	}
+    my $sth = $dbh->prepare(
+        "SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where substring(sha1 FROM 1 FOR 8) = ?"
+    );
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return 0;
+    }
 
-	$sth->execute($id);
-	if ($dbh->errstr){ 
-		$self->{error} = "Could not get paste from db: " . $dbh->errstr;
-		return 0;
-	}
-	my $hash_ref = $sth->fetchrow_hashref;
-	if (defined($hash_ref->{code})) {
-		return $hash_ref; 
-	} else {
-		return undef;
-	}
+    $sth->execute($id);
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not get paste from db: " . $dbh->errstr;
+        return 0;
+    }
+    my $hash_ref = $sth->fetchrow_hashref;
+    if ( defined( $hash_ref->{code} ) ) {
+        return $hash_ref;
+    } else {
+        return undef;
+    }
 }
 
 sub get_langs () {
-	my ($self, $id) = @_;
-	my $dbh = $self->{dbh};
-	my $ary_ref = $dbh->selectall_arrayref("SELECT * from lang", { Slice => {} }); 
-	if ($dbh->errstr) {
-		$self->{error} = "Could not get languages vom database: " . $dbh->errstr;
-		return 0;
-	}
-	return $ary_ref;
+    my ( $self, $id ) = @_;
+    my $dbh = $self->{dbh};
+    my $ary_ref =
+        $dbh->selectall_arrayref( "SELECT * from lang", { Slice => {} } );
+    if ( $dbh->errstr ) {
+        $self->{error} =
+            "Could not get languages vom database: " . $dbh->errstr;
+        return 0;
+    }
+    return $ary_ref;
 }
 
 sub get_lang ($) {
-	my ($self, $lang) = @_; 
-	my $dbh = $self->{dbh};
+    my ( $self, $lang ) = @_;
+    my $dbh = $self->{dbh};
 
-	my $lang_id_ref = $dbh->selectall_arrayref("SELECT lang_id from lang where \"desc\" = '$lang'");
+    my $lang_id_ref = $dbh->selectall_arrayref(
+        "SELECT lang_id from lang where \"desc\" = '$lang'");
 
-    if ($dbh->errstr) {
+    if ( $dbh->errstr ) {
         $self->{error} = "Could not execute db statement: " . $dbh->errstr;
         return 0;
     }
-	
-    if (! @{$lang_id_ref}) {
+
+    if ( !@{$lang_id_ref} ) {
         $self->{error} = "Language $lang not found";
         return 0;
     }
-    my $id = @{@{$lang_id_ref}[0]}[0];
-	return $id;
+    my $id = @{ @{$lang_id_ref}[0] }[0];
+    return $id;
 }
 
 sub check_ip ($) {
-	my $ip = shift; 
-	my $rbl = Net::RBLClient->new(
-		max_time => 0.5,
-		lists => [ 'dnsbl.njabl.org',
-		'no-more-funn.moensted.dk',
-		'spammers.v6net.org',
-		'proxies.monkeys.com'
-		],
+    my $ip  = shift;
+    my $rbl = Net::RBLClient->new(
+        max_time => 0.5,
+        lists    => [
+            'dnsbl.njabl.org',    'no-more-funn.moensted.dk',
+            'spammers.v6net.org', 'proxies.monkeys.com'
+        ],
 
-	);
-	$rbl->lookup($ip);
-	my @listed_by = $rbl->listed_by;
+    );
+    $rbl->lookup($ip);
+    my @listed_by = $rbl->listed_by;
 
-	return 1 if @listed_by; 
-	return 0; 
+    return 1 if @listed_by;
+    return 0;
 }
 1;
 
 # vim: syntax=perl sw=4 ts=4 noet shiftround
 
+# vim: syntax=perl sw=4 ts=4 noet shiftround
