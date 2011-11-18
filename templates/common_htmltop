@@ -4,14 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <title>[% title %]</title>
-  <meta name="google-site-verification" content="DccTb5yeo1BIPg2xon8dKL2Sf5LH7wU8e5DwRi4adqA" />
   <link rel="stylesheet" type="text/css" href="/pastebin.css" />
   <!-- [% CGI.user_agent %] -->
 </head>
 
 <body>
 
-	<center><img src="/images/grml.png" alt="" border="0" hspace="0" vspace="0" height="61" /></center><br /> 
+	<center><img src="/images/debian.png" alt="" border="0" hspace="0" vspace="0" height="61" /></center><br />
 <div id="titlebar">[% title %]</div>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

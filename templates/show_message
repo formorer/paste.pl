@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="Grml Pastezone" %]
+[% WRAPPER common_htmlpage title="debian Pastezone" %]
 <h1>[% message %]</h1><br />
 
 <p>

@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="Grml Pastezone" %]
+[% WRAPPER common_htmlpage title="debian Pastezone" %]
 [% INCLUDE include_show %]
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

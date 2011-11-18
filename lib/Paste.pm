@@ -129,8 +129,8 @@ sub add_paste ($$$$;$$) {
 	$hidden = $hidden || 'f'; 
 
 	warn $hidden;
-	if ($name !~ /^[^;,'"<>]{1,16}$/i) {
-		$self->{error} = "Invalid format for name (no special chars, max 16 chars)";
+	if ($name !~ /^[^;,'"<>]{1,10}$/i) {
+		$self->{error} = "Invalid format for name (no special chars, max 10 chars)";
 		return 0;
 	}
 

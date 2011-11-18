@@ -1,5 +1,5 @@
 <center>
 <h2>Database Error</h2>
 A database error has occurred: <br /> [% error.info %]<br />
-<b>Please contact the <a href=mailto:formorer@grml.org>admin</a> about the problem</b>
+<b>Please contact the <a href=mailto:formorer@debian.org>admin</a> about the problem</b>
 </center>

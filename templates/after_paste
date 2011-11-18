@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="Grml Pastezone" %]
+[% WRAPPER common_htmlpage title="Debian Pastezone" %]
 [% USE format %]
 
 [% IF status %]
