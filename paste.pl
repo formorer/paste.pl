@@ -351,7 +351,7 @@ sub print_paste {
 
         my ( $id, $digest ) =
             $paste->add_paste( $code, $name, $cgi->param("expire"),
-            $cgi->param("lang"), $session_id, $hidden );
+            $cgi->param("lang"), $session_id, $hidden, $cgi->param("wrap") );
         if ( $paste->error ) {
             $statusmessage
                 .= "Could not add your entry to the paste database:<br><br>\n";

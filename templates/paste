@@ -62,6 +62,8 @@
 <br />
 <input type="checkbox" name="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>Create this paste as a non-public (hidden) paste? <b>experimental</b> 
 <br />
+<input type="checkbox" name="wrap" value=1 />Wrap text at 78 characters
+<br />
 <br />
 <b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.<br />

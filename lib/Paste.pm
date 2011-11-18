@@ -27,6 +27,7 @@ use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 use RPC::XML;
 use RPC::XML::Client;
 use Text::ExtractWords qw (words_list);
+use Text::Wrap;
 
 
 use Carp;
@@ -125,8 +126,8 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 
 =cut
 
-sub add_paste ($$$$;$$) {
-    my ( $self, $code, $name, $expire, $lang, $sessionid, $hidden ) = @_;
+sub add_paste ($$$$;$$$) {
+    my ( $self, $code, $name, $expire, $lang, $sessionid, $hidden, $wrap ) = @_;
     my $dbh = $self->{dbh};
     $name      = $name      || 'anonymous';
     $sessionid = $sessionid || '';
@@ -193,6 +194,10 @@ sub add_paste ($$$$;$$) {
 
     #replace \r\n with \n
     $code =~ s/\r\n/\n/g;
+
+	#wrap text if wanted
+
+	$code = wrap("","", $code);
 
 #we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry.
 #in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys.
