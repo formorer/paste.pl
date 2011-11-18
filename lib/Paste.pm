@@ -179,7 +179,7 @@ sub add_paste ($$$$;$$) {
 	if ($spamscore) {
 		my ($hits, $score) = $self->check_wordfilter($code);
 		if ($hits && $score >= $spamscore) {
-			$self->{error} = 'The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.';
+			$self->{error} = "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
 		}
 	}
 			
