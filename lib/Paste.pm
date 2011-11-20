@@ -197,7 +197,9 @@ sub add_paste ($$$$;$$$) {
 
 	#wrap text if wanted
 
-	$code = wrap("","", $code);
+	if ($wrap) {
+		$code = wrap("","", $code);
+	}
 
 #we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry.
 #in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys.
