@@ -47,16 +47,16 @@
 <select name="lang" id="lang">
 	<option value="-1">text</option>
 	[% FOREACH lang = mydb.query('SELECT * from lang order by "desc"') -%]
-		<option [% IF lang.lang_id == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.lang_id %]" >[% lang.desc %]</option>
+		<option [% IF lang.desc == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.desc %]" >[% lang.desc %]</option>
 	[% END %]
 </select>
 <b>Expiration</b>
 <select name="expire" id="expire">
-<option value="259200" [% IF  CGI.cookie('paste_expire') == 259200 %] selected [% END %]>72h</option>
-<option value="86400" [% IF  CGI.cookie('paste_expire') == 86400 %] selected [% END %]>24h</option>
-<option value="43200" [% IF  CGI.cookie('paste_expire') == 43200 %] selected [% END %]>12h</option>
-<option value="3600" [% IF  CGI.cookie('paste_expire') == 3600 %] selected [% END %]>1h</option>
 <option value="-1" [% IF  CGI.cookie('paste_expire') == -1 %] selected [% END %]>Never</option>
+<option value="7776000"  [% IF  CGI.cookie('paste_expire') == 7776000  %] selected [% END %]>90d</option>
+<option value="259200" [% IF  CGI.cookie('paste_expire') == 259200 %] selected [% END %]>3d</option>
+<option value="86400" [% IF  CGI.cookie('paste_expire') == 86400 || ! CGI.cookie('paste_expire') %] selected [% END %]>24h</option>
+<option value="3600" [% IF  CGI.cookie('paste_expire') == 3600 %] selected [% END %]>1h</option>
 </select>
 <br />
 <br />
@@ -67,7 +67,7 @@
 <br />
 <b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.<br />
-<textarea id="code" class="codeedit" name="code" cols="80" rows="10" onkeydown="checkTab(this)">[% entry.code %]</textarea>
+<textarea id="code" class="codeedit" name="code" cols="80" rows="10">[% entry.code %]</textarea>
 <br />
 <input type="file" name="upload" /><input type="submit" name="paste" value="Send"/>
 
