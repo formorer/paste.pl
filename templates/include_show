@@ -76,11 +76,11 @@ never
 <br>
 <h1>Information about your entry</h1>
 <ul>
-<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
+<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url.substr(2) %]/[% post.id %]</a></li>
 
-<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
-<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
-<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
+<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url.substr(2) %]/download/[% post.id %]</a></li>
+<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url.substr(2) %]/plain/[% post.id %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url.substr(2) %]/delete/[% post.sha1 %]</a></li>
 </ul>
 [% END -%]
 [% END -%]
