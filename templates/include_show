@@ -74,7 +74,7 @@ never
 [% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
 
 <br>
-<h1>Informations about your entry</h1>
+<h1>Information about your entry</h1>
 <ul>
 <li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
 

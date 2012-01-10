@@ -87,7 +87,7 @@ Posted on [% comment.postedate %] by [% comment.name %]:</div>
 <br />
 <b>Comment</b>
 <br />
-<textarea id="comment" class="codeedit" name="comment" rows="2" cols="80" onkeydown="checkTab(this)"></textarea>
+<textarea id="comment" class="codeedit" name="comment" rows="2" cols="80"></textarea>
 <input type="submit" name="comment" value="Send"/>
 </form>
 </div>
@@ -95,7 +95,7 @@ Posted on [% comment.postedate %] by [% comment.name %]:</div>
 [% session_id =  CGI.cookie('session_id') %]
 [% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND  substring(sha1 FROM 1 FOR 8) = '$show'") %] 
 
-<h1>Informations about your entry</h1>
+<h1>Information about your entry</h1>
 <br />
 <b>This entry is hidden. So don't lose your hidden id ([% show %])</b>
 <ul>
