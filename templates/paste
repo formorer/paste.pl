@@ -60,7 +60,7 @@
 </select>
 <br />
 <br />
-<input type="checkbox" name="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>Create this paste as a non-public (hidden) paste? <b>experimental</b> 
+<input type="checkbox" name="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>Create this paste as a non-public (hidden) paste?
 <br />
 <input type="checkbox" name="wrap" value=1 />Wrap text at 78 characters
 <br />
