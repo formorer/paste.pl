@@ -139,6 +139,10 @@ sub add_paste ($$$$;$$$) {
         return 0;
     }
 
+    if ($lang !~ /[0-9]+/) {
+	$lang = $self->get_lang($lang);
+	return 0 if $self->error;
+    }
     if ( $expire !~ /^(-1|[0-9]+)/ ) {
         $self->{error} = "Expire must be an integer or -1";
         return 0;
@@ -148,12 +152,6 @@ sub add_paste ($$$$;$$$) {
         $self->{error} = "Sessionid does not look like a sha1 hex";
         return 0;
     }
-    if ( $expire > 604800 ) {
-        $self->{error} =
-            'Expiration time can not be longer than 604800 seconds (7 days)';
-        return 0;
-    }
-
     my $code_size = length($code);
 
     if ( $code_size > 91080 ) {
