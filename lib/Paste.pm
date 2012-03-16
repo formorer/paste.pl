@@ -170,9 +170,11 @@ sub add_paste ($$$$;$$$) {
         $pos++;
     }
 
-    if ( $newlines <= 1 ) {
+    if ( defined $self->get_config_key('spam', 'linebreaks')
+			&& $newlines < $self->get_config_key('spam', 'linebreaks') ) {
+		my $needed = $self->get_config_key('spam', 'linebreaks');
         $self->{error} =
-            'Thanks to some spammers you need to provide at least 3 lines or two linebreaks';
+            "Thanks to some spammers you need to provide at least $needed linebreaks";
         return 0;
     }
 
