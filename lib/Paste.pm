@@ -172,7 +172,7 @@ sub add_paste ($$$$;$$$) {
 
     if ( $newlines <= 1 ) {
         $self->{error} =
-            'Thanks to some spammers you need to provide at least 3 or two linebreaks';
+            'Thanks to some spammers you need to provide at least 3 lines or two linebreaks';
         return 0;
     }
 
