@@ -24,7 +24,7 @@ use Template;
 use POSIX;
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Cookie;
-use Digest::SHA1 qw (sha1_hex);
+use Digest::SHA qw (sha1_hex);
 use Paste;
 use ShortURL;
 
