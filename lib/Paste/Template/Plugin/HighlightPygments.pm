@@ -18,7 +18,7 @@ package Paste::Template::Plugin::HighlightPygments;
 
 use Template::Plugin::Filter;
 use base qw( Template::Plugin::Filter );
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 use File::Temp qw (tempfile );
 
 use strict;
@@ -59,14 +59,14 @@ sub filter {
     }
 
     my $digest = sha1_hex($text);
-    my $lines = %$config->{'linenumbers'} || 0;
+    my $lines = $config->{'linenumbers'} || 0;
 
-    if ( %$config->{'cache'} ) {
+    if ( $config->{'cache'} ) {
         die Template::Exception->new( highlight => "cache_dir not found" )
-            unless -d %$config->{'cache_dir'};
+            unless -d $config->{'cache_dir'};
 
-        if ( -f %$config->{'cache_dir'} . "/$digest-$lines" ) {
-            open( my $fh, '<', %$config->{'cache_dir'} . "/$digest-$lines" )
+        if ( -f $config->{'cache_dir'} . "/$digest-$lines" ) {
+            open( my $fh, '<', $config->{'cache_dir'} . "/$digest-$lines" )
                 or die Template::Exception->new(
                 highlight => "Could not open cache file: $!" );
             $text = join( "", <$fh> );
@@ -87,13 +87,13 @@ sub filter {
           '/usr/bin/pygmentize -f html -l "' 
         . $lang
         . '" -O style=default,classprefix=pygment';
-    if ( exists %$config->{'linenumbers'} && %$config->{'linenumbers'} == 1 )
+    if ( exists $config->{'linenumbers'} && $config->{'linenumbers'} == 1 )
     {
         $pygment .= ',linenos=1';
     }
 
-    if ( exists %$config->{'style'} ) {
-        $pygment .= ',style=' . %$config->{'style'};
+    if ( exists $config->{'style'} ) {
+        $pygment .= ',style=' . $config->{'style'};
     }
 
     run3( $pygment, \$text, \$out, \$stderr );
@@ -104,11 +104,11 @@ sub filter {
 
     my $text = $out;
 
-    if (   %$config->{'cache'}
-        && -d %$config->{'cache_dir'}
-        && -w %$config->{'cache_dir'} )
+    if (   $config->{'cache'}
+        && -d $config->{'cache_dir'}
+        && -w $config->{'cache_dir'} )
     {
-        open( my $fh, '>', %$config->{'cache_dir'} . "/$digest-$lines" )
+        open( my $fh, '>', $config->{'cache_dir'} . "/$digest-$lines" )
             or die Template::Exception->new(
             highlight => "Could not opencache file: $!" );
         print $fh $text;

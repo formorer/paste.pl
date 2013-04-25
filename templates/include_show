@@ -64,23 +64,22 @@ never
 	<br/>
 	[% END %]
 [% CATCH -%]
-<b>[% error.info %]</b><br />
 <pre>
-[% entry.code %]
-<pre>
+[% entry.code | html %]
+</pre>
 [% END %]
 [% IF CGI.cookie('session_id') -%]
 [% session_id =  CGI.cookie('session_id') %]
 [% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
 
 <br>
-<h1>Informations about your entry</h1>
+<h1>Information about your entry</h1>
 <ul>
-<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url %]/[% post.id %]</a></li>
+<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url.substr(2) %]/[% post.id %]</a></li>
 
-<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url %]/download/[% post.id %]</a></li>
-<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url %]/plain/[% post.id %]</a></li>
-<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url %]/delete/[% post.sha1 %]</a></li>
+<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url.substr(2) %]/download/[% post.id %]</a></li>
+<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url.substr(2) %]/plain/[% post.id %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url.substr(2) %]/delete/[% post.sha1 %]</a></li>
 </ul>
 [% END -%]
 [% END -%]

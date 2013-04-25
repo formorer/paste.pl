@@ -68,11 +68,11 @@ sub addPaste {
     } else {
         if ( $hidden eq 'f' ) {
             $statusmessage = "Your entry has been added to the database:\n";
-            $statusmessage .= "$base_url/$id\n";
+            $statusmessage .= "http:$base_url/$id\n";
             $statusmessage
-                .= "To download your entry use: $base_url/download/$id\n";
+                .= "To download your entry use: http:$base_url/download/$id\n";
             $statusmessage
-                .= "To delete your entry use: $base_url/delete/$digest\n";
+                .= "To delete your entry use: http:$base_url/delete/$digest\n";
             $v_url  = "$base_url/$id";
             $dl_url = "$base_url/download/$id";
             $d_url  = "$base_url/delete/$digest";
@@ -81,11 +81,11 @@ sub addPaste {
             $statusmessage
                 .= "This entry is hidden. So don't lose your hidden id ($id)\n";
             $statusmessage
-                .= "To link to your entry use: $base_url/hidden/$id\n";
+                .= "To link to your entry use: http:$base_url/hidden/$id\n";
             $statusmessage
-                .= "To download your entry use: $base_url/downloadh/$id\n";
+                .= "To download your entry use: http:$base_url/downloadh/$id\n";
             $statusmessage
-                .= "To delete your entry use: $base_url/delete/delete/$digest\n";
+                .= "To delete your entry use: http:$base_url/delete/delete/$digest\n";
             $v_url  = "$base_url/hidden/$id";
             $dl_url = "$base_url/downloadh/$id";
             $d_url  = "$base_url/delete/$digest";
