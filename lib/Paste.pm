@@ -22,12 +22,15 @@ use Exporter;
 use Config::IniFiles;
 use DBI;
 use Encode;
-use Digest::SHA1 qw(sha1_hex);
+use Digest::SHA qw(sha1_hex);
 use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 use RPC::XML;
 use RPC::XML::Client;
 use Text::ExtractWords qw (words_list);
 use Text::Wrap;
+use GnuPG;
+use File::Temp qw ( tempfile ); 
+use Format::Human::Bytes;
 
 
 use Carp;
@@ -152,10 +155,41 @@ sub add_paste ($$$$;$$$) {
         $self->{error} = "Sessionid does not look like a sha1 hex";
         return 0;
     }
+
+    my $max_code_size = 153600;
+
+    my $file;
+    if ($code =~/^-----BEGIN PGP SIGNED MESSAGE/) {
+	    my $gpg = new GnuPG();
+	    my $sig;
+	   	    
+	    my $code_new;
+	    foreach my $line (split("\n", $code)) {
+		    $code_new .= "$line\n";
+		    last if $line =~ /^-----END PGP SIGNATURE-----/;
+	    }
+	    $code = $code_new;
+	    my ($fh, $filename) = tempfile(UNLINK => 1);
+	    print $fh $code;
+	    close($fh);
+	    eval {
+		    $sig = $gpg->verify( signature => $filename);
+	    };
+	    if ($sig) {
+		    die  $sig->{'user'};
+		    warn "Code signed by " . $sig->{'user'};
+		    $max_code_size = 52428800;
+	    } elsif ($@ =~ /no public key (\S+)/m) {
+		    warn "Code signed by $1";
+		    $max_code_size = 52428800;
+	    }
+	    unlink($filename);
+    }
     my $code_size = length($code);
 
-    if ( $code_size > 91080 ) {
-        $self->{error} = 'Length of code is not allowed to exceed 90kb';
+    if ( defined($max_code_size) && $code_size > $max_code_size ) {
+	my $readable = Format::Human::Bytes::base2($max_code_size);
+        $self->{error} = "Length of code is not allowed to exceed $readable";
         return 0;
     }
 
@@ -179,6 +213,7 @@ sub add_paste ($$$$;$$$) {
 		my ($hits, $score) = $self->check_wordfilter($code);
 		if ($hits && $score >= $spamscore) {
 			$self->{error} = "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
+			return 0;
 		}
 	}
 			
@@ -585,7 +620,7 @@ sub check_wordfilter ($) {
 	my $paste = shift;
 
 	my $db = $self->get_config_key('spam', 'db');
-	next unless $db && -f $db;
+	return unless $db && -f $db;
 
 	open (my $fh, '<', $db) or die "Could not open spamdb: $db";
 
