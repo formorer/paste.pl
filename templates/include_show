@@ -64,10 +64,9 @@ never
 	<br/>
 	[% END %]
 [% CATCH -%]
-<b>[% error.info %]</b><br />
 <pre>
-[% entry.code %]
-<pre>
+[% entry.code | html %]
+</pre>
 [% END %]
 [% IF CGI.cookie('session_id') -%]
 [% session_id =  CGI.cookie('session_id') %]

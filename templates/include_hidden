@@ -63,10 +63,9 @@ never
 	<br/>
 	[% END %]
 [% CATCH -%]
-<b>[% error.info %]</b><br />
 <pre>
-[% entry.code %]
-<pre>
+[% entry.code | html -%]
+</pre>
 [% END %]
 [% comments = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$entry.paste_id'") %]
 [% IF comments.size >= 1 %]
