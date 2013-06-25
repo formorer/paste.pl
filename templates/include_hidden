@@ -72,9 +72,9 @@ never
 <p>
 [% FOREACH comment  = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$entry.paste_id'") %]
 <div id="comment_header">
-Posted on [% comment.postedate %] by [% comment.name %]:</div>
+Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
 <div id="comment">
-[% comment.text %]<br />
+[% comment.text | html %]<br />
 </div>
 [% END %]
 [% END %]
