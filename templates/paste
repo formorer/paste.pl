@@ -34,23 +34,24 @@
 
 <b>[% CGI.cookie('lang') | html %]</b>
 
-<form name="editor" method="post" action="./" enctype="multipart/form-data">
-<b>Name</b><br />
-<input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
+<form name="editor" id="editor" method="post" action="./" enctype="multipart/form-data">
+<label for="poster" form="editor"><b>Name</b></label><br />
+<input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% CGI.cookie('paste_name') | html %]" />
 <br />
 [% IF CGI.cookie('session_id') -%]
 <input type='hidden' name='session_id'  value="[% CGI.cookie('session_id')  | html %]">
 [% END -%]
-<input type="checkbox" name="remember" value="1" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />Remember my name and my selected language in a cookie
+<input type="checkbox" name="remember" id="remember" value="1" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />
+<label for="remember">Remember my name and my selected language in a cookie</label>
 <br /> <br />
-<b>Language</b>
+<label for="lang"><b>Language</b></label>
 <select name="lang" id="lang">
 	<option value="-1">text</option>
 	[% FOREACH lang = mydb.query('SELECT * from lang order by "desc"') -%]
 		<option [% IF lang.desc == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.desc %]" >[% lang.desc %]</option>
 	[% END %]
 </select>
-<b>Expiration</b>
+<label for="expire"><b>Expiration</b></label>
 <select name="expire" id="expire">
 <option value="-1" [% IF  CGI.cookie('paste_expire') == -1 %] selected [% END %]>Never</option>
 <option value="7776000"  [% IF  CGI.cookie('paste_expire') == 7776000  %] selected [% END %]>90d</option>
@@ -60,13 +61,15 @@
 </select>
 <br />
 <br />
-<input type="checkbox" name="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>Create this paste as a non-public (hidden) paste?
+<input type="checkbox" name="private" id="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>
+<label for="private">Create this paste as a non-public (hidden) paste?</label>
 <br />
-<input type="checkbox" name="wrap" value=1 />Wrap text at 78 characters
+<input type="checkbox" name="wrap" id="wrap" value=1 />
+<label for="wrap">Wrap text at 78 characters</label>
 <br />
 <br />
-<b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
-Include comments to indicate what you need feedback on.<br />
+<label for="code"><b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
+Include comments to indicate what you need feedback on.</label><br />
 <textarea id="code" class="codeedit" name="code" cols="80" rows="10">[% entry.code | html %]</textarea>
 <br />
 <input type="file" name="upload" /><input type="submit" name="paste" value="Send"/>

@@ -80,11 +80,11 @@ Posted on [% comment.postedate %] by [% comment.name %]:</div>
 [% END %]
 <div id="comment_add">
 <b>Add Comment:</b>
-<form name="add_comment" method="post" action="./">
-<b>Name</b><br/><input type="hidden" name="paste_id" value="[% entry.paste_id %]"/>
-<input type="text" maxlength="24" size="24" name="poster" value="[% CGI.cookie('paste_name') | html %]" />
+<form name="add_comment" id="add_comment" method="post" action="./">
+<label for="poster" form="add_comment"><b>Name</b></label><br/><input type="hidden" name="paste_id" value="[% entry.paste_id %]"/>
+<input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% CGI.cookie('paste_name') | html %]" />
 <br />
-<b>Comment</b>
+<label for="comment"><b>Comment</b></label>
 <br />
 <textarea id="comment" class="codeedit" name="comment" rows="2" cols="80"></textarea>
 <input type="submit" name="comment" value="Send"/>
