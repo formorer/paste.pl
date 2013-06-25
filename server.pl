@@ -282,7 +282,7 @@ process_cgi_call(
 #  (Based on xmlrpc_cgi.c by Eric Kidd <http://xmlrpc-c.sourceforge.net/>.)
 
 # Process a CGI call.
-sub process_cgi_call ($) {
+sub process_cgi_call {
     my ($methods) = @_;
 
     # Get our CGI request information.
@@ -307,7 +307,7 @@ sub process_cgi_call ($) {
 }
 
 # Send an HTTP error and exit.
-sub http_error ($$) {
+sub http_error {
     my ( $code, $message ) = @_;
     print <<"EOD";
 Status: $code $message
@@ -321,7 +321,7 @@ EOD
 }
 
 # Send an XML document (but don't exit).
-sub send_xml ($) {
+sub send_xml {
     my ($xml_string) = @_;
     my $length = length($xml_string);
     print <<"EOD";
