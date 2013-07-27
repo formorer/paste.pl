@@ -142,7 +142,7 @@ sub add_paste ($$$$;$$$) {
         return 0;
     }
 
-    if ($lang !~ /[0-9]+/) {
+    if ($lang !~ /^[0-9]+$/) {
 	$lang = $self->get_lang($lang);
 	return 0 if $self->error;
     }
@@ -597,6 +597,7 @@ sub get_lang ($) {
         return 0;
     }
     my $id = @{ @{$lang_id_ref}[0] }[0];
+    warn $id;
     return $id;
 }
 
