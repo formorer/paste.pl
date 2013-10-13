@@ -66,14 +66,14 @@ if ( $cgi->param("plain") ) {
     print_download($cgi);
 } elsif ( $cgi->param("downloadh") ) {
     print_download( $cgi, 1 );
+} elsif ( $cgi->param("comment") ) {
+    print_add_comment($cgi);
 } elsif ( $cgi->param("show") ) {
     print_show($cgi);
 } elsif ( $cgi->param("hidden") ) {
     print_show( $cgi, 1 );
 } elsif ( $cgi->param("delete") ) {
     print_delete($cgi);
-} elsif ( $cgi->param("comment") ) {
-    print_add_comment($cgi);
 } elsif ( $cgi->param("show_template") ) {
     print_template($cgi);
 } elsif ( $cgi->param("shorturl") ) {
@@ -214,7 +214,6 @@ sub print_delete {
 
 sub print_add_comment {
     my ($cgi) = (@_);
-
     my $error;
     my $comment  = $cgi->param("comment")  or $error = "Please add a comment";
     my $paste_id = $cgi->param("paste_id") or $error = "No Paste id found";
@@ -226,11 +225,18 @@ sub print_add_comment {
 
     my $digest;
 
+
     $paste->add_comment( $comment, $name, $paste_id );
+
+warn $cgi->param("hide");
+    my $tmpl_name = $cgi->param("hide") ? "hidden" : "show";
+
     if ( !$paste->error ) {
         print_header();
+
+warn $tmpl_name;
         $template->process(
-            'show',
+            $tmpl_name,
             {   "dbname" => "dbi:Pg:dbname=$dbname",
                 "dbuser" => $dbuser,
                 "dbpass" => $dbpass,
@@ -379,7 +385,6 @@ sub print_paste {
                     -value   => $session_id,
                 );
                 my %header;
-                warn "oben $hidden";
                 if ( $hidden eq 'f' ) {
                     %header = (
                         -cookie => [
@@ -406,7 +411,6 @@ sub print_paste {
                 );
                 my %header;
 
-                warn "unten $hidden";
                 if ( $hidden eq 'f' ) {
                     %header = ( -cookie => [$session], -location => "$id/" );
                 } else {
