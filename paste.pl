@@ -363,8 +363,8 @@ sub print_paste {
                 .= "Could not add your entry to the paste database:<br><br>\n";
             $statusmessage .= "<b>" . $paste->error . "</b><br>\n";
         } else {
-            if ( $cgi->param("remember") ) {
-                my $cookie_lang = new CGI::Cookie(
+            if ( my $remember = $cgi->param("remember") ) {
+                my $cookie_lang = $remember eq "both" && new CGI::Cookie(
                     -name    => 'paste_lang',
                     -value   => $cgi->param("lang"),
                     -expires => '+2M',
@@ -384,21 +384,17 @@ sub print_paste {
                     -expires => '+1M',
                     -value   => $session_id,
                 );
+                my @cookies = grep { $_ } ($cookie_lang, $cookie_expire,
+                                           $cookie_name, $session);
                 my %header;
                 if ( $hidden eq 'f' ) {
                     %header = (
-                        -cookie => [
-                            $cookie_lang, $cookie_expire,
-                            $cookie_name, $session
-                        ],
+                        -cookie => \@cookies,
                         -location => "$id/"
                     );
                 } else {
                     %header = (
-                        -cookie => [
-                            $cookie_lang, $cookie_expire,
-                            $cookie_name, $session
-                        ],
+                        -cookie => \@cookies,
                         -location => "hidden/$id/"
                     );
                 }

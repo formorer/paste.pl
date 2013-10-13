@@ -41,8 +41,11 @@
 [% IF CGI.cookie('session_id') -%]
 <input type='hidden' name='session_id'  value="[% CGI.cookie('session_id')  | html %]">
 [% END -%]
-<input type="checkbox" name="remember" id="remember" value="1" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />
-<label for="remember">Remember my name and my selected language in a cookie</label>
+<input type="checkbox" name="remember" id="remember_name" value="name" [% IF CGI.cookie('paste_name') && !CGI.cookie('paste_lang') %] checked='checked' [% END %] />
+<label for="remember_name">Remember my name in a cookie</label>
+<br />
+<input type="checkbox" name="remember" id="remember_both" value="both" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />
+<label for="remember_both">Remember my name and my selected language in a cookie</label>
 <br /> <br />
 <label for="lang"><b>Language</b></label>
 <select name="lang" id="lang">
