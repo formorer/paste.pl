@@ -142,7 +142,7 @@ sub add_paste ($$$$;$$$) {
         return 0;
     }
 
-    if ($lang !~ /^[0-9]+$/) {
+    if ($lang !~ /^[0-9-]+$/) {
 	$lang = $self->get_lang($lang);
 	return 0 if $self->error;
     }
