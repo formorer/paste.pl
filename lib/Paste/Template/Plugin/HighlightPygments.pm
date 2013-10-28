@@ -84,11 +84,10 @@ sub filter {
     my $stderr;
 
     my $pygment =
-          '/usr/bin/pygmentize -f html -l "' 
+          '/usr/bin/pygmentize -f html -l "'
         . $lang
         . '" -O style=default,classprefix=pygment';
-    if ( exists $config->{'linenumbers'} && $config->{'linenumbers'} == 1 )
-    {
+    if ( exists $config->{'linenumbers'} && $config->{'linenumbers'} == 1 ) {
         $pygment .= ',linenos=1';
     }
 

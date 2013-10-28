@@ -225,7 +225,6 @@ sub print_add_comment {
 
     my $digest;
 
-
     $paste->add_comment( $comment, $name, $paste_id );
 
     my $tmpl_name = $cgi->param("hide") ? "hidden" : "show";
@@ -233,7 +232,7 @@ sub print_add_comment {
     if ( !$paste->error ) {
         print_header();
 
-warn $tmpl_name;
+        warn $tmpl_name;
         $template->process(
             $tmpl_name,
             {   "dbname" => "dbi:Pg:dbname=$dbname",
@@ -354,20 +353,20 @@ sub print_paste {
         my $session_id = $cgi->param('session_id')
             || sha1_hex( rand() . time() );
 
-	    my $wrap = $cgi->param("wrap");
-	    my $expire = $cgi->param("expire");
-	    my $lang = $cgi->param("lang");
-        my ( $id, $digest ) =
-            $paste->add_paste( { 
-			    'code' => $code, 
-			    'name' => $name, 
-			    'expire' => $expire,
-            		    'lang' => $lang, 
-			    'session_id' => $session_id, 
-			    'hidden' => $hidden, 
-			    'wrap' => $wrap, 
-			    'cgi' => $cgi
-		    });
+        my $wrap   = $cgi->param("wrap");
+        my $expire = $cgi->param("expire");
+        my $lang   = $cgi->param("lang");
+        my ( $id, $digest ) = $paste->add_paste(
+            {   'code'       => $code,
+                'name'       => $name,
+                'expire'     => $expire,
+                'lang'       => $lang,
+                'session_id' => $session_id,
+                'hidden'     => $hidden,
+                'wrap'       => $wrap,
+                'cgi'        => $cgi
+            }
+        );
         if ( $paste->error ) {
             $statusmessage
                 .= "Could not add your entry to the paste database:<br><br>\n";
@@ -394,17 +393,18 @@ sub print_paste {
                     -expires => '+1M',
                     -value   => $session_id,
                 );
-                my @cookies = grep { $_ } ($cookie_lang, $cookie_expire,
-                                           $cookie_name, $session);
+                my @cookies =
+                    grep {$_}
+                    ( $cookie_lang, $cookie_expire, $cookie_name, $session );
                 my %header;
                 if ( $hidden eq 'f' ) {
                     %header = (
-                        -cookie => \@cookies,
+                        -cookie   => \@cookies,
                         -location => "$id/"
                     );
                 } else {
                     %header = (
-                        -cookie => \@cookies,
+                        -cookie   => \@cookies,
                         -location => "hidden/$id/"
                     );
                 }

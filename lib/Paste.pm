@@ -29,7 +29,7 @@ use RPC::XML::Client;
 use Text::ExtractWords qw (words_list);
 use Text::Wrap;
 use GnuPG;
-use File::Temp qw ( tempfile ); 
+use File::Temp qw ( tempfile );
 use Format::Human::Bytes;
 use WWW::Honeypot::httpBL;
 
@@ -130,15 +130,15 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 =cut
 
 sub add_paste {
-    my $self = shift;
-    my $args = shift;
-    my $code = $args->{code};
-    my $name = $args->{name};
-    my $expire = $args->{expire};
-    my $lang = $args->{lang};
+    my $self      = shift;
+    my $args      = shift;
+    my $code      = $args->{code};
+    my $name      = $args->{name};
+    my $expire    = $args->{expire};
+    my $lang      = $args->{lang};
     my $sessionid = $args->{sessionid};
-    my $hidden = $args->{hidden};
-    my $wrap = $args->{wrap};
+    my $hidden    = $args->{hidden};
+    my $wrap      = $args->{wrap};
 
     my $dbh = $self->{dbh};
     $name      = $name      || 'anonymous';
@@ -151,9 +151,9 @@ sub add_paste {
         return 0;
     }
 
-    if ($lang !~ /^[0-9-]+$/) {
-	$lang = $self->get_lang($lang);
-	return 0 if $self->error;
+    if ( $lang !~ /^[0-9-]+$/ ) {
+        $lang = $self->get_lang($lang);
+        return 0 if $self->error;
     }
     if ( $expire !~ /^(-1|[0-9]+)/ ) {
         $self->{error} = "Expire must be an integer or -1";
@@ -168,36 +168,34 @@ sub add_paste {
     my $max_code_size = 153600;
 
     my $file;
-    if ($code =~/^-----BEGIN PGP SIGNED MESSAGE/) {
-	    my $gpg = new GnuPG();
-	    my $sig;
-	   	    
-	    my $code_new;
-	    foreach my $line (split("\n", $code)) {
-		    $code_new .= "$line\n";
-		    last if $line =~ /^-----END PGP SIGNATURE-----/;
-	    }
-	    $code = $code_new;
-	    my ($fh, $filename) = tempfile(UNLINK => 1);
-	    print $fh $code;
-	    close($fh);
-	    eval {
-		    $sig = $gpg->verify( signature => $filename);
-	    };
-	    if ($sig) {
-		    die  $sig->{'user'};
-		    warn "Code signed by " . $sig->{'user'};
-		    $max_code_size = 52428800;
-	    } elsif ($@ =~ /no public key (\S+)/m) {
-		    warn "Code signed by $1";
-		    $max_code_size = 52428800;
-	    }
-	    unlink($filename);
+    if ( $code =~ /^-----BEGIN PGP SIGNED MESSAGE/ ) {
+        my $gpg = new GnuPG();
+        my $sig;
+
+        my $code_new;
+        foreach my $line ( split( "\n", $code ) ) {
+            $code_new .= "$line\n";
+            last if $line =~ /^-----END PGP SIGNATURE-----/;
+        }
+        $code = $code_new;
+        my ( $fh, $filename ) = tempfile( UNLINK => 1 );
+        print $fh $code;
+        close($fh);
+        eval { $sig = $gpg->verify( signature => $filename ); };
+        if ($sig) {
+            die $sig->{'user'};
+            warn "Code signed by " . $sig->{'user'};
+            $max_code_size = 52428800;
+        } elsif ( $@ =~ /no public key (\S+)/m ) {
+            warn "Code signed by $1";
+            $max_code_size = 52428800;
+        }
+        unlink($filename);
     }
     my $code_size = length($code);
 
     if ( defined($max_code_size) && $code_size > $max_code_size ) {
-	my $readable = Format::Human::Bytes::base2($max_code_size);
+        my $readable = Format::Human::Bytes::base2($max_code_size);
         $self->{error} = "Length of code is not allowed to exceed $readable";
         return 0;
     }
@@ -211,41 +209,42 @@ sub add_paste {
         $pos++;
     }
 
-    if ( defined $self->get_config_key('spam', 'linebreaks')
-			&& $newlines < $self->get_config_key('spam', 'linebreaks') ) {
-		my $needed = $self->get_config_key('spam', 'linebreaks');
+    if ( defined $self->get_config_key( 'spam', 'linebreaks' )
+        && $newlines < $self->get_config_key( 'spam', 'linebreaks' ) )
+    {
+        my $needed = $self->get_config_key( 'spam', 'linebreaks' );
         $self->{error} =
             "Thanks to some spammers you need to provide at least $needed linebreaks";
         return 0;
     }
 
-	my $spamscore = $self->get_config_key('spam', 'score');
-	if ($spamscore) {
-		my ($hits, $score) = $self->check_wordfilter($code);
-		if ($hits && $score >= $spamscore) {
-			$self->{error} = "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
-			return 0;
-		}
-	}
+    my $spamscore = $self->get_config_key( 'spam', 'score' );
+    if ($spamscore) {
+        my ( $hits, $score ) = $self->check_wordfilter($code);
+        if ( $hits && $score >= $spamscore ) {
+            $self->{error} =
+                "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
+            return 0;
+        }
+    }
 
-	if ($self->get_config_key('spam', 'honeypotblkey')) {
-		my $key = $self->get_config_key('spam', 'honeypotblkey');
-		my $h = WWW::Honeypot::httpBL->new( { access_key => $key });
-		my $cgi = $args->{cgi};
-		my $remote_ip = $cgi->remote_host();
-		$h->fetch($remote_ip);
+    if ( $self->get_config_key( 'spam', 'honeypotblkey' ) ) {
+        my $key = $self->get_config_key( 'spam', 'honeypotblkey' );
+        my $h         = WWW::Honeypot::httpBL->new( { access_key => $key } );
+        my $cgi       = $args->{cgi};
+        my $remote_ip = $cgi->remote_host();
+        $h->fetch($remote_ip);
 
-		if (    $h->is_comment_spammer() ||
-			$h->is_suspicious() ) {
-			$self->{error} =
-				"Your ip is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
-			return 0;
-		}
-			
+        if (   $h->is_comment_spammer()
+            || $h->is_suspicious() )
+        {
+            $self->{error} =
+                "Your ip is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
+            return 0;
+        }
 
+    }
 
-	}
-			
     my $sth = $dbh->prepare(
         "INSERT INTO paste(poster,posted,code,lang_id,expires,sha1, sessionid, hidden) VALUES(?,now(),?,?,?,?,?,?)"
     );
@@ -257,11 +256,11 @@ sub add_paste {
     #replace \r\n with \n
     $code =~ s/\r\n/\n/g;
 
-	#wrap text if wanted
+    #wrap text if wanted
 
-	if ($wrap) {
-		$code = wrap("","", $code);
-	}
+    if ($wrap) {
+        $code = wrap( "", "", $code );
+    }
 
 #we create some kind of digest here. This will be used for "administrative work". Everyone who has this digest can delete the entry.
 #in the future the first 8 or so chars will be used as an accesskeys for "hidden" entrys.
@@ -646,31 +645,31 @@ sub check_ip ($) {
 }
 
 sub check_wordfilter ($) {
-	my $self = shift;
-	my $paste = shift;
+    my $self  = shift;
+    my $paste = shift;
 
-	my $db = $self->get_config_key('spam', 'db');
-	return unless $db && -f $db;
+    my $db = $self->get_config_key( 'spam', 'db' );
+    return unless $db && -f $db;
 
-	open (my $fh, '<', $db) or die "Could not open spamdb: $db";
+    open( my $fh, '<', $db ) or die "Could not open spamdb: $db";
 
-	my $lkup;
-	while (my $line = <$fh>) {
-		my ($word, $score) = split (/\s+/, $line, 2); 
-		$lkup->{$word} = $score;
-	}
-	close ($fh);
+    my $lkup;
+    while ( my $line = <$fh> ) {
+        my ( $word, $score ) = split( /\s+/, $line, 2 );
+        $lkup->{$word} = $score;
+    }
+    close($fh);
 
-	my $aref = []; 
-	words_list($aref, $paste);
-	my ( $score, $hits ) = 0;
-	foreach my $word (@{$aref}) {
-		if (exists $lkup->{$word}) {
-			$score += $lkup->{lc($word)};
-			$hits++;
-		}  
-	}
-	return $hits, $score;
+    my $aref = [];
+    words_list( $aref, $paste );
+    my ( $score, $hits ) = 0;
+    foreach my $word ( @{$aref} ) {
+        if ( exists $lkup->{$word} ) {
+            $score += $lkup->{ lc($word) };
+            $hits++;
+        }
+    }
+    return $hits, $score;
 }
 
 1;
