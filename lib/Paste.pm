@@ -31,7 +31,7 @@ use Text::Wrap;
 use GnuPG;
 use File::Temp qw ( tempfile ); 
 use Format::Human::Bytes;
-
+use WWW::Honeypot::httpBL;
 
 use Carp;
 
@@ -129,8 +129,17 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 
 =cut
 
-sub add_paste ($$$$;$$$) {
-    my ( $self, $code, $name, $expire, $lang, $sessionid, $hidden, $wrap ) = @_;
+sub add_paste {
+    my $self = shift;
+    my $args = shift;
+    my $code = $args->{code};
+    my $name = $args->{name};
+    my $expire = $args->{expire};
+    my $lang = $args->{lang};
+    my $sessionid = $args->{sessionid};
+    my $hidden = $args->{hidden};
+    my $wrap = $args->{wrap};
+
     my $dbh = $self->{dbh};
     $name      = $name      || 'anonymous';
     $sessionid = $sessionid || '';
@@ -217,6 +226,24 @@ sub add_paste ($$$$;$$$) {
 			$self->{error} = "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
 			return 0;
 		}
+	}
+
+	if ($self->get_config_key('spam', 'honeypotblkey')) {
+		my $key = $self->get_config_key('spam', 'honeypotblkey');
+		my $h = WWW::Honeypot::httpBL->new( { access_key => $key });
+		my $cgi = $args->{cgi};
+		my $remote_ip = $cgi->remote_host();
+		$h->fetch($remote_ip);
+
+		if (    $h->is_comment_spammer() ||
+			$h->is_suspicious() ) {
+			$self->{error} =
+				"Your ip is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
+			return 0;
+		}
+			
+
+
 	}
 			
     my $sth = $dbh->prepare(

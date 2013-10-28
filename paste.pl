@@ -228,7 +228,6 @@ sub print_add_comment {
 
     $paste->add_comment( $comment, $name, $paste_id );
 
-warn $cgi->param("hide");
     my $tmpl_name = $cgi->param("hide") ? "hidden" : "show";
 
     if ( !$paste->error ) {
@@ -355,9 +354,20 @@ sub print_paste {
         my $session_id = $cgi->param('session_id')
             || sha1_hex( rand() . time() );
 
+	    my $wrap = $cgi->param("wrap");
+	    my $expire = $cgi->param("expire");
+	    my $lang = $cgi->param("lang");
         my ( $id, $digest ) =
-            $paste->add_paste( $code, $name, $cgi->param("expire"),
-            $cgi->param("lang"), $session_id, $hidden, $cgi->param("wrap") );
+            $paste->add_paste( { 
+			    'code' => $code, 
+			    'name' => $name, 
+			    'expire' => $expire,
+            		    'lang' => $lang, 
+			    'session_id' => $session_id, 
+			    'hidden' => $hidden, 
+			    'wrap' => $wrap, 
+			    'cgi' => $cgi
+		    });
         if ( $paste->error ) {
             $statusmessage
                 .= "Could not add your entry to the paste database:<br><br>\n";
