@@ -239,7 +239,7 @@ sub add_paste {
             || $h->is_suspicious() )
         {
             $self->{error} =
-                "Your ip ($ip) is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
+                "Your ip ($remote_ip) is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
             return 0;
         }
 
