@@ -59,7 +59,14 @@ sub addPaste {
     }
 
     my ( $id, $digest ) =
-        $paste->add_paste( $code, $name, $expire, $lang_id, '', $hidden );
+        $paste->add_paste( {
+			'code' => $code, 
+			'name' => $name, 
+			'expire' => $expire, 
+			'lang' => $lang_id, 
+			'hidden' => $hidden 
+		});
+
     my ( $dl_url, $v_url, $d_url );
 
     if ( $paste->error ) {
