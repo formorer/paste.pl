@@ -300,7 +300,7 @@ sub process_cgi_call {
     # Perform some sanity checks.
     http_error( 405, "Method Not Allowed" ) unless $method;
     http_error( 405, "Method Not Allowed" ) unless $method eq "POST";
-    http_error( 400, "Bad Request" )        unless $type eq "text/xml";
+    http_error( 400, "Bad Request" )        unless $type =~ "^text/xml";
     http_error( 411, "Length Required" )    unless $length > 0;
 
     # Fetch our body.
