@@ -228,7 +228,7 @@ sub add_paste {
         }
     }
 
-    if ( $self->get_config_key( 'spam', 'honeypotblkey' ) ) {
+    if ( $self->get_config_key( 'spam', 'honeypotblkey' ) && $args->{cgi} ) {
         my $key = $self->get_config_key( 'spam', 'honeypotblkey' );
         my $h         = WWW::Honeypot::httpBL->new( { access_key => $key } );
         my $cgi       = $args->{cgi};
