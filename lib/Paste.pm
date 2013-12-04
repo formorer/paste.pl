@@ -136,7 +136,7 @@ sub add_paste {
     my $name      = $args->{name};
     my $expire    = $args->{expire};
     my $lang      = $args->{lang};
-    my $sessionid = $args->{sessionid};
+    my $sessionid = $args->{session_id};
     my $hidden    = $args->{hidden};
     my $wrap      = $args->{wrap};
 
