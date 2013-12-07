@@ -528,7 +528,10 @@ sub get_paste ($) {
     my $dbh = $self->{dbh};
 
     my $sth = $dbh->prepare(
-        "SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where id = ? and hidden is FALSE"
+        "SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted,
+                code, paste.lang_id, lang.desc as lang_desc, expires, sha1, sessionid
+         FROM paste LEFT JOIN lang ON paste.lang_id=lang.lang_id
+         WHERE id = ? AND hidden IS FALSE"
     );
     if ( $dbh->errstr ) {
         $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
@@ -573,7 +576,10 @@ sub get_hidden_paste ($) {
     my $dbh = $self->{dbh};
 
     my $sth = $dbh->prepare(
-        "SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted, code, lang_id, expires, sha1, sessionid from paste where substring(sha1 FROM 1 FOR 8) = ?"
+        "SELECT id, poster, to_char(posted, 'YYYY-MM-DD HH24:MI:SS') as posted,
+                code, paste.lang_id, lang.desc as lang_desc, expires, sha1, sessionid
+         FROM paste LEFT JOIN lang ON paste.lang_id=lang.lang_id
+         WHERE substring(sha1 FROM 1 FOR 8) = ?"
     );
     if ( $dbh->errstr ) {
         $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
