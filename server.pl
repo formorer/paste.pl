@@ -140,7 +140,7 @@ sub getPaste {
     my $error = 0;
 
     my $entry = '';
-    if ( $id =~ /^[0-8a-f]{8}$/ ) {
+    if ( $id =~ /^[0-9a-f]{8}$/ ) {
         $entry = $paste->get_hidden_paste($id);
     } else {
         $entry = $paste->get_paste($id);
