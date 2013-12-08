@@ -162,6 +162,7 @@ sub getPaste {
             'rc'            => $error,
             'statusmessage' => $statusmessage,
             'code'          => $entry->{code},
+            'lang'          => $entry->{lang_desc},
             'submitter'     => $entry->{poster},
             'submitdate'    => $entry->{posted},
             expiredate      => $entry->{expires},
