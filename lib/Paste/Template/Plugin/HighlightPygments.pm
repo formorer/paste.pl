@@ -98,7 +98,7 @@ sub filter {
     run3( $pygment, \$text, \$out, \$stderr );
 
     if ($stderr) {
-        die Template::Exception->new( highlight => "pymentize error: $out" );
+        die Template::Exception->new( highlight => "pygmentize error: $out" );
     }
 
     my $text = $out;
