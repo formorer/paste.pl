@@ -606,7 +606,7 @@ sub get_langs () {
         $dbh->selectall_arrayref( "SELECT * from lang", { Slice => {} } );
     if ( $dbh->errstr ) {
         $self->{error} =
-            "Could not get languages vom database: " . $dbh->errstr;
+            "Could not get languages from database: " . $dbh->errstr;
         return 0;
     }
     return $ary_ref;
