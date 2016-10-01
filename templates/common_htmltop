@@ -5,7 +5,6 @@
 <head>
   <title>[% title %]</title>
   <link rel="stylesheet" type="text/css" href="/pastebin.css" />
-  <!-- [% CGI.user_agent %] -->
 </head>
 
 <body>
