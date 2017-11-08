@@ -1,9 +1,9 @@
-[% WRAPPER common_htmlpage title="debian Pastezone" %]
-<h1>[% message %]</h1><br />
+[%- WRAPPER common_htmlpage title="debian Pastezone" -%]
+<h1>[%- message -%]</h1><br />
 
 <p>
-[% message %]
-[% END %]
+[%- message -%]
+[%- END -%]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 
