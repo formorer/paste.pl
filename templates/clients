@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="Debian Pastezone" %]
+[%- WRAPPER common_htmlpage title="Debian Pastezone" -%]
 <h1>XML-RPC Clients for paste.debian.net</h1><br />
 
 <p>
@@ -14,7 +14,7 @@ There are some clients available for the XML-RPC interface of
 
 If you have any additions please drop me a mail. 
 
-[% END %]
+[%- END -%]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 

@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="Debian Pastezone" %]
+[%- WRAPPER common_htmlpage title="Debian Pastezone" -%]
 <h1>About this Site</h1><br />
 
 <p>
@@ -11,6 +11,6 @@ http://git.snow-crash.org/?p=paste.pl.git</a> or <a href="https://github.com/for
 https://github.com/formorer/paste.pl</a>
 and can be cloned via <i>git clone git://git.snow-crash.org/paste.pl</i>. 
 
-[% END %]
+[%- END -%]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]

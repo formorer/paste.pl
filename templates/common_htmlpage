@@ -1,9 +1,9 @@
-[% INCLUDE common_htmltop %]
+[%- INCLUDE common_htmltop -%]
 <div id="content">
-[% content %]
-[% INCLUDE navbar %]
+[%- content -%]
+[%- INCLUDE navbar -%]
 
-[% INCLUDE common_htmlbottom %]
+[%- INCLUDE common_htmlbottom -%]
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]

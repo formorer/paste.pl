@@ -1,76 +1,76 @@
-[% TRY %]
-	[% USE mydb = DBI(dbname, dbuser, dbpass) %]
-	[% CATCH %]
-		[% INCLUDE dberror %]
-	[% STOP %]
-[% END %]
-[% USE format %]
-[% USE HighlightPygments %]
+[%- TRY -%]
+	[%- USE mydb = DBI(dbname, dbuser, dbpass) -%]
+	[%- CATCH -%]
+		[%- INCLUDE dberror -%]
+	[%- STOP -%]
+[%- END -%]
+[%- USE format -%]
+[%- USE HighlightPygments -%]
 
-[% USE CGI %]
-[% f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now() and expires <> '-1'") -%]
+[%- USE CGI -%]
+[%- f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now() and expires <> '-1'") -%]
 
 <div id="menu">
 
 <h1>Recent Posts</h1>
-<a href="[% base_url %]">Make new paste</a>
+<a href="[%- base_url -%]">Make new paste</a>
 <br />
 <ul>
-[% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
+[%- FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
 							  posted as postdate 
 							  from paste where hidden is not true order by posted desc, id desc limit 10") -%]
 
-<li><a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
-[% commented = format(' %s') %]
-[% days = post.age / (3600*24) %]
-[% hours = post.age / 3600 %]
-[% minutes = post.age / 60 %]
-[% IF round(days) > 1 %]
-	[% round(days) %] days ago 
-[% ELSIF hours >= 1 %]
-	[% round(hours) %] hour(s) ago
-[% ELSIF minutes >= 1 %] 
-	[% round(minutes) %] minute(s) ago 
-[% ELSE %]
-	[% round(post.age) %] second(s) ago
-[% END %]
+<li><a href='[%- base_url -%]/[%- post.id -%]'>[%- post.poster -%]</a><br />
+[%- commented = format(' %s') -%]
+[%- days = post.age / (3600*24) -%]
+[%- hours = post.age / 3600 -%]
+[%- minutes = post.age / 60 -%]
+[%- IF round(days) > 1 -%]
+	[%- round(days) -%] days ago 
+[%- ELSIF hours >= 1 -%]
+	[%- round(hours) -%] hour(s) ago
+[%- ELSIF minutes >= 1 -%] 
+	[%- round(minutes) -%] minute(s) ago 
+[%- ELSE -%]
+	[%- round(post.age) -%] second(s) ago
+[%- END -%]
 </li>
-[% END %]
+[%- END -%]
 </ul>
-[% IF CGI.cookie('session_id') -%]
-[% pastes = mydb.query("SELECT * from paste WHERE sessionid = '$session_id'") %]
+[%- IF CGI.cookie('session_id') -%]
+[%- pastes = mydb.query("SELECT * from paste WHERE sessionid = '$session_id'") -%]
 <h1>Your pastes</h1>
 <ul>
-[% session_id = CGI.cookie('session_id') %]
-[% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
+[%- session_id = CGI.cookie('session_id') -%]
+[%- FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
 posted AS postedate,hidden,sha1, code from paste WHERE sessionid = '$session_id' 
-order by posted DESC, id desc limit 5") %]
+order by posted DESC, id desc limit 5") -%]
 <li>
-[% IF post.hidden == '1' %]
-<a href='[% base_url %]/hidden/[% post.sha1.substr(0,8) %]'>[% post.poster %]</a><br />
-[% ELSE %]
-<a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
-[% END %]
-[% commented = format(' %s') %]
-[% days = post.age / (3600*24) %]
-[% hours = post.age / 3600 %]
-[% minutes = post.age / 60 %]
-[% IF round(days) > 1 %]
-[% round(days) %] days ago 
-[% ELSIF hours >= 1 %]
-[% round(hours) %] hour(s) ago
-[% ELSIF minutes >= 1 %] 
-[% round(minutes) %] minute(s) ago 
-[% ELSE %]
-[% round(post.age) %] second(s) ago
-[% END %]
+[%- IF post.hidden == '1' -%]
+<a href='[%- base_url -%]/hidden/[%- post.sha1.substr(0,8) -%]'>[%- post.poster -%]</a><br />
+[%- ELSE -%]
+<a href='[%- base_url -%]/[%- post.id -%]'>[%- post.poster -%]</a><br />
+[%- END -%]
+[%- commented = format(' %s') -%]
+[%- days = post.age / (3600*24) -%]
+[%- hours = post.age / 3600 -%]
+[%- minutes = post.age / 60 -%]
+[%- IF round(days) > 1 -%]
+[%- round(days) -%] days ago 
+[%- ELSIF hours >= 1 -%]
+[%- round(hours) -%] hour(s) ago
+[%- ELSIF minutes >= 1 -%] 
+[%- round(minutes) -%] minute(s) ago 
+[%- ELSE -%]
+[%- round(post.age) -%] second(s) ago
+[%- END -%]
 <br />
-"[% post.code | truncate(20) %]"
+"[%- post.code | truncate(20) -%]"
 </li>
-[% END %]
+[%- END -%]
 </ul>
-[% END %]
-[% INCLUDE links %]
+[%- END -%]
+[%- INCLUDE links -%]
 
 <br />
 <a href="//flattr.com/thing/63347/debian-net-pastebin" target="_blank">

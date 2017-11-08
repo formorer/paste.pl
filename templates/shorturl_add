@@ -1,4 +1,4 @@
-[% WRAPPER common_htmlpage title="New ShortURL" %]
+[%- WRAPPER common_htmlpage title="New ShortURL" -%]
 
 <h1>Add new ShortURL</h1><br />
 
@@ -14,7 +14,7 @@ Or use: http://frm.li/add/<i>url</i>
 <li>http://frm.li/add/http://people.debian.org/
 </ul>
 
-[% END %]
+[%- END -%]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
 
