@@ -71,10 +71,6 @@ order by posted DESC, id desc limit 5") %]
 </ul>
 [% END %]
 [% INCLUDE links %]
-
-<br />
-<a href="//flattr.com/thing/63347/debian-net-pastebin" target="_blank">
-<img src="//api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
 </div>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
