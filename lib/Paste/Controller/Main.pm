@@ -208,7 +208,7 @@ sub _create {
     my $wrap   = $c->param('wrap');
     my $expire = $c->param('expire');
     my $lang   = $c->param('lang');
-    my $hidden = $c->param('private') ? 't' : 'f';
+    my $hidden = 't';    # enforce hidden pastes by default
 
     my $cgi_obj = _build_cgi_from_tx($c);
 

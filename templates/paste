@@ -49,6 +49,8 @@
 <label for="wrap">Wrap text at 78 characters</label>
 <br />
 <br />
+<input type="hidden" name="private" value="1" />
+<p><em>New pastes are always hidden; share the hidden link to view.</em></p>
 <label for="code"><b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.</label><br />
 <textarea id="code" class="codeedit" name="code" cols="80" rows="10">[% prefill_code | html %]</textarea>

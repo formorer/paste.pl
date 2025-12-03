@@ -28,11 +28,11 @@ $t->post_ok(
 
 my $loc = $t->tx->res->headers->location;
 ok( $loc, 'got redirect location' );
-my ($id) = $loc =~ m{/?([0-9a-f]+)/?};
+my ($id) = $loc =~ m{([0-9a-f]+)};
 ok( $id, "extracted id $id" );
 $loc = "/$loc" unless $loc =~ m{^/};
 $t->get_ok($loc)->status_is(200)->content_like(qr/$code/);
-$t->get_ok("/plain/$id")->status_is(200)->content_is($code);
+$t->get_ok("/plainh/$id")->status_is(200)->content_is($code);
 
 done_testing();
 
