@@ -16,10 +16,8 @@ never
 [% END %]
 </h1>
 
-[% TRY -%]
-	[% IF entry.code -%]
-    [% language = entry.lang_desc || "text" %]
-	[% IF lines == 0 %]
+[% language = entry.lang_desc || "text" %]
+[% IF lines == 0 %]
 [% FILTER highlight "$language" linenumbers = 0 cache=0 cache_dir="cache/" -%]
 [% entry.code -%]
 [% END -%]
@@ -27,23 +25,16 @@ never
 [% FILTER highlight "$language" linenumbers = 1 cache=0 cache_dir="cache/" -%]
 [% entry.code -%]
 [% END -%]
-	[% END %]
-	<br/>
-	<a href='[% base_url %]/plainh/[% entry.hidden_id %]'>Show as text</a> | 
-	<a href='[% base_url %]/downloadh/[% entry.hidden_id %]'>Download</a> |
-	[% IF lines == 0 %]
-	<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=1'>With linenumbers</a> |
-	[% ELSE %]
-	<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=0'>Without linenumbers</a> |
-	[% END %]
-	<a href='[% base_url %]/?as_hidden=1'>Paste new</a> |
-	<br/>
-	[% END %]
-[% CATCH -%]
-<pre>
-[% entry.code | html -%]
-</pre>
+<br/>
+<a href='[% base_url %]/plainh/[% entry.hidden_id %]'>Show as text</a> | 
+<a href='[% base_url %]/downloadh/[% entry.hidden_id %]'>Download</a> |
+[% IF lines == 0 %]
+<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=1'>With linenumbers</a> |
+[% ELSE %]
+<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=0'>Without linenumbers</a> |
 [% END %]
+<a href='[% base_url %]/?as_hidden=1'>Paste new</a> |
+<br/>
 [% IF comments.size >= 1 %]
 <p>
 [% FOREACH comment  = comments %]
