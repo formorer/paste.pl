@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: paste
+      POSTGRES_PASSWORD: paste
+      POSTGRES_DB: paste
+    volumes:
+      - ./paste.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./docker/init-roles.sql:/docker-entrypoint-initdb.d/00-roles.sql:ro
+      - ./docker/patch-schema.sql:/docker-entrypoint-initdb.d/02-patch-schema.sql:ro
+      - ./docker/grants.sql:/docker-entrypoint-initdb.d/03-grants.sql:ro
+      - ./docker/cleanup-revoke.sql:/docker-entrypoint-initdb.d/99-cleanup-revoke.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paste"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    environment:
+      PASTE_CONFIG: /app/t/conf/paste.conf
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      bash -c "until pg_isready -h db -U paste; do sleep 1; done;
+               prove -v -Ilib t"
+
+  app_dev:
+    build: .
+    environment:
+      PASTE_CONFIG: /app/t/conf/paste.conf
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    command: >
+      bash -c "until pg_isready -h db -U paste; do sleep 1; done;
+               morbo -l http://0.0.0.0:3000 app.psgi"
+
+# vim: sw=2 ts=2 et
