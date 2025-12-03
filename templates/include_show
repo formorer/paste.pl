@@ -1,29 +1,8 @@
 [% USE format %]
 [% USE HighlightPygments %]
 [% USE CGI %]
-[% TRY %]
-	[% USE mydb = DBI(dbname, dbuser, dbpass) %]
-	[% CATCH %]
-		[% INCLUDE dberror %]
-	[% STOP %]
-[% END %]
 
-[% TRY -%]
-	[% entry = mydb.query ("SELECT id,poster,lang_id,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate,date_trunc('second', posted) as postedate, expires from paste where id = '$show' and hidden is FALSE") %]
-	[% IF entry.size != 1 %] 
-		[%THROW notfound "Entry was not found in database" %]
-	[% END %]
-	[% FOREACH entry = mydb.query ("SELECT id,lang_id,poster,code,date_trunc('second', posted) as postedate,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate, expires from paste where id = '$show' and hidden is FALSE") %]
-	[% END %]
-	[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
-	[% END %]
-[% CATCH %]
-	[% INCLUDE common_error %]
-[% STOP %]
-
-[% END %]
-
-[%IF status -%]
+[% IF status -%]
 <div id="status"> 
 [% status %]
 </div>
@@ -37,54 +16,40 @@ never
 [% END %]
 </h1>
 
-[% TRY -%]
-	[% IF entry.code -%]
-	[% IF entry.lang_id == -1 %] 
-	[% language.desc = "text" %]
-	[% END %]
-	[% IF lines == 0 %]
-[% FILTER highlight "$language.desc" linenumbers = 0 cache=0 cache_dir="cache/" -%]
+[% language = entry.lang_desc || "text" %]
+[% IF lines == 0 %]
+[% FILTER highlight "$language" linenumbers = 0 cache=0 cache_dir="cache/" -%]
 [% entry.code -%]
 [% END -%]
 [% ELSE %]
-[% FILTER highlight "$language.desc" linenumbers = 1 cache=0 cache_dir="cache/" -%]
+[% FILTER highlight "$language" linenumbers = 1 cache=0 cache_dir="cache/" -%]
 [% entry.code -%]
 [% END -%]
-	[% END %]
-	<br/>
-	<a href='[% base_url %]/plain/[% entry.id %]'>Show as text</a> | 
-	<a href='[% base_url %]/download/[% entry.id %]'>Download</a> |
-	[% IF lines == 0 %]
-	<a href='[% base_url %]/?show=[% entry.id %];lines=1'>With linenumbers</a> |
-	[% ELSE %]
-	<a href='[% base_url %]/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
-	[% END %]
-	<a href='[% base_url %]/'>Paste new</a> |
-	<a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
-	<br/>
-	[% END %]
-[% CATCH -%]
-<pre>
-[% entry.code | html %]
-</pre>
 [% END %]
-[% IF CGI.cookie('session_id') -%]
-[% session_id =  CGI.cookie('session_id') %]
-[% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND id = '$show'") %] 
+<br/>
+<a href='[% base_url %]/plain/[% entry.id %]'>Show as text</a> | 
+<a href='[% base_url %]/download/[% entry.id %]'>Download</a> |
+[% IF lines == 0 %]
+<a href='[% base_url %]/?show=[% entry.id %];lines=1'>With linenumbers</a> |
+[% ELSE %]
+<a href='[% base_url %]/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
+[% END %]
+<a href='[% base_url %]/'>Paste new</a> |
+<a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
+<br/>
+
+[% IF own_entry -%]
 
 <br>
 <h1>Information about your entry</h1>
 <ul>
-<li>To link to your entry use: <a href="[% base_url %]/[% post.id %]">[% base_url.substr(2) %]/[% post.id %]</a></li>
+<li>To link to your entry use: <a href="[% base_url %]/[% entry.id %]">[% base_url.substr(2) %]/[% entry.id %]</a></li>
 
-<li>To download your entry use: <a href="[% base_url %]/download/[% post.id %]">[% base_url.substr(2) %]/download/[% post.id %]</a></li>
-<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% post.id %]">[% base_url.substr(2) %]/plain/[% post.id %]</a></li>
-<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url.substr(2) %]/delete/[% post.sha1 %]</a></li>
+<li>To download your entry use: <a href="[% base_url %]/download/[% entry.id %]">[% base_url.substr(2) %]/download/[% entry.id %]</a></li>
+<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% entry.id %]">[% base_url.substr(2) %]/plain/[% entry.id %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% entry.sha1 %]">[% base_url.substr(2) %]/delete/[% entry.sha1 %]</a></li>
 </ul>
 [% END -%]
-[% END -%]
-
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
-

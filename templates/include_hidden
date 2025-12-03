@@ -1,27 +1,6 @@
 [% USE format %]
 [% USE HighlightPygments %]
 [% USE CGI %]
-[% TRY %]
-	[% USE mydb = DBI(dbname, dbuser, dbpass) %]
-	[% CATCH %]
-		[% INCLUDE dberror %]
-	[% STOP %]
-[% END %]
-
-[% TRY -%]
-	[% entry = mydb.query ("SELECT substring(sha1 FROM 1 FOR 8) AS id, id as paste_id, poster,lang_id,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate,date_trunc('second', posted) as postedate, expires from paste where substring(sha1 FROM 1 FOR 8) = '$show'") %]
-	[% IF entry.size != 1 %] 
-		[%THROW notfound "Entry was not found in database" %]
-	[% END %]
-	[% FOREACH entry = mydb.query ("SELECT substring(sha1 FROM 1 FOR 8) AS id, id as paste_id, lang_id,poster,code,date_trunc('second', posted) as postedate,code,date_trunc('second', posted + interval '1 second' * expires) as expiredate, expires from paste where substring(sha1 FROM 1 FOR 8) = '$show'") %]
-	[% END %]
-	[% FOREACH language = mydb.query ("SELECT * from lang where lang_id = $entry.lang_id") %]
-	[% END %]
-[% CATCH %]
-	[% INCLUDE common_error %]
-[% STOP %]
-
-[% END %]
 
 [%IF status -%]
 <div id="status"> 
@@ -29,7 +8,7 @@
 </div>
 [% END %]
 
-<h1><b>hidden</b> Posting [% entry.id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
+<h1><b>hidden</b> Posting [% entry.hidden_id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% IF entry.expires == -1 %]
 never
 [% ELSE %]
@@ -39,25 +18,23 @@ never
 
 [% TRY -%]
 	[% IF entry.code -%]
-	[% IF entry.lang_id == -1 %] 
-	[% language.desc = "text" %]
-	[% END %]
+    [% language = entry.lang_desc || "text" %]
 	[% IF lines == 0 %]
-[% FILTER highlight "$language.desc" linenumbers = 0 cache=0 cache_dir="cache/" -%]
+[% FILTER highlight "$language" linenumbers = 0 cache=0 cache_dir="cache/" -%]
 [% entry.code -%]
 [% END -%]
 [% ELSE %]
-[% FILTER highlight "$language.desc" linenumbers = 1 cache=0 cache_dir="cache/" -%]
+[% FILTER highlight "$language" linenumbers = 1 cache=0 cache_dir="cache/" -%]
 [% entry.code -%]
 [% END -%]
 	[% END %]
 	<br/>
-	<a href='[% base_url %]/plainh/[% entry.id %]'>Show as text</a> | 
-	<a href='[% base_url %]/downloadh/[% entry.id %]'>Download</a> |
+	<a href='[% base_url %]/plainh/[% entry.hidden_id %]'>Show as text</a> | 
+	<a href='[% base_url %]/downloadh/[% entry.hidden_id %]'>Download</a> |
 	[% IF lines == 0 %]
-	<a href='[% base_url %]/?hidden=[% entry.id %];lines=1'>With linenumbers</a> |
+	<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=1'>With linenumbers</a> |
 	[% ELSE %]
-	<a href='[% base_url %]/?hidden=[% entry.id %];lines=0'>Without linenumbers</a> |
+	<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=0'>Without linenumbers</a> |
 	[% END %]
 	<a href='[% base_url %]/?as_hidden=1'>Paste new</a> |
 	<br/>
@@ -67,10 +44,9 @@ never
 [% entry.code | html -%]
 </pre>
 [% END %]
-[% comments = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$entry.paste_id'") %]
 [% IF comments.size >= 1 %]
 <p>
-[% FOREACH comment  = mydb.query ("SELECT text,name,date_trunc('second', date) as postedate from comments where paste_id = '$entry.paste_id'") %]
+[% FOREACH comment  = comments %]
 <div id="comment_header">
 Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
 <div id="comment">
@@ -81,7 +57,7 @@ Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
 <div id="comment_add">
 <b>Add Comment:</b>
 <form name="add_comment" id="add_comment" method="post" action="./">
-<label for="poster" form="add_comment"><b>Name</b></label><br/><input type="hidden" name="paste_id" value="[% entry.paste_id %]"/>
+<label for="poster" form="add_comment"><b>Name</b></label><br/><input type="hidden" name="paste_id" value="[% entry.id %]"/>
 <input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% CGI.cookie('paste_name') | html %]" />
 <br />
 <label for="comment"><b>Comment</b></label>
@@ -91,9 +67,7 @@ Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
 <input type="hidden" name="hide" value="1">
 </form>
 </div>
-[% IF CGI.cookie('session_id') -%]
-[% session_id =  CGI.cookie('session_id') %]
-[% FOREACH post = mydb.query("SELECT sha1, id from paste WHERE sessionid = '$session_id' AND  substring(sha1 FROM 1 FOR 8) = '$show'") %] 
+[% IF own_entry -%]
 
 <h1>Information about your entry</h1>
 <br />
@@ -102,7 +76,7 @@ Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
 <li>To link to your entry use: <a href="[% base_url %]/hidden/[% show %]">[% base_url.substr(2) %]/hidden/[% show %]</a></li>
 <li>To download your entry use: <a href="[% base_url %]/downloadh/[% show %]">[% base_url.substr(2) %]/download_h/[% show %]</a></li>
 <li>To see your entry as plain text use: <a href="[% base_url %]/plainh/[% show %]">[% base_url.substr(2) %]/plain_h/[% show %]</a></li>
-<li>To delete your entry use: <a href="[% base_url %]/delete/[% post.sha1 %]">[% base_url.substr(2) %]/delete/[% post.sha1 %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% entry.sha1 %]">[% base_url.substr(2) %]/delete/[% entry.sha1 %]</a></li>
 </ul>
 [% END -%]
 [% END -%]
@@ -110,4 +84,3 @@ Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
-

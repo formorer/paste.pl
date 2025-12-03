@@ -1,14 +1,6 @@
-[% TRY %]
-	[% USE mydb = DBI(dbname, dbuser, dbpass) %]
-	[% CATCH %]
-		[% INCLUDE dberror %]
-	[% STOP %]
-[% END %]
 [% USE format %]
 [% USE HighlightPygments %]
-
 [% USE CGI %]
-[% f = mydb.query("DELETE from paste where posted + interval '1 second' * expires < now() and expires <> '-1'") -%]
 
 <div id="menu">
 
@@ -16,9 +8,7 @@
 <a href="[% base_url %]">Make new paste</a>
 <br />
 <ul>
-[% FOREACH post = mydb.query("select id,poster,EXTRACT (epoch from (now() - posted)) as age, 
-							  posted as postdate 
-							  from paste where hidden is not true order by posted desc, id desc limit 10") -%]
+[% FOREACH post = recent_posts -%]
 
 <li><a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
 [% commented = format(' %s') %]
@@ -37,16 +27,12 @@
 </li>
 [% END %]
 </ul>
-[% IF CGI.cookie('session_id') -%]
-[% pastes = mydb.query("SELECT * from paste WHERE sessionid = '$session_id'") %]
+[% IF CGI.cookie('session_id') && user_pastes.size > 0 -%]
 <h1>Your pastes</h1>
 <ul>
-[% session_id = CGI.cookie('session_id') %]
-[% FOREACH post = mydb.query("SELECT id, poster, EXTRACT (epoch from (now() - posted)) as age,
-posted AS postedate,hidden,sha1, code from paste WHERE sessionid = '$session_id' 
-order by posted DESC, id desc limit 5") %]
+[% FOREACH post = user_pastes %]
 <li>
-[% IF post.hidden == '1' %]
+[% IF post.hidden == '1' || post.hidden == 't' %]
 <a href='[% base_url %]/hidden/[% post.sha1.substr(0,8) %]'>[% post.poster %]</a><br />
 [% ELSE %]
 <a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
@@ -79,4 +65,3 @@ order by posted DESC, id desc limit 5") %]
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
-

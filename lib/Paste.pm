@@ -599,17 +599,160 @@ sub get_hidden_paste ($) {
     }
 }
 
+sub get_paste_display {
+    my ( $self, $id, $hidden ) = @_;
+    my $dbh  = $self->{dbh};
+    my $sql  = '';
+    my $args = [$id];
+
+    if ($hidden) {
+        $sql =
+            "SELECT id, substring(sha1 FROM 1 FOR 8) AS hidden_id, poster, code,
+                    paste.lang_id, lang.desc AS lang_desc, expires, sha1, sessionid,
+                    to_char(posted, 'YYYY-MM-DD HH24:MI:SS') AS postedate,
+                    CASE WHEN expires = -1 THEN NULL ELSE
+                        to_char(posted + (expires || ' seconds')::interval,
+                                'YYYY-MM-DD HH24:MI:SS') END AS expiredate
+             FROM paste
+             LEFT JOIN lang ON paste.lang_id = lang.lang_id
+             WHERE substring(sha1 FROM 1 FOR 8) = ?";
+    } else {
+        $sql =
+            "SELECT id, poster, code, paste.lang_id, lang.desc AS lang_desc,
+                    expires, sha1, sessionid,
+                    to_char(posted, 'YYYY-MM-DD HH24:MI:SS') AS postedate,
+                    CASE WHEN expires = -1 THEN NULL ELSE
+                        to_char(posted + (expires || ' seconds')::interval,
+                                'YYYY-MM-DD HH24:MI:SS') END AS expiredate
+             FROM paste
+             LEFT JOIN lang ON paste.lang_id = lang.lang_id
+             WHERE id = ? AND hidden IS FALSE";
+    }
+
+    my $sth = $dbh->prepare($sql);
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare db statement: " . $dbh->errstr;
+        return;
+    }
+
+    $sth->execute(@$args);
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not get paste from db: " . $dbh->errstr;
+        return;
+    }
+    my $entry = $sth->fetchrow_hashref;
+    return $entry if $entry && defined $entry->{code};
+    return;
+}
+
+sub get_comments {
+    my ( $self, $paste_id ) = @_;
+    my $dbh = $self->{dbh};
+
+    my $sth = $dbh->prepare(
+        "SELECT text, name, to_char(date, 'YYYY-MM-DD HH24:MI:SS') AS postedate
+         FROM comments
+         WHERE paste_id = ?
+         ORDER BY date ASC"
+    );
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not prepare comments statement: " . $dbh->errstr;
+        return;
+    }
+
+    $sth->execute($paste_id);
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not fetch comments: " . $dbh->errstr;
+        return;
+    }
+
+    return $sth->fetchall_arrayref( {}, 1000 ) || [];
+}
+
+sub get_recent_pastes {
+    my ( $self, $limit ) = @_;
+    $limit ||= 10;
+
+    my $dbh = $self->{dbh};
+    my $sth = $dbh->prepare(
+        "SELECT id, poster,
+                EXTRACT (epoch from (now() - posted)) as age,
+                posted AS postdate
+         FROM paste
+         WHERE hidden is not true
+         ORDER BY posted DESC, id DESC
+         LIMIT ?"
+    );
+
+    if ( $dbh->errstr ) {
+        $self->{error} =
+            "Could not prepare recent pastes statement: " . $dbh->errstr;
+        return;
+    }
+
+    $sth->execute($limit);
+    if ( $dbh->errstr ) {
+        $self->{error} =
+            "Could not fetch recent pastes: " . $dbh->errstr;
+        return;
+    }
+
+    return $sth->fetchall_arrayref( {}, $limit ) || [];
+}
+
+sub get_user_pastes {
+    my ( $self, $session_id, $limit ) = @_;
+    $limit ||= 5;
+    my $dbh = $self->{dbh};
+    return [] unless $session_id;
+
+    my $sth = $dbh->prepare(
+        "SELECT id, poster,
+                EXTRACT (epoch from (now() - posted)) as age,
+                posted AS postedate,
+                hidden, sha1, code
+         FROM paste
+         WHERE sessionid = ?
+         ORDER BY posted DESC, id DESC
+         LIMIT ?"
+    );
+
+    if ( $dbh->errstr ) {
+        $self->{error} =
+            "Could not prepare user pastes statement: " . $dbh->errstr;
+        return;
+    }
+
+    $sth->execute( $session_id, $limit );
+    if ( $dbh->errstr ) {
+        $self->{error} = "Could not fetch user pastes: " . $dbh->errstr;
+        return;
+    }
+
+    return $sth->fetchall_arrayref( {}, $limit ) || [];
+}
+
 sub get_langs () {
     my ( $self, $id ) = @_;
     my $dbh = $self->{dbh};
     my $ary_ref =
-        $dbh->selectall_arrayref( "SELECT * from lang", { Slice => {} } );
+        $dbh->selectall_arrayref( "SELECT * from lang ORDER BY \"desc\"",
+        { Slice => {} } );
     if ( $dbh->errstr ) {
         $self->{error} =
             "Could not get languages from database: " . $dbh->errstr;
         return 0;
     }
     return $ary_ref;
+}
+
+sub cleanup_expired {
+    my ($self) = @_;
+    my $dbh    = $self->{dbh};
+    $dbh->do(
+        "DELETE from paste where posted + interval '1 second' * expires < now() and expires <> '-1'"
+    );
+    return 1;
 }
 
 sub get_lang ($) {

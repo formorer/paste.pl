@@ -1,28 +1,6 @@
 [% WRAPPER common_htmlpage title="Debian Pastezone" %]
 [% USE format %]
 [% USE CGI %]
-[% TRY %]
-    [% USE mydb = DBI(dbname, dbuser, dbpass) %]
-    [% CATCH %]
-        [% INCLUDE dberror %]
-    [% STOP %]
-[% END %]
-[% IF pnew %]
-    [% TRY %]
-        [% entry = mydb.query ("SELECT code from paste where id = '$pnew';") %]
-        [% IF entry.size != 1 %]
-            [%THROW notfound "Paste $pnew can not be used a base for a new paste" %]
-        [% END %]
-        [% FOREACH entry = mydb.query ("SELECT code from paste where id = '$pnew';") %]
-        [% END %]
-    [% CATCH DBI %]
-        [% INCLUDE dberror %]
-        [% STOP %]
-    [% CATCH %]
-        [% INCLUDE common_error %]
-        [% STOP %]
-    [% END %]
-[% END %]
 
 <h1>New paste:</h1>
 
@@ -50,7 +28,7 @@
 <label for="lang"><b>Language</b></label>
 <select name="lang" id="lang">
 	<option value="-1">text</option>
-	[% FOREACH lang = mydb.query('SELECT * from lang order by "desc"') -%]
+	[% FOREACH lang IN langs -%]
 		<option [% IF lang.desc == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.desc %]" >[% lang.desc %]</option>
 	[% END %]
 </select>
@@ -73,7 +51,7 @@
 <br />
 <label for="code"><b>Code:</b> To ensure legibility, keep your code lines under 80 characters long.<br />
 Include comments to indicate what you need feedback on.</label><br />
-<textarea id="code" class="codeedit" name="code" cols="80" rows="10">[% entry.code | html %]</textarea>
+<textarea id="code" class="codeedit" name="code" cols="80" rows="10">[% prefill_code | html %]</textarea>
 <br />
 <input type="file" name="upload" /><input type="submit" name="paste" value="Send"/>
 
@@ -82,4 +60,3 @@ Include comments to indicate what you need feedback on.</label><br />
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]
-
