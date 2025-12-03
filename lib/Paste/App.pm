@@ -44,7 +44,6 @@ sub startup {
             my $output = '';
             local %ENV = %{ $c->req->env };    # TT CGI plugin expects %ENV
             $c->paste_model->cleanup_expired;
-            my $recent = $c->paste_model->get_recent_pastes || [];
             my $user_pastes = [];
             if ( my $sid = $c->cookie('session_id') ) {
                 $user_pastes = $c->paste_model->get_user_pastes($sid) || [];
@@ -53,7 +52,6 @@ sub startup {
                 (   %{ $c->stash },
                     %{ $vars || {} },
                     round        => sub { floor(@_) },
-                    recent_posts => $recent,
                     user_pastes  => $user_pastes,
                 );
             $c->app->tt->process( $template, \%stash, \$output )

@@ -1,42 +1,17 @@
-[% USE format %]
-[% USE HighlightPygments %]
 [% USE CGI %]
 
 <div id="menu">
 
-<h1>Recent Posts</h1>
-<a href="[% base_url %]">Make new paste</a>
+<h1>Paste</h1>
+<a href="[% base_url %]">Make new hidden paste</a>
 <br />
-<ul>
-[% FOREACH post = recent_posts -%]
 
-<li><a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
-[% commented = format(' %s') %]
-[% days = post.age / (3600*24) %]
-[% hours = post.age / 3600 %]
-[% minutes = post.age / 60 %]
-[% IF round(days) > 1 %]
-	[% round(days) %] days ago 
-[% ELSIF hours >= 1 %]
-	[% round(hours) %] hour(s) ago
-[% ELSIF minutes >= 1 %] 
-	[% round(minutes) %] minute(s) ago 
-[% ELSE %]
-	[% round(post.age) %] second(s) ago
-[% END %]
-</li>
-[% END %]
-</ul>
 [% IF CGI.cookie('session_id') && user_pastes.size > 0 -%]
 <h1>Your pastes</h1>
 <ul>
 [% FOREACH post = user_pastes %]
 <li>
-[% IF post.hidden == '1' || post.hidden == 't' %]
 <a href='[% base_url %]/hidden/[% post.sha1.substr(0,8) %]'>[% post.poster %]</a><br />
-[% ELSE %]
-<a href='[% base_url %]/[% post.id %]'>[% post.poster %]</a><br />
-[% END %]
 [% commented = format(' %s') %]
 [% days = post.age / (3600*24) %]
 [% hours = post.age / 3600 %]

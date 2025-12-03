@@ -673,31 +673,7 @@ sub get_recent_pastes {
     my ( $self, $limit ) = @_;
     $limit ||= 10;
 
-    my $dbh = $self->{dbh};
-    my $sth = $dbh->prepare(
-        "SELECT id, poster,
-                EXTRACT (epoch from (now() - posted)) as age,
-                posted AS postdate
-         FROM paste
-         WHERE hidden is not true
-         ORDER BY posted DESC, id DESC
-         LIMIT ?"
-    );
-
-    if ( $dbh->errstr ) {
-        $self->{error} =
-            "Could not prepare recent pastes statement: " . $dbh->errstr;
-        return;
-    }
-
-    $sth->execute($limit);
-    if ( $dbh->errstr ) {
-        $self->{error} =
-            "Could not fetch recent pastes: " . $dbh->errstr;
-        return;
-    }
-
-    return $sth->fetchall_arrayref( {}, $limit ) || [];
+    return [];
 }
 
 sub get_user_pastes {
