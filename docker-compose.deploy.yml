@@ -1,7 +1,6 @@
 services:
   app:
     image: ghcr.io/formorer/paste.pl:${IMAGE_TAG:-latest}
-    platform: ${APP_PLATFORM:-linux/arm64/v8}
     environment:
       PASTE_CONFIG: /app/paste.conf
       CMD_TEST: "0"
