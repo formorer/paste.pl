@@ -12,6 +12,6 @@ RUN cpanm -n --installdeps .
 COPY . .
 ENV PASTE_CONFIG=/app/t/conf/paste.conf
 
-CMD ["prove", "-v", "-Ilib", "t"]
+CMD ["morbo", "-l", "http://0.0.0.0:3000", "app.psgi"]
 
 # vim: syntax=Dockerfile
