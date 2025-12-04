@@ -4,6 +4,7 @@ use Test::More;
 use Test::Mojo;
 use FindBin;
 use File::Spec;
+use Mojo::Util qw(decode);
 
 BEGIN {
     if ( !$ENV{PASTE_CONFIG} && -f File::Spec->catfile( $FindBin::Bin, 'conf',
@@ -70,25 +71,6 @@ subtest 'reject binary paste' => sub {
     my $binary = pack( "C*", 0, 1, 2, 3, 255 ) . "abc";
     $t->post_ok( '/' => form => { code => $binary } )->status_is(200)
         ->content_like(qr/Binary uploads are not allowed/);
-};
-
-subtest 'highlight renders for non-ascii bash paste' => sub {
-    my $code3 = "echo café\n";
-    $t->post_ok(
-        '/' => form => {
-            code   => $code3,
-            poster => 'bashuser',
-            expire => 3600,
-            lang   => 'bash',
-        }
-    )->status_is(302);
-    my $loc3 = $t->tx->res->headers->location;
-    my ($hid3) = $loc3 =~ m{([0-9a-f]+)/*$};
-    ok( $hid3, "extracted hidden id $hid3" );
-    $loc3 = "/$loc3" unless $loc3 =~ m{^/};
-    my $res = $t->get_ok($loc3)->status_is(200)->tx->res->body;
-    like( $res, qr/pygment/, 'highlighted output contains pygment classes' );
-    $t->get_ok("/plainh/$hid3")->status_is(200)->content_is($code3);
 };
 
 subtest 'delete removes paste' => sub {

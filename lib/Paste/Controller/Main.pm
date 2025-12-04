@@ -265,6 +265,8 @@ sub _create {
         $code = $upload->slurp;
     } else {
         $code = $c->param('code') // '';
+        $code = Encode::decode( 'UTF-8', $code )
+            unless Encode::is_utf8($code);
     }
 
     if ( $ENV{PASTE_DEBUG_PARAMS} ) {
