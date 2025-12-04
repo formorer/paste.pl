@@ -43,10 +43,10 @@ never
 <br />
 <b>Keep this link safe; only those with it can view the paste ([% show %]).</b>
 <ul>
-<li>To link to your entry use: <a href="[% base_url %]/hidden/[% show %]">[% base_url.substr(2) %]/hidden/[% show %]</a></li>
-<li>To download your entry use: <a href="[% base_url %]/downloadh/[% show %]">[% base_url.substr(2) %]/download_h/[% show %]</a></li>
-<li>To see your entry as plain text use: <a href="[% base_url %]/plainh/[% show %]">[% base_url.substr(2) %]/plain_h/[% show %]</a></li>
-<li>To delete your entry use: <a href="[% base_url %]/delete/[% entry.sha1 %]">[% base_url.substr(2) %]/delete/[% entry.sha1 %]</a></li>
+<li>To link to your entry use: <a href="[% base_url %]/hidden/[% show %]">[% base_url %]/hidden/[% show %]</a></li>
+<li>To download your entry use: <a href="[% base_url %]/downloadh/[% show %]">[% base_url %]/downloadh/[% show %]</a></li>
+<li>To see your entry as plain text use: <a href="[% base_url %]/plainh/[% show %]">[% base_url %]/plainh/[% show %]</a></li>
+<li>To delete your entry use: <a href="[% base_url %]/delete/[% entry.sha1 %]">[% base_url %]/delete/[% entry.sha1 %]</a></li>
 </ul>
 [% END -%]
 [% END -%]
