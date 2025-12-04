@@ -58,12 +58,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
+      - name: Log in to GHCR
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "${CR_PAT}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build and push Docker image
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
         run: |
-          docker build -t pastepl:${{ github.ref_name }} .
-      - name: Save Docker image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pastepl-image
-          path: |
-            $(docker save pastepl:${{ github.ref_name }} | gzip > pastepl-${{ github.ref_name }}.tar.gz)
+          docker build -t "${IMAGE_NAME}" .
+          docker push "${IMAGE_NAME}"
