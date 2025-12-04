@@ -6,8 +6,12 @@ use FindBin;
 use File::Spec;
 
 BEGIN {
-    $ENV{PASTE_CONFIG} = File::Spec->catfile( $FindBin::Bin, 'conf',
-        'paste.conf' );
+    if ( !$ENV{PASTE_CONFIG} && -f File::Spec->catfile( $FindBin::Bin, 'conf',
+            'paste.conf' ) )
+    {
+        $ENV{PASTE_CONFIG} = File::Spec->catfile( $FindBin::Bin, 'conf',
+            'paste.conf' );
+    }
 }
 
 use Paste::App;
