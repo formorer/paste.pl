@@ -45,11 +45,10 @@ jobs:
           sed 's/host=db/host=localhost/' t/conf/paste.conf > /tmp/paste.conf
           echo "[www]" >> /tmp/paste.conf
           echo "base_url = http://localhost:3000" >> /tmp/paste.conf
+          cat /tmp/paste.conf
       - name: Lint/test
-        env:
-          PASTE_CONFIG: /tmp/paste.conf
         run: |
-          prove -Ilib t
+          PASTE_CONFIG=/tmp/paste.conf prove -Ilib t
 
   docker:
     needs: test
