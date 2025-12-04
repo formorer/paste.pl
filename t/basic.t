@@ -62,6 +62,12 @@ subtest 'reject empty paste' => sub {
         ->content_like(qr/Please add some text/);
 };
 
+subtest 'reject binary paste' => sub {
+    my $binary = pack( "C*", 0, 1, 2, 3, 255 ) . "abc";
+    $t->post_ok( '/' => form => { code => $binary } )->status_is(200)
+        ->content_like(qr/Binary uploads are not allowed/);
+};
+
 done_testing();
 
 # vim: syntax=perl sw=4 ts=4 noet shiftround

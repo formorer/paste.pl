@@ -296,6 +296,15 @@ sub _create {
         unless ( defined($code) && length $code )
         || $c->req->upload('upload');
 
+    if ( _looks_binary($code) ) {
+        return $c->render_tt(
+            'paste',
+            {   langs  => $langs,
+                status => 'Binary uploads are not allowed (#8).'
+            }
+        );
+    }
+
     my $name = $c->param('poster') || 'anonymous';
 
     my $session_id =
@@ -365,6 +374,17 @@ sub _build_cgi_from_tx {
         || $c->tx->remote_address
         || $c->req->url->to_abs->host;
     return bless { remote_host => $addr }, 'Paste::CGIShim';
+}
+
+sub _looks_binary {
+    my ($text) = @_;
+    return 1 if !defined $text || $text eq '';
+    return 1 if $text =~ /\0/;
+    use bytes;
+    my $len = length($text);
+    return 0 if $len == 0;
+    my $non_printable = ( $text =~ tr/\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF// );
+    return ( $non_printable / $len ) > 0.3;
 }
 
 package Paste::CGIShim;
