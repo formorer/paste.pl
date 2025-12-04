@@ -13,7 +13,7 @@ else
   exit 1
 fi
 
-# Build and start in detached mode
-"${compose_cmd[@]}" up --build -d db app_dev
+# Build and start in detached mode with debug logging
+PASTE_DEBUG_PARAMS=1 MOJO_LOG_LEVEL=debug "${compose_cmd[@]}" up --build db app_dev
 
 echo "Manual test instance should be reachable at http://localhost:3000 (once db/app_dev are healthy)."

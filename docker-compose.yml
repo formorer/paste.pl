@@ -12,6 +12,7 @@ services:
       - ./docker/init-roles.sql:/docker-entrypoint-initdb.d/00-roles.sql:ro
       - ./docker/patch-schema.sql:/docker-entrypoint-initdb.d/02-patch-schema.sql:ro
       - ./docker/grants.sql:/docker-entrypoint-initdb.d/03-grants.sql:ro
+      - ./docker/langs.sql:/docker-entrypoint-initdb.d/04-langs.sql:ro
       - ./docker/cleanup-revoke.sql:/docker-entrypoint-initdb.d/99-cleanup-revoke.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U paste"]
@@ -33,6 +34,8 @@ services:
   app_dev:
     build: .
     environment:
+      MOJO_LOG_LEVEL: debug
+      PASTE_DEBUG_PARAMS: 1
       PASTE_CONFIG: /app/t/conf/paste.conf
     depends_on:
       db:
