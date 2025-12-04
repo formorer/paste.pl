@@ -20,6 +20,7 @@ use Template::Plugin::Filter;
 use base qw( Template::Plugin::Filter );
 use Digest::SHA qw( sha1_hex );
 use File::Temp qw (tempfile );
+use Encode ();
 
 use strict;
 
@@ -95,7 +96,9 @@ sub filter {
         $pygment .= ',style=' . $config->{'style'};
     }
 
-    run3( $pygment, \$text, \$out, \$stderr );
+    my $input = Encode::encode( 'UTF-8', $text );
+    run3( $pygment, \$input, \$out, \$stderr,
+        { binmode_stdout => ':raw', binmode_stderr => ':raw' } );
 
     if ($stderr) {
         die Template::Exception->new( highlight => "pygmentize error: $out" );
