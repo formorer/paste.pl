@@ -47,6 +47,8 @@ jobs:
           echo "base_url = http://localhost:3000" >> /tmp/paste.conf
           cat /tmp/paste.conf
       - name: Lint/test
+        env:
+          PASTE_CONFIG: /tmp/paste.conf
         run: |
           PASTE_CONFIG=/tmp/paste.conf prove -Ilib t
 
