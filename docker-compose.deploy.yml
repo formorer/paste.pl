@@ -6,8 +6,8 @@ services:
       PASTE_CONFIG: /app/paste.conf
       CMD_TEST: "0"
       MOJO_LOG_LEVEL: info
-      DB_HOST: db
-      DB_PORT: 5432
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
       GITLAB_SITE: ${GITLAB_SITE:-}
       GITLAB_CLIENT_ID: ${GITLAB_CLIENT_ID:-}
       GITLAB_CLIENT_SECRET: ${GITLAB_CLIENT_SECRET:-}
@@ -15,25 +15,3 @@ services:
       - ./paste.conf:/app/paste.conf:ro
     ports:
       - "3000:3000"
-    depends_on:
-      db:
-        condition: service_started
-
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: paste
-      POSTGRES_PASSWORD: paste
-      POSTGRES_DB: paste
-    volumes:
-      - paste_data:/var/lib/postgresql/data
-      - ./paste.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./docker/langs.sql:/docker-entrypoint-initdb.d/02-langs.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U paste"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-volumes:
-  paste_data:
