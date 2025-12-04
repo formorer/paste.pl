@@ -50,7 +50,7 @@ jobs:
         env:
           PASTE_CONFIG: /tmp/paste.conf
         run: |
-          PASTE_CONFIG=/tmp/paste.conf prove -Ilib t
+          PASTE_CONFIG=/tmp/paste.conf prove -v -Ilib t
 
   docker:
     needs: test
