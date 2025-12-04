@@ -65,7 +65,9 @@ jobs:
         run: echo "${CR_PAT}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build and push Docker image
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          IMAGE_BASE: ghcr.io/${{ github.repository }}
+          IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          docker build -t "${IMAGE_NAME}" .
-          docker push "${IMAGE_NAME}"
+          docker build -t "${IMAGE_BASE}:${IMAGE_TAG}" -t "${IMAGE_BASE}:latest" .
+          docker push "${IMAGE_BASE}:${IMAGE_TAG}"
+          docker push "${IMAGE_BASE}:latest"

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   app:
-    image: ghcr.io/formorer/paste.pl:latest
+    image: ghcr.io/formorer/paste.pl:${IMAGE_TAG:-latest}
     environment:
       PASTE_CONFIG: /app/paste.conf
       MOJO_LOG_LEVEL: info
