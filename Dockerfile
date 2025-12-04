@@ -14,4 +14,7 @@ ENV PASTE_CONFIG=/app/t/conf/paste.conf
 
 CMD ["morbo", "-l", "http://0.0.0.0:3000", "app.psgi"]
 
+# If CMD_TEST is set, run tests instead (used in CI)
+ENTRYPOINT ["/bin/sh", "-c", "if [ \"$CMD_TEST\" = \"1\" ]; then PASTE_CONFIG=${PASTE_CONFIG:-t/conf/paste.conf} prove -Ilib t; else exec \"$@\"; fi", "--"]
+
 # vim: syntax=Dockerfile

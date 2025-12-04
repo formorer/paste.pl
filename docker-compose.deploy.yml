@@ -5,6 +5,7 @@ services:
     image: ghcr.io/formorer/paste.pl:${IMAGE_TAG:-latest}
     environment:
       PASTE_CONFIG: /app/paste.conf
+      CMD_TEST: "0"
       MOJO_LOG_LEVEL: info
       DB_HOST: db
       DB_PORT: 5432
