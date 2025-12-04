@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ modernize, main, master ]
+  pull_request:
+    branches: [ modernize, main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "5.38"
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps .
+      - name: Lint/test
+        run: |
+          prove -Ilib t
+
+  docker:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          docker build -t pastepl:${{ github.ref_name }} .
+      - name: Save Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pastepl-image
+          path: |
+            $(docker save pastepl:${{ github.ref_name }} | gzip > pastepl-${{ github.ref_name }}.tar.gz)
