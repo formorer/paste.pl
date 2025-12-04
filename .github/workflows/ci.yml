@@ -42,9 +42,10 @@ jobs:
           if [ -f docker/langs.sql ]; then
             psql -h localhost -U paste -d paste -f docker/langs.sql
           fi
+          sed 's/host=db/host=localhost/' t/conf/paste.conf > /tmp/paste.conf
       - name: Lint/test
         env:
-          PASTE_CONFIG: t/conf/paste.conf
+          PASTE_CONFIG: /tmp/paste.conf
         run: |
           prove -Ilib t
 
