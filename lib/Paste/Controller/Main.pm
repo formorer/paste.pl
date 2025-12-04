@@ -2,6 +2,7 @@ package Paste::Controller::Main;
 
 use Mojo::Base 'Mojolicious::Controller';
 use Digest::SHA qw(sha1_hex);
+use Mojo::JSON qw(encode_json);
 
 # Controller emulating the old CGI behaviors with Mojolicious routes
 sub index {
@@ -187,16 +188,42 @@ sub page {
 sub _create {
     my $c = shift;
     my $code;
+    my $upload = $c->req->upload('upload');
 
-    if ( my $upload = $c->req->upload('upload') ) {
+    if ( $upload && $upload->size ) {
         $code = $upload->slurp;
     } else {
-        $code = $c->param('code');
+        $code = $c->param('code') // '';
+    }
+
+    if ( $ENV{PASTE_DEBUG_PARAMS} ) {
+        my $params = $c->req->params->to_hash;
+        $c->app->log->debug(
+            'paste form params: '
+                . encode_json($params)
+                . ' content_type='
+                . ( $c->req->headers->content_type || '' )
+                . ' content_length='
+                . ( $c->req->headers->content_length || 0 ) );
+        for my $u ( @{ $c->req->uploads // [] } ) {
+            next unless $u && ref $u;
+            $c->app->log->debug(
+                'upload detected: '
+                    . ( $u->name // '' ) . '/'
+                    . ( $u->filename // '' ) . ' size='
+                    . ( $u->size // 0 ) );
+        }
     }
 
     my $langs = $c->paste_model->get_langs || [];
-    return $c->render_tt('paste', { langs => $langs } )
-        unless defined $code && length $code;
+    return $c->render_tt(
+        'paste',
+        {   langs  => $langs,
+            status => 'Please add some text to paste.'
+        }
+        )
+        unless ( defined($code) && length $code )
+        || $c->req->upload('upload');
 
     my $name = $c->param('poster') || 'anonymous';
 
@@ -206,13 +233,13 @@ sub _create {
         || sha1_hex( rand() . time() );
 
     my $wrap   = $c->param('wrap');
-    my $expire = $c->param('expire');
-    my $lang   = $c->param('lang');
+    my $expire = defined $c->param('expire') ? $c->param('expire') : 86400;
+    my $lang   = defined $c->param('lang')   ? $c->param('lang')   : -1;
     my $hidden = 't';    # enforce hidden pastes by default
 
     my $cgi_obj = _build_cgi_from_tx($c);
 
-    my ($id) = $c->paste_model->add_paste(
+    my ( $id, $digest ) = $c->paste_model->add_paste(
         {   code       => $code,
             name       => $name,
             expire     => $expire,
