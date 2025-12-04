@@ -38,8 +38,5 @@ never
 <a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
 <br/>
 
-[% INCLUDE include_comments %]
-[% INCLUDE include_comment_form hide_comment=0 %]
-
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]

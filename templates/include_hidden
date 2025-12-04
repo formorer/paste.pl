@@ -35,8 +35,6 @@ never
 [% END %]
 <a href='[% base_url %]/?as_hidden=1'>Paste new</a> |
 <br/>
-[% INCLUDE include_comments %]
-[% INCLUDE include_comment_form hide_comment=1 %]
 [% IF own_entry -%]
 
 <h1>Information about your entry</h1>
