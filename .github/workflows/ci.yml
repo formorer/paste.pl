@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [ modernize, main, master ]
+    tags: ['*']
   pull_request:
     branches: [ modernize, main, master ]
 
