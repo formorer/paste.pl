@@ -145,10 +145,12 @@ sub add_paste {
     $sessionid = $sessionid || '';
     $hidden    = $hidden    || 'f';
 
-    if ( $name !~ /^[^;,'"<>]{1,10}$/i ) {
-        $self->{error} =
-            "Invalid format for name (no special chars, max 10 chars)";
-        return 0;
+    if ( !$args->{authenticated} ) {
+        if ( $name !~ /^[^;,'"<>]{1,10}$/i ) {
+            $self->{error} =
+                "Invalid format for name (no special chars, max 10 chars)";
+            return 0;
+        }
     }
 
     if ( $lang !~ /^[0-9-]+$/ ) {
@@ -165,7 +167,7 @@ sub add_paste {
         return 0;
     }
 
-    my $max_code_size = 153600;
+    my $max_code_size = $args->{authenticated} ? 5242880 : 153600;
 
     my $file;
     if ( $code =~ /^-----BEGIN PGP SIGNED MESSAGE/ ) {
@@ -209,40 +211,44 @@ sub add_paste {
         $pos++;
     }
 
-    if ( defined $self->get_config_key( 'spam', 'linebreaks' )
-        && $newlines < $self->get_config_key( 'spam', 'linebreaks' ) )
-    {
-        my $needed = $self->get_config_key( 'spam', 'linebreaks' );
-        $self->{error} =
-            "Thanks to some spammers you need to provide at least $needed linebreaks";
-        return 0;
-    }
-
-    my $spamscore = $self->get_config_key( 'spam', 'score' );
-    if ($spamscore) {
-        my ( $hits, $score ) = $self->check_wordfilter($code);
-        if ( $hits && $score >= $spamscore ) {
-            $self->{error} =
-                "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
-            return 0;
-        }
-    }
-
-    if ( $self->get_config_key( 'spam', 'honeypotblkey' ) && $args->{cgi} ) {
-        my $key = $self->get_config_key( 'spam', 'honeypotblkey' );
-        my $h         = WWW::Honeypot::httpBL->new( { access_key => $key } );
-        my $cgi       = $args->{cgi};
-        my $remote_ip = $cgi->remote_host();
-        $h->fetch($remote_ip);
-
-        if (   $h->is_comment_spammer()
-            || $h->is_suspicious() )
+    if ( !$args->{authenticated} ) {
+        if ( defined $self->get_config_key( 'spam', 'linebreaks' )
+            && $newlines < $self->get_config_key( 'spam', 'linebreaks' ) )
         {
+            my $needed = $self->get_config_key( 'spam', 'linebreaks' );
             $self->{error} =
-                "Your ip ($remote_ip) is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
+                "Thanks to some spammers you need to provide at least $needed linebreaks";
             return 0;
         }
+    }
 
+    unless ( $args->{authenticated} ) {
+        my $spamscore = $self->get_config_key( 'spam', 'score' );
+        if ($spamscore) {
+            my ( $hits, $score ) = $self->check_wordfilter($code);
+            if ( $hits && $score >= $spamscore ) {
+                $self->{error} =
+                    "The spam wordfilter said you had $hits that led to a score of $score which is more or equal than the limit of $spamscore. If this was a false positive please contact the admin.";
+                return 0;
+            }
+        }
+
+        if ( $self->get_config_key( 'spam', 'honeypotblkey' ) && $args->{cgi} ) {
+            my $key = $self->get_config_key( 'spam', 'honeypotblkey' );
+            my $h         = WWW::Honeypot::httpBL->new( { access_key => $key } );
+            my $cgi       = $args->{cgi};
+            my $remote_ip = $cgi->remote_host();
+            $h->fetch($remote_ip);
+
+            if (   $h->is_comment_spammer()
+                || $h->is_suspicious() )
+            {
+                $self->{error} =
+                    "Your ip ($remote_ip) is listed on http://www.projecthoneypot.org/. If this was a false positive please contact the admin";
+                return 0;
+            }
+
+        }
     }
 
     my $sth = $dbh->prepare(
