@@ -5,11 +5,7 @@
 paste.debian.net has been written by Alexander Wirt <formorer@debian.org> and
 is relased under the <a
 href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'> AGPL 3.0</a>. <br />
-The code can be found in my git repository under <a
-href='http://git.snow-crash.org/?p=paste.pl.git'>
-http://git.snow-crash.org/?p=paste.pl.git</a> or <a href="https://github.com/formorer/paste.pl">
-https://github.com/formorer/paste.pl</a>
-and can be cloned via <i>git clone git://git.snow-crash.org/paste.pl</i>. 
+The code is available at <a href="https://github.com/formorer/paste.pl">https://github.com/formorer/paste.pl</a>.
 
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
