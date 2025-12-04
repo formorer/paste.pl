@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious';
 use POSIX qw(floor);
 use Template;
 use Paste;
+use Mojo::JSON qw(encode_json);
 
 sub startup {
     my $self = shift;
@@ -53,6 +54,8 @@ sub startup {
                     %{ $vars || {} },
                     round        => sub { floor(@_) },
                     user_pastes  => $user_pastes,
+                    current_user => $c->current_user,
+                    auth_enabled => $c->app->defaults('auth_enabled'),
                 );
             $c->app->tt->process( $template, \%stash, \$output )
                 or die $c->app->tt->error . "\n";
@@ -68,6 +71,31 @@ sub startup {
 
     my $r = $self->routes;
     $r->namespaces( ['Paste::Controller'] );
+
+    if (   $ENV{GITLAB_SITE}
+        && $ENV{GITLAB_CLIENT_ID}
+        && $ENV{GITLAB_CLIENT_SECRET} )
+    {
+        $self->plugin(
+            'OAuth2',
+            providers => {
+                gitlab => {
+                    key           => $ENV{GITLAB_CLIENT_ID},
+                    secret        => $ENV{GITLAB_CLIENT_SECRET},
+                    site          => $ENV{GITLAB_SITE},
+                    authorize_url => $ENV{GITLAB_AUTHORIZE_URL}
+                        || "$ENV{GITLAB_SITE}/oauth/authorize",
+                    token_url => $ENV{GITLAB_TOKEN_URL}
+                        || "$ENV{GITLAB_SITE}/oauth/token",
+                }
+            }
+        );
+        $self->defaults( auth_enabled => 1 );
+    } else {
+        $self->defaults( auth_enabled => 0 );
+    }
+
+    $self->helper( current_user => sub { shift->session('user') } );
 
     $r->get('/')->to('main#index');
     $r->post('/')->to('main#index');
@@ -97,6 +125,10 @@ sub startup {
         ->to( 'main#comment', hidden => 1, id => qr/[0-9a-f]+/ );
     $r->post('/:id')->to( 'main#comment', hidden => 0 );
     $r->get('/page/:tmpl')->to('main#page')->name('page');
+
+    $r->get('/auth/login')->to('main#login')->name('login');
+    $r->get('/auth/callback')->to('main#callback')->name('login_callback');
+    $r->get('/logout')->to('main#logout')->name('logout');
 
     $r->get('/:id')->to( 'main#show', hidden => 0, lines => 1 )
         ->name('show');

@@ -185,6 +185,77 @@ sub page {
     $c->render_tt( $tmpl, {} );
 }
 
+sub login {
+    my $c = shift;
+    return $c->redirect_to('/') unless $c->app->defaults('auth_enabled');
+
+    my $cb =
+          $c->app->defaults('base_url')
+        . '/auth/callback';
+    my $state = $c->csrf_token;
+    $c->session( oauth_state => $state );
+    $c->oauth2->authorize(
+        gitlab => {
+            redirect_uri => $cb,
+            scope        => 'read_user',
+            state        => $state,
+        }
+    );
+}
+
+sub callback {
+    my $c = shift;
+    return $c->redirect_to('/') unless $c->app->defaults('auth_enabled');
+
+    my $state = $c->param('state') || '';
+    if ( !$c->session('oauth_state') || $state ne $c->session('oauth_state') )
+    {
+        return $c->_error( "Authentication failed",
+            "Invalid OAuth state, please retry." );
+    }
+
+    my $cb =
+          $c->app->defaults('base_url')
+        . '/auth/callback';
+
+    my ( $err, $data ) = $c->oauth2->get_token_p(
+        gitlab => {
+            redirect_uri => $cb,
+        }
+    )->get;
+
+    return $c->_error( "Authentication failed", $err ) if $err;
+    return $c->_error( "Authentication failed", "No token received" )
+        unless $data->{access_token};
+
+    my $ua    = Mojo::UserAgent->new;
+    my $site  = $ENV{GITLAB_API_URL} || $ENV{GITLAB_SITE} . '/api/v4';
+    my $res   = $ua->get(
+        $site . '/user' => { Authorization => "Bearer $data->{access_token}" } )
+        ->result;
+    return $c->_error( "Authentication failed",
+        $res->message || "GitLab user fetch failed" )
+        if $res->is_error;
+
+    my $user = $res->json || {};
+    my $user_session = { id => $user->{id}, name => $user->{name} };
+    my $session_id   = sha1_hex( $user->{id} );
+    $c->session( user => $user_session );
+    $c->cookie( session_id => $session_id,
+        { expires => time + 60 * 60 * 24 * 30 } );
+    $c->session( oauth_state => undef );
+    $c->flash( status => "Signed in as $user->{name}" );
+    return $c->redirect_to('/');
+}
+
+sub logout {
+    my $c = shift;
+    delete $c->session->{user};
+    $c->cookie( session_id => undef, { expires => 1 } );
+    $c->flash( status => "Signed out" );
+    return $c->redirect_to('/');
+}
+
 sub _create {
     my $c = shift;
     my $code;
@@ -239,6 +310,10 @@ sub _create {
 
     my $cgi_obj = _build_cgi_from_tx($c);
 
+    my $authenticated = $c->current_user ? 1 : 0;
+    $session_id = sha1_hex( $c->current_user->{id} )
+        if $c->current_user && !$c->cookie('session_id');
+
     my ( $id, $digest ) = $c->paste_model->add_paste(
         {   code       => $code,
             name       => $name,
@@ -248,6 +323,7 @@ sub _create {
             hidden     => $hidden,
             wrap       => $wrap,
             cgi        => $cgi_obj,
+            authenticated => $authenticated,
         }
     );
 

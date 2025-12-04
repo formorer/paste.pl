@@ -6,6 +6,14 @@
 <a href="[% base_url %]">Make new paste</a>
 <br />
 
+[% IF auth_enabled %]
+    [% IF current_user %]
+        <div>Signed in as [% current_user.name | html %] | <a href="[% base_url %]/logout">Logout</a></div>
+    [% ELSE %]
+        <div><a href="[% base_url %]/auth/login">Login with GitLab</a></div>
+    [% END %]
+[% END %]
+
 [% IF CGI.cookie('session_id') && user_pastes.size > 0 -%]
 <h1>Your pastes</h1>
 <ul>
