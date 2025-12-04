@@ -9,16 +9,42 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:15
+        env:
+          POSTGRES_USER: paste
+          POSTGRES_PASSWORD: paste
+          POSTGRES_DB: paste
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U paste"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - name: Install Perl
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: "5.38"
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
+      - name: Init test database schema
+        env:
+          PGPASSWORD: paste
+        run: |
+          psql -h localhost -U paste -d paste -f paste.sql
+          if [ -f docker/langs.sql ]; then
+            psql -h localhost -U paste -d paste -f docker/langs.sql
+          fi
       - name: Lint/test
+        env:
+          PASTE_CONFIG: t/conf/paste.conf
         run: |
           prove -Ilib t
 
