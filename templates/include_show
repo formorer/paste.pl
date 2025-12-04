@@ -38,18 +38,8 @@ never
 <a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
 <br/>
 
-[% IF own_entry -%]
-
-<br>
-<h1>Information about your entry</h1>
-<ul>
-<li>To link to your entry use: <a href="[% base_url %]/[% entry.id %]">[% base_url.substr(2) %]/[% entry.id %]</a></li>
-
-<li>To download your entry use: <a href="[% base_url %]/download/[% entry.id %]">[% base_url.substr(2) %]/download/[% entry.id %]</a></li>
-<li>To see your entry as plain text use: <a href="[% base_url %]/plain/[% entry.id %]">[% base_url.substr(2) %]/plain/[% entry.id %]</a></li>
-<li>To delete your entry use: <a href="[% base_url %]/delete/[% entry.sha1 %]">[% base_url.substr(2) %]/delete/[% entry.sha1 %]</a></li>
-</ul>
-[% END -%]
+[% INCLUDE include_comments %]
+[% INCLUDE include_comment_form hide_comment=0 %]
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround
 %]

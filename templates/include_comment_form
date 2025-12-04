@@ -1,0 +1,15 @@
+<div id="comment_add">
+<b>Add Comment:</b>
+<form name="add_comment" id="add_comment" method="post" action="./">
+<label for="poster" form="add_comment"><b>Name</b></label><br/><input type="hidden" name="paste_id" value="[% entry.id %]"/>
+<input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% CGI.cookie('paste_name') | html %]" />
+<br />
+<label for="comment"><b>Comment</b></label>
+<br />
+<textarea id="comment" class="codeedit" name="comment" rows="2" cols="80"></textarea>
+<input type="submit" name="comment" value="Send"/>
+[% IF hide_comment -%]
+<input type="hidden" name="hide" value="1">
+[% END -%]
+</form>
+</div>

@@ -8,7 +8,7 @@
 </div>
 [% END %]
 
-<h1><b>hidden</b> Posting [% entry.hidden_id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
+<h1>Posting [% entry.hidden_id %] from [% entry.poster %] posted at [% entry.postedate %] expires: 
 [% IF entry.expires == -1 %]
 never
 [% ELSE %]
@@ -35,34 +35,13 @@ never
 [% END %]
 <a href='[% base_url %]/?as_hidden=1'>Paste new</a> |
 <br/>
-[% IF comments.size >= 1 %]
-<p>
-[% FOREACH comment  = comments %]
-<div id="comment_header">
-Posted on [% comment.postedate %] by [% comment.name | html %]:</div>
-<div id="comment">
-[% comment.text | html %]<br />
-</div>
-[% END %]
-[% END %]
-<div id="comment_add">
-<b>Add Comment:</b>
-<form name="add_comment" id="add_comment" method="post" action="./">
-<label for="poster" form="add_comment"><b>Name</b></label><br/><input type="hidden" name="paste_id" value="[% entry.id %]"/>
-<input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% CGI.cookie('paste_name') | html %]" />
-<br />
-<label for="comment"><b>Comment</b></label>
-<br />
-<textarea id="comment" class="codeedit" name="comment" rows="2" cols="80"></textarea>
-<input type="submit" name="comment" value="Send"/>
-<input type="hidden" name="hide" value="1">
-</form>
-</div>
+[% INCLUDE include_comments %]
+[% INCLUDE include_comment_form hide_comment=1 %]
 [% IF own_entry -%]
 
 <h1>Information about your entry</h1>
 <br />
-<b>This entry is hidden. So don't lose your hidden id ([% show %])</b>
+<b>Keep this link safe; only those with it can view the paste ([% show %]).</b>
 <ul>
 <li>To link to your entry use: <a href="[% base_url %]/hidden/[% show %]">[% base_url.substr(2) %]/hidden/[% show %]</a></li>
 <li>To download your entry use: <a href="[% base_url %]/downloadh/[% show %]">[% base_url.substr(2) %]/download_h/[% show %]</a></li>
