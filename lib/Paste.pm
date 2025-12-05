@@ -44,6 +44,7 @@ sub new {
     my $invocant    = shift;
     my $class       = ref($invocant) || $invocant;
     my $config_file = shift || '';
+    my %opts        = @_;
     croak("Need a configfile ($config_file)") unless -f $config_file;
     my $config = Config::IniFiles->new( -file => $config_file );
 
@@ -76,9 +77,14 @@ sub new {
         ? $ENV{DB_PORT}
         : $config->val( 'database', 'dbport' );
 
-    my $dsn = "dbi:Pg:dbname=$dbname";
-    $dsn .= ";host=$dbhost" if $dbhost;
-    $dsn .= ";port=$dbport" if $dbport;
+    my $dsn;
+    if ( $opts{dsn} ) {
+        $dsn = $opts{dsn};
+    } else {
+        $dsn = "dbi:Pg:dbname=$dbname";
+        $dsn .= ";host=$dbhost" if $dbhost;
+        $dsn .= ";port=$dbport" if $dbport;
+    }
 
     if ( $ENV{PASTE_DEBUG} ) {
         my $masked = $dbpass ? '***' : '';
@@ -90,7 +96,7 @@ sub new {
         || carp "base_url not specified in config";
 
     my $dbh =
-        DBI->connect( "dbi:Pg:dbname=$dbname", $dbuser, $dbpass,
+        DBI->connect( $dsn, $dbuser, $dbpass,
         { RaiseError => 0, PrintError => 0 } )
         or croak "Could not connect to DB: " . $DBI::errstr;
 
