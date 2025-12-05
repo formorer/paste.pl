@@ -71,6 +71,11 @@ sub new {
     $dsn .= ";host=$dbhost" if $dbhost;
     $dsn .= ";port=$dbport" if $dbport;
 
+    if ( $ENV{PASTE_DEBUG} ) {
+        my $masked = $dbpass ? '***' : '';
+        warn "DB debug: dsn=$dsn user=$dbuser pass=$masked\n";
+    }
+
     my $base_url = $ENV{BASE_URL}
         || $config->val( 'www', 'base_url' )
         || carp "base_url not specified in config";
