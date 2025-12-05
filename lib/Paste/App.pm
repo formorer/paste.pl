@@ -35,8 +35,15 @@ sub startup {
         : ( $paste->get_config_key( 'database', 'dbpassword' ) || '' );
     my $base_url   = $ENV{BASE_URL} || $paste->get_config_key( 'www', 'base_url' ) || '';
 
+    my $dbhost = $ENV{DB_HOST} || $paste->get_config_key( 'database', 'dbhost' );
+    my $dbport = $ENV{DB_PORT} || $paste->get_config_key( 'database', 'dbport' );
+
+    my $dsn = "dbi:Pg:dbname=$dbname";
+    $dsn .= ";host=$dbhost" if $dbhost;
+    $dsn .= ";port=$dbport" if $dbport;
+
     $self->defaults(
-        dbname     => "dbi:Pg:dbname=$dbname",
+        dbname     => $dsn,
         dbuser     => $dbuser,
         dbpass     => $dbpass,
         base_url   => $base_url,
