@@ -42,6 +42,11 @@ sub startup {
     $dsn .= ";host=$dbhost" if $dbhost;
     $dsn .= ";port=$dbport" if $dbport;
 
+    if ( $ENV{PASTE_DEBUG} ) {
+        my $masked = $dbpass ? '***' : '';
+        $self->log->debug("DB debug: dsn=$dsn user=$dbuser pass=$masked");
+    }
+
     $self->defaults(
         dbname     => $dsn,
         dbuser     => $dbuser,
