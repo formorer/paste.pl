@@ -5,6 +5,9 @@ services:
       PASTE_CONFIG: /app/paste.conf
       CMD_TEST: "0"
       MOJO_LOG_LEVEL: info
+      DB_NAME: ${DB_NAME:-paste}
+      DB_USER: ${DB_USER:-paste}
+      DB_PASSWORD: ${DB_PASSWORD:-paste}
       DB_HOST: ${DB_HOST:-db}
       DB_PORT: ${DB_PORT:-5432}
       GITLAB_SITE: ${GITLAB_SITE:-}
