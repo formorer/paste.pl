@@ -54,18 +54,27 @@ sub new {
     }
 
     my $dbname =
-           $ENV{DB_NAME}
-        || $config->val( 'database', 'dbname' )
+           ( defined $ENV{DB_NAME} && $ENV{DB_NAME} !~ /\$\{/ )
+        ? $ENV{DB_NAME}
+        : $config->val( 'database', 'dbname' )
         || carp "Databasename not specified in config";
     my $dbuser =
-           $ENV{DB_USER}
-        || $config->val( 'database', 'dbuser' )
+           ( defined $ENV{DB_USER} && $ENV{DB_USER} !~ /\$\{/ )
+        ? $ENV{DB_USER}
+        : $config->val( 'database', 'dbuser' )
         || carp "Databaseuser not specified in config";
-    my $dbpass = defined $ENV{DB_PASSWORD}
+    my $dbpass =
+          ( defined $ENV{DB_PASSWORD} && $ENV{DB_PASSWORD} !~ /\$\{/ )
         ? $ENV{DB_PASSWORD}
         : ( $config->val( 'database', 'dbpassword' ) || '' );
-    my $dbhost = $ENV{DB_HOST} || $config->val( 'database', 'dbhost' );
-    my $dbport = $ENV{DB_PORT} || $config->val( 'database', 'dbport' );
+    my $dbhost =
+          ( defined $ENV{DB_HOST} && $ENV{DB_HOST} !~ /\$\{/ )
+        ? $ENV{DB_HOST}
+        : $config->val( 'database', 'dbhost' );
+    my $dbport =
+          ( defined $ENV{DB_PORT} && $ENV{DB_PORT} !~ /\$\{/ )
+        ? $ENV{DB_PORT}
+        : $config->val( 'database', 'dbport' );
 
     my $dsn = "dbi:Pg:dbname=$dbname";
     $dsn .= ";host=$dbhost" if $dbhost;
