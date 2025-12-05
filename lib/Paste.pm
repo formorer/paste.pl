@@ -53,23 +53,23 @@ sub new {
         croak "Could not load configfile '$config_file': $error";
     }
 
-    my $dbname = $ENV{DB_NAME}
+    my $dbname =
+           $ENV{DB_NAME}
         || $config->val( 'database', 'dbname' )
         || carp "Databasename not specified in config";
-    my $dbuser = $ENV{DB_USER}
+    my $dbuser =
+           $ENV{DB_USER}
         || $config->val( 'database', 'dbuser' )
         || carp "Databaseuser not specified in config";
     my $dbpass = defined $ENV{DB_PASSWORD}
         ? $ENV{DB_PASSWORD}
         : ( $config->val( 'database', 'dbpassword' ) || '' );
-    my $dbhost = $ENV{DB_HOST};
-    my $dbport = $ENV{DB_PORT};
-    if ($dbhost) {
-        $dbname .= ";host=$dbhost";
-    }
-    if ($dbport) {
-        $dbname .= ";port=$dbport";
-    }
+    my $dbhost = $ENV{DB_HOST} || $config->val( 'database', 'dbhost' );
+    my $dbport = $ENV{DB_PORT} || $config->val( 'database', 'dbport' );
+
+    my $dsn = "dbi:Pg:dbname=$dbname";
+    $dsn .= ";host=$dbhost" if $dbhost;
+    $dsn .= ";port=$dbport" if $dbport;
 
     my $base_url = $ENV{BASE_URL}
         || $config->val( 'www', 'base_url' )
