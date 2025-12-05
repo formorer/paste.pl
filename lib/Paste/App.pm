@@ -44,7 +44,7 @@ sub startup {
 
     if ( $ENV{PASTE_DEBUG} ) {
         my $masked = $dbpass ? '***' : '';
-        $self->log->debug("DB debug: dsn=$dsn user=$dbuser pass=$masked");
+        warn "DB debug: dsn=$dsn user=$dbuser pass=$masked\n";
     }
 
     $self->defaults(
