@@ -22,13 +22,18 @@ sub startup {
     );
 
     my $dbname =
-        $paste->get_config_key( 'database', 'dbname' )
+           $ENV{DB_NAME}
+        || $paste->get_config_key( 'database', 'dbname' )
         || die "Databasename not specified";
     my $dbuser =
-        $paste->get_config_key( 'database', 'dbuser' )
+           $ENV{DB_USER}
+        || $paste->get_config_key( 'database', 'dbuser' )
         || die "Databaseuser not specified";
-    my $dbpass = $paste->get_config_key( 'database', 'dbpassword' ) || '';
-    my $base_url   = $paste->get_config_key( 'www',      'base_url' ) || '';
+    my $dbpass =
+          defined $ENV{DB_PASSWORD}
+        ? $ENV{DB_PASSWORD}
+        : ( $paste->get_config_key( 'database', 'dbpassword' ) || '' );
+    my $base_url   = $ENV{BASE_URL} || $paste->get_config_key( 'www', 'base_url' ) || '';
 
     $self->defaults(
         dbname     => "dbi:Pg:dbname=$dbname",
