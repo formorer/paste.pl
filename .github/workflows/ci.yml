@@ -43,7 +43,7 @@ jobs:
           if [ -f docker/langs.sql ]; then
             psql -h localhost -U paste -d paste -f docker/langs.sql
           fi
-          sed 's/host=db/host=localhost/' t/conf/paste.conf > /tmp/paste.conf
+          sed 's/dbhost = db/dbhost = localhost/' t/conf/paste.conf > /tmp/paste.conf
           echo "[www]" >> /tmp/paste.conf
           echo "base_url = http://localhost:3000" >> /tmp/paste.conf
           cat /tmp/paste.conf
