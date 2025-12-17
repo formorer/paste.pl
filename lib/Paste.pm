@@ -86,14 +86,12 @@ sub new {
         $dsn .= ";port=$dbport" if $dbport;
     }
 
-    if ( $ENV{PASTE_DEBUG} || ( $opts{log} && $opts{log}->is_level('debug') ) ) {
-        my $masked = $dbpass ? '***' : '';
-        my $msg = "DB debug: dsn=$dsn user=$dbuser pass=$masked host=$dbhost port=$dbport ENV{DB_HOST}='" . ($ENV{DB_HOST}//'undef') . "'";
-        if ( $opts{log} ) {
-            $opts{log}->debug($msg);
-        } else {
-            warn "$msg\n";
-        }
+    # Debug logging to investigate DB_HOST issue
+    my $masked = $dbpass ? '***' : '';
+    my $debug_info = "DB_DEBUG: dsn='$dsn' user='$dbuser' pass='$masked' host='$dbhost' port='$dbport' ENV{DB_HOST}='" . ($ENV{DB_HOST}//'<undef>') . "'";
+    warn "$debug_info\n";
+    if ( $opts{log} && $opts{log}->is_level('debug') ) {
+         $opts{log}->debug($debug_info);
     }
 
     my $base_url = $ENV{BASE_URL}
