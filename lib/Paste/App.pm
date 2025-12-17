@@ -143,6 +143,9 @@ sub startup {
     $r->post('/:id')->to( 'main#comment', hidden => 0 );
     $r->get('/page/:tmpl')->to('main#page')->name('page');
 
+    $r->get('/about')->to('main#page', tmpl => 'about')->name('about');
+    $r->get('/clients')->to('main#page', tmpl => 'clients')->name('clients');
+
     $r->get('/auth/login')->to('main#login')->name('login');
     $r->get('/auth/callback')->to('main#callback')->name('login_callback');
     $r->get('/logout')->to('main#logout')->name('logout');
