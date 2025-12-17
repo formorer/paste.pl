@@ -100,8 +100,15 @@ sub new {
 
     my $dbh =
         DBI->connect( $dsn, $dbuser, $dbpass,
-        { RaiseError => 0, PrintError => 0 } )
-        or croak "Could not connect to DB: " . $DBI::errstr;
+        { RaiseError => 0, PrintError => 0 } );
+
+    unless ($dbh) {
+        my $err = "Could not connect to DB: " . $DBI::errstr;
+        warn "$err\n";
+        if ( $opts{log} ) {
+            $opts{log}->error($err);
+        }
+    }
 
     my $self = {
         config => $config,
@@ -112,6 +119,10 @@ sub new {
         log    => $opts{log},
         @_,
     };
+    
+    if ( !$dbh ) {
+         $self->{error} = "Database connection failed";
+    }
 
     bless( $self, $class );
 
