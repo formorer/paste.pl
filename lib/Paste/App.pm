@@ -9,12 +9,18 @@ use Mojo::JSON qw(encode_json);
 sub startup {
     my $self = shift;
 
+    # Ensure logs go to STDOUT
+    $self->log( Mojo::Log->new( handle => \*STDOUT ) );
+
+    # Apache-style access logs to STDOUT
+    $self->plugin( 'AccessLog', { log => $self->log->handle, format => 'combined' } );
+
     # Load config and core objects once; keep TT templates unchanged
     my $config_file =
         $ENV{PASTE_CONFIG}
         || $self->home->child('paste.conf')->to_string;
 
-    my $paste    = Paste->new($config_file);
+    my $paste    = Paste->new($config_file, log => $self->log);
     my $tt = Template->new(
         {   INCLUDE_PATH => $self->home->child('templates')->to_string,
             PLUGIN_BASE  => 'Paste::Template::Plugin',
@@ -44,7 +50,7 @@ sub startup {
 
     if ( $ENV{PASTE_DEBUG} ) {
         my $masked = $dbpass ? '***' : '';
-        warn "DB debug: dsn=$dsn user=$dbuser pass=$masked\n";
+        $self->log->debug("DB debug: dsn=$dsn user=$dbuser pass=$masked");
     }
 
     $self->defaults(

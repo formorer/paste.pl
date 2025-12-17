@@ -86,11 +86,6 @@ sub new {
         $dsn .= ";port=$dbport" if $dbport;
     }
 
-    if ( $ENV{PASTE_DEBUG} || $ENV{MOJO_LOG_LEVEL} eq 'debug' ) {
-        my $masked = $dbpass ? '***' : '';
-        warn "DB debug: dsn=$dsn user=$dbuser pass=$masked host=$dbhost port=$dbport ENV{DB_HOST}='" . ($ENV{DB_HOST}//'undef') . "'\n";
-    }
-
     my $base_url = $ENV{BASE_URL}
         || $config->val( 'www', 'base_url' )
         || carp "base_url not specified in config";
@@ -106,10 +101,22 @@ sub new {
         dbuser => $dbuser,
         dbpass => $dbpass,
         dbh    => $dbh,
+        log    => $opts{log},
         @_,
     };
 
     bless( $self, $class );
+
+    if ( $ENV{PASTE_DEBUG} || ( $self->{log} && $self->{log}->is_level('debug') ) ) {
+        my $masked = $dbpass ? '***' : '';
+        my $msg = "DB debug: dsn=$dsn user=$dbuser pass=$masked host=$dbhost port=$dbport ENV{DB_HOST}='" . ($ENV{DB_HOST}//'undef') . "'";
+        if ( $self->{log} ) {
+            $self->{log}->debug($msg);
+        } else {
+            warn "$msg\n";
+        }
+    }
+
     return $self;
 }
 
@@ -220,10 +227,18 @@ sub add_paste {
         eval { $sig = $gpg->verify( signature => $filename ); };
         if ($sig) {
             die $sig->{'user'};
-            warn "Code signed by " . $sig->{'user'};
+            if ( $self->{log} ) {
+                $self->{log}->warn( "Code signed by " . $sig->{'user'} );
+            } else {
+                warn "Code signed by " . $sig->{'user'};
+            }
             $max_code_size = 52428800;
         } elsif ( $@ =~ /no public key (\S+)/m ) {
-            warn "Code signed by $1";
+            if ( $self->{log} ) {
+                $self->{log}->warn( "Code signed by $1" );
+            } else {
+                warn "Code signed by $1";
+            }
             $max_code_size = 52428800;
         }
         unlink($filename);
@@ -788,7 +803,6 @@ sub get_lang ($) {
         return 0;
     }
     my $id = @{ @{$lang_id_ref}[0] }[0];
-    warn $id;
     return $id;
 }
 

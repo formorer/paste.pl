@@ -19,5 +19,6 @@ requires 'Encode::Base58';
 requires 'CGI';
 requires 'CGI::Cookie';
 requires 'Mojolicious::Plugin::OAuth2';
+requires 'Mojolicious::Plugin::AccessLog';
 
 # vim: syntax=perl sw=4 ts=4 noet shiftround
