@@ -55,25 +55,25 @@ sub new {
     }
 
     my $dbname =
-           ( defined $ENV{DB_NAME} && $ENV{DB_NAME} !~ /\$\{/ )
+           ( defined $ENV{DB_NAME} && length( $ENV{DB_NAME} ) && $ENV{DB_NAME} !~ /\$\{/ )
         ? $ENV{DB_NAME}
         : $config->val( 'database', 'dbname' )
         || carp "Databasename not specified in config";
     my $dbuser =
-           ( defined $ENV{DB_USER} && $ENV{DB_USER} !~ /\$\{/ )
+           ( defined $ENV{DB_USER} && length( $ENV{DB_USER} ) && $ENV{DB_USER} !~ /\$\{/ )
         ? $ENV{DB_USER}
         : $config->val( 'database', 'dbuser' )
         || carp "Databaseuser not specified in config";
     my $dbpass =
-          ( defined $ENV{DB_PASSWORD} && $ENV{DB_PASSWORD} !~ /\$\{/ )
+          ( defined $ENV{DB_PASSWORD} && length( $ENV{DB_PASSWORD} ) && $ENV{DB_PASSWORD} !~ /\$\{/ )
         ? $ENV{DB_PASSWORD}
         : ( $config->val( 'database', 'dbpassword' ) || '' );
     my $dbhost =
-          ( defined $ENV{DB_HOST} && $ENV{DB_HOST} !~ /\$\{/ )
+          ( defined $ENV{DB_HOST} && length( $ENV{DB_HOST} ) && $ENV{DB_HOST} !~ /\$\{/ )
         ? $ENV{DB_HOST}
         : $config->val( 'database', 'dbhost' );
     my $dbport =
-          ( defined $ENV{DB_PORT} && $ENV{DB_PORT} !~ /\$\{/ )
+          ( defined $ENV{DB_PORT} && length( $ENV{DB_PORT} ) && $ENV{DB_PORT} !~ /\$\{/ )
         ? $ENV{DB_PORT}
         : $config->val( 'database', 'dbport' );
 
@@ -86,9 +86,9 @@ sub new {
         $dsn .= ";port=$dbport" if $dbport;
     }
 
-    if ( $ENV{PASTE_DEBUG} ) {
+    if ( $ENV{PASTE_DEBUG} || $ENV{MOJO_LOG_LEVEL} eq 'debug' ) {
         my $masked = $dbpass ? '***' : '';
-        warn "DB debug: dsn=$dsn user=$dbuser pass=$masked\n";
+        warn "DB debug: dsn=$dsn user=$dbuser pass=$masked host=$dbhost port=$dbport ENV{DB_HOST}='" . ($ENV{DB_HOST}//'undef') . "'\n";
     }
 
     my $base_url = $ENV{BASE_URL}
