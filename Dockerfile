@@ -1,4 +1,4 @@
-FROM perl:5.38
+FROM docker.io/library/perl:5.38
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
