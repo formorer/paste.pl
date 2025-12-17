@@ -46,4 +46,13 @@ services:
       bash -c "until pg_isready -h db -U paste; do sleep 1; done;
                morbo -l http://0.0.0.0:3000 app.psgi"
 
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    ports:
+      - "8923:8923"
+    environment:
+      TARGET: http://app_dev:3000
+    depends_on:
+      - app_dev
+
 # vim: sw=2 ts=2 et

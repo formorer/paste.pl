@@ -776,7 +776,7 @@ sub get_lang ($) {
     my $dbh = $self->{dbh};
 
     my $lang_id_ref = $dbh->selectall_arrayref(
-        "SELECT lang_id from lang where \"desc\" = '$lang'");
+        "SELECT lang_id from lang where \"desc\" = ?", undef, $lang);
 
     if ( $dbh->errstr ) {
         $self->{error} = "Could not execute db statement: " . $dbh->errstr;
