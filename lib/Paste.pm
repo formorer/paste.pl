@@ -86,6 +86,16 @@ sub new {
         $dsn .= ";port=$dbport" if $dbport;
     }
 
+    if ( $ENV{PASTE_DEBUG} || ( $opts{log} && $opts{log}->is_level('debug') ) ) {
+        my $masked = $dbpass ? '***' : '';
+        my $msg = "DB debug: dsn=$dsn user=$dbuser pass=$masked host=$dbhost port=$dbport ENV{DB_HOST}='" . ($ENV{DB_HOST}//'undef') . "'";
+        if ( $opts{log} ) {
+            $opts{log}->debug($msg);
+        } else {
+            warn "$msg\n";
+        }
+    }
+
     my $base_url = $ENV{BASE_URL}
         || $config->val( 'www', 'base_url' )
         || carp "base_url not specified in config";
@@ -106,16 +116,6 @@ sub new {
     };
 
     bless( $self, $class );
-
-    if ( $ENV{PASTE_DEBUG} || ( $self->{log} && $self->{log}->is_level('debug') ) ) {
-        my $masked = $dbpass ? '***' : '';
-        my $msg = "DB debug: dsn=$dsn user=$dbuser pass=$masked host=$dbhost port=$dbport ENV{DB_HOST}='" . ($ENV{DB_HOST}//'undef') . "'";
-        if ( $self->{log} ) {
-            $self->{log}->debug($msg);
-        } else {
-            warn "$msg\n";
-        }
-    }
 
     return $self;
 }
