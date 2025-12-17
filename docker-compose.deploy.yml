@@ -16,3 +16,11 @@ services:
       - ./paste.conf:/app/paste.conf:ro
     ports:
       - "3000:3000"
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    ports:
+      - "8923:8923"
+    environment:
+      TARGET: http://app:3000
+    depends_on:
+      - app
