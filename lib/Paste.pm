@@ -163,9 +163,16 @@ sub log_request {
     my ($self, $ip, $paste_id, $path, $action) = @_;
     return unless $self->{dbh};
 
+    # Sanitize IP: take first IP if multiple
+    $ip =~ s/,.*$// if defined $ip;
+    # Default to localhost if empty (shouldn't happen but safe for inet)
+    $ip ||= '127.0.0.1';
+
     my $sth = $self->{dbh}->prepare("INSERT INTO request_log (ip, paste_id, path, action) VALUES (?, ?, ?, ?)");
     if ($sth) {
-        $sth->execute($ip, $paste_id, $path, $action);
+        unless ($sth->execute($ip, $paste_id, $path, $action)) {
+             warn "Failed to execute log_request: " . $sth->errstr . " (IP: $ip)\n";
+        }
     } else {
         warn "Failed to prepare log_request statement: " . $self->{dbh}->errstr . "\n";
     }
