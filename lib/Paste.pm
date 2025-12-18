@@ -219,6 +219,7 @@ SHA1 of the sessionid which will be used to identify a special user. (optional)
 
 sub add_paste {
     my $self      = shift;
+    $self->{error} = undef;
     my $args      = shift;
     my $code      = $args->{code};
     my $name      = $args->{name};
@@ -452,6 +453,7 @@ The ID of the paste entry where the comment belongs to.
 
 sub add_comment ($$$) {
     my ( $self, $comment, $name, $paste_id ) = @_;
+    $self->{error} = undef;
     my $dbh = $self->{dbh};
     $name = $name || 'anonymous';
 
@@ -524,6 +526,7 @@ The digest of the entry you want to delete
 
 sub delete_paste ($) {
     my ( $self, $sha1 ) = @_;
+    $self->{error} = undef;
     my $dbh = $self->{dbh};
 
     if ( $sha1 !~ /^[0-9a-f]{40}$/i ) {
@@ -627,6 +630,7 @@ The id of the entry you want to retreive
 
 sub get_paste ($) {
     my ( $self, $id ) = @_;
+    $self->{error} = undef;
     my $dbh = $self->{dbh};
 
     my $sth = $dbh->prepare(
@@ -675,6 +679,7 @@ The id of the entry you want to retreive
 
 sub get_hidden_paste ($) {
     my ( $self, $id ) = @_;
+    $self->{error} = undef;
     my $dbh = $self->{dbh};
 
     my $sth = $dbh->prepare(

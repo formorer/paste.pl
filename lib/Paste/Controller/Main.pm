@@ -368,6 +368,8 @@ sub _create {
 
     my $cgi_obj = _build_cgi_from_tx($c);
 
+    $c->app->log->debug("DEBUG: _create calling add_paste. authenticated=$authenticated. current_user=" . ($c->current_user ? 'YES' : 'NO'));
+
     my ( $id, $digest ) = $c->paste_model->add_paste(
         {   code       => $code,
             name       => $name,
