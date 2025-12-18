@@ -122,11 +122,37 @@ sub new {
     
     if ( !$dbh ) {
          $self->{error} = "Database connection failed";
+    } else {
+        # Automatic migration: Create request_log table if it doesn't exist
+        my $table_exists = $dbh->selectrow_array("SELECT to_regclass('public.request_log')");
+        unless ($table_exists) {
+            $dbh->do(<<'SQL');
+CREATE TABLE request_log (
+    request_time timestamp without time zone DEFAULT now(),
+    ip inet,
+    paste_id integer,
+    path text
+)
+SQL
+            warn "Created request_log table for automatic migration.\n";
+        }
     }
 
     bless( $self, $class );
 
     return $self;
+}
+
+sub log_request {
+    my ($self, $ip, $paste_id, $path) = @_;
+    return unless $self->{dbh};
+
+    my $sth = $self->{dbh}->prepare("INSERT INTO request_log (ip, paste_id, path) VALUES (?, ?, ?)");
+    if ($sth) {
+        $sth->execute($ip, $paste_id, $path);
+    } else {
+        warn "Failed to prepare log_request statement: " . $self->{dbh}->errstr . "\n";
+    }
 }
 
 sub get_config_key () {

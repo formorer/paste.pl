@@ -75,6 +75,10 @@ sub show {
         && sha1_hex( $c->current_user->{id} ) eq $entry->{sessionid};
     $entry->{hidden_id} ||= $id if $hidden;
 
+    # Log the request
+    my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
+    $c->paste_model->log_request($ip, $entry->{id}, $c->req->url->path->to_string);
+
     $c->render_tt(
         $tmpl,
         {   show   => $id,
@@ -103,6 +107,10 @@ sub plain {
         "Your requested paste entry '$id' could not be found" )
         unless $paste;
 
+    # Log the request
+    my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
+    $c->paste_model->log_request($ip, $paste->{id}, $c->req->url->path->to_string);
+
     $c->res->headers->content_type('text/plain; charset=utf-8');
     $c->render( data => $paste->{code} );
 }
@@ -122,6 +130,10 @@ sub download {
     return $c->_error( "Entry not found",
         "Your requested paste entry '$id' could not be found" )
         unless $paste;
+
+    # Log the request
+    my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
+    $c->paste_model->log_request($ip, $paste->{id}, $c->req->url->path->to_string);
 
     $c->res->headers->content_type('text/plain; charset=utf-8');
     $c->res->headers->content_disposition("attachment; filename=paste_$id");

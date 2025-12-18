@@ -165,6 +165,21 @@ CREATE UNIQUE INDEX index_id ON lang USING btree (lang_id);
 
 
 --
+-- Name: request_log; Type: TABLE; Schema: public; Owner: paste; Tablespace: 
+--
+
+CREATE TABLE request_log (
+    request_time timestamp without time zone DEFAULT now(),
+    ip inet,
+    paste_id integer,
+    path text
+);
+
+
+ALTER TABLE public.request_log OWNER TO paste;
+
+
+--
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
