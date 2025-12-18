@@ -29,7 +29,6 @@ h1 {
 	margin-top: 0px; 
 }
 	
-
 p {
 	font:11px/20px verdana, arial, helvetica, sans-serif;
 	margin:0px 10px 10px 10px;
@@ -106,7 +105,7 @@ code { font-size:12px;}
 	margin-bottom: 11px;
 }
 
-.nav { margin: 0px 5px 0px 5px; }
+.nav { margin: 0px 5px 0px 5px; } 
 	
 li.highlight{ background-color: #ccccff; }
 
@@ -146,7 +145,7 @@ li {
 	overflow: hidden;
 
 	/* IE5 Hack */
-	voice-family: "\"}\"";
+	voice-family: "}"" ;
 	voice-family:inherit;
 	width:155px;
 }
@@ -238,3 +237,63 @@ A:active { color: #F00; background: white none }
 .synTodo       { color: #0000FF ; background: #FFFF00 none }
 pre { display: inline; }
 
+
+/*Navbar Improvements */
+.menu-content {
+    padding: 8px;
+    margin-bottom: 10px;
+    border-left: 1px solid #3d8ea8;
+    border-right: 1px solid #3d8ea8;
+    border-bottom: 1px solid #005069;
+    background-color: #f9f9f9;
+}
+
+.action-btn {
+    display: block;
+    text-align: center;
+    background-color: #3d8ea8;
+    color: #ffffff !important;
+    padding: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 3px;
+    border: 1px solid #005069;
+}
+
+.action-btn:hover {
+    background-color: #005069;
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.action-btn.secondary {
+    background-color: #eee;
+    color: #333 !important;
+    border: 1px solid #ccc;
+}
+
+.action-btn.secondary:hover {
+    background-color: #ddd;
+    color: #000 !important;
+}
+
+.user-content {
+    text-align: center;
+}
+
+.logged-in-user {
+    margin-bottom: 5px;
+    font-weight: bold;
+    border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.user-icon {
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.user-links a {
+    font-size: 0.9em;
+}

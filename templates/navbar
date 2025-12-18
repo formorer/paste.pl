@@ -3,19 +3,34 @@
 <div id="menu">
 
 <h1>Paste</h1>
-<a href="[% base_url %]">Make new paste</a>
-<br />
+<div class="menu-content">
+    <a href="[% base_url %]" class="action-btn">Make new paste</a>
+</div>
 
 [% IF auth_enabled %]
-    [% IF current_user %]
-        <div>Signed in as [% current_user.name | html %] | <a href="[% base_url %]/logout">Logout</a></div>
-    [% ELSE %]
-        <div><a href="[% base_url %]/auth/login">Login with GitLab</a></div>
-    [% END %]
+    <div class="user-section">
+        <h1>User</h1>
+        <div class="menu-content user-content">
+        [% IF current_user %]
+            <div class="logged-in-user">
+                <span class="user-icon">👤</span>
+                <span class="username">[% current_user.name | html %]</span>
+            </div>
+            <div class="user-links">
+                <a href="[% base_url %]/logout">Logout</a>
+            </div>
+        [% ELSE %]
+            <div class="login-action">
+                <a href="[% base_url %]/auth/login" class="action-btn secondary">Login with GitLab</a>
+            </div>
+        [% END %]
+        </div>
+    </div>
 [% END %]
 
 [% IF current_user && user_pastes.size > 0 -%]
 <h1>Your pastes</h1>
+<div class="menu-content">
 <ul>
 [% FOREACH post = user_pastes %]
 <li>
@@ -38,8 +53,13 @@
 </li>
 [% END %]
 </ul>
+</div>
 [% END %]
+
+<div class="links-section">
 [% INCLUDE links %]
+</div>
+
 </div>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

@@ -324,7 +324,8 @@ sub _create {
         );
     }
 
-    my $name = $c->param('poster') || 'anonymous';
+    my $form_name = $c->param('poster');
+    my $name;
 
     my $authenticated = $c->current_user ? 1 : 0;
     my $session_id;
@@ -332,9 +333,19 @@ sub _create {
     if ($authenticated) {
         # If logged in, use the user's stable session ID
         $session_id = sha1_hex( $c->current_user->{id} );
-        $name = $c->current_user->{name} if $c->current_user->{name};
+        
+        # Use provided name or fallback to session name
+        $name = (defined $form_name && length $form_name) ? $form_name : $c->current_user->{name};
+        
+        # Update session if name changed
+        if ( defined $form_name && length $form_name && $name ne ($c->current_user->{name} // '') ) {
+             my $u = $c->session('user');
+             $u->{name} = $name;
+             $c->session(user => $u);
+        }
     } else {
-        # Anonymous paste (no persistent session)
+        # Anonymous paste
+        $name = $form_name || 'anonymous';
         $session_id = sha1_hex( rand() . time() );
     }
 
