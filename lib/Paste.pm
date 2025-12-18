@@ -122,10 +122,12 @@ sub new {
     
     if ( !$dbh ) {
          $self->{error} = "Database connection failed";
+         warn "DB Connection failed, skipping migration: " . $DBI::errstr . "\n";
     } else {
         # Automatic migration: Create request_log table if it doesn't exist
         my $table_exists = $dbh->selectrow_array("SELECT to_regclass('public.request_log')");
         unless ($table_exists) {
+            warn "Migrating: Creating request_log table...\n";
             $dbh->do(<<'SQL');
 CREATE TABLE request_log (
     request_time timestamp without time zone DEFAULT now(),
@@ -135,7 +137,11 @@ CREATE TABLE request_log (
     action text
 )
 SQL
-            warn "Created request_log table for automatic migration.\n";
+            if ($dbh->err) {
+                warn "Migration failed: " . $dbh->errstr . "\n";
+            } else {
+                warn "Created request_log table for automatic migration.\n";
+            }
         } else {
             # Check if 'action' column exists (migration for existing table)
             my $col_exists = $dbh->selectrow_array("
@@ -144,8 +150,13 @@ SQL
                 WHERE table_name='request_log' AND column_name='action'
             ");
             unless ($col_exists) {
+                warn "Migrating: Adding 'action' column to request_log...\n";
                 $dbh->do("ALTER TABLE request_log ADD COLUMN action text");
-                warn "Added 'action' column to request_log table.\n";
+                if ($dbh->err) {
+                    warn "Migration failed (add column): " . $dbh->errstr . "\n";
+                } else {
+                    warn "Added 'action' column to request_log table.\n";
+                }
             }
         }
     }
