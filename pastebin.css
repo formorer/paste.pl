@@ -238,63 +238,50 @@ A:active { color: #F00; background: white none }
 pre { display: inline; }
 
 
-/*Navbar Improvements */
-.menu-content {
-    padding: 8px;
+
+
+
+/* Navbar Improvements */
+
+
+.menu-group {
+
+
+    padding: 5px;
+
+
     margin-bottom: 10px;
+
+
     border-left: 1px solid #3d8ea8;
+
+
     border-right: 1px solid #3d8ea8;
+
+
     border-bottom: 1px solid #005069;
-    background-color: #f9f9f9;
+
+
+    background-color: #ffffff;
+
+
 }
 
-.action-btn {
-    display: block;
-    text-align: center;
-    background-color: #DF0451; /* Debian Red */
-    color: #ffffff !important;
-    padding: 8px 6px;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 3px;
-    border: none;
-}
 
-.action-btn:hover {
-    background-color: #b00340; /* Darker Red */
-    color: #ffffff !important;
-    text-decoration: none;
-}
 
-.action-btn.secondary {
-    background-color: #f0f0f0;
-    color: #333 !important;
-    border: 1px solid #ccc;
-}
 
-.action-btn.secondary:hover {
-    background-color: #e0e0e0;
-    color: #000 !important;
-    border-color: #bbb;
-}
-
-.user-content {
-    text-align: center;
-}
 
 .logged-in-user {
+
+
     margin-bottom: 5px;
-    font-weight: bold;
-    border-bottom: 1px solid #dcdcdc;
+
+
     padding-bottom: 5px;
+
+
     word-wrap: break-word;
+
+
 }
 
-.user-icon {
-    font-size: 1.2em;
-    vertical-align: middle;
-}
-
-.user-links a {
-    font-size: 0.9em;
-}

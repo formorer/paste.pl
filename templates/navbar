@@ -3,34 +3,27 @@
 <div id="menu">
 
 <h1>Paste</h1>
-<div class="menu-content">
-    <a href="[% base_url %]" class="action-btn">Make new paste</a>
+<div class="menu-group">
+    <a href="[% base_url %]">Make new paste</a>
 </div>
 
 [% IF auth_enabled %]
-    <div class="user-section">
-        <h1>User</h1>
-        <div class="menu-content user-content">
-        [% IF current_user %]
-            <div class="logged-in-user">
-                <span class="user-icon">👤</span>
-                <span class="username">[% current_user.name | html %]</span>
-            </div>
-            <div class="user-links">
-                <a href="[% base_url %]/logout">Logout</a>
-            </div>
-        [% ELSE %]
-            <div class="login-action">
-                <a href="[% base_url %]/auth/login" class="action-btn secondary">Login with GitLab</a>
-            </div>
-        [% END %]
+    <h1>User</h1>
+    <div class="menu-group">
+    [% IF current_user %]
+        <div class="logged-in-user">
+            <strong>[% current_user.name | html %]</strong><br>
+            <a href="[% base_url %]/logout">Logout</a>
         </div>
+    [% ELSE %]
+        <a href="[% base_url %]/auth/login">Login with GitLab</a>
+    [% END %]
     </div>
 [% END %]
 
 [% IF current_user && user_pastes.size > 0 -%]
 <h1>Your pastes</h1>
-<div class="menu-content">
+<div class="menu-group">
 <ul>
 [% FOREACH post = user_pastes %]
 <li>
@@ -56,9 +49,7 @@
 </div>
 [% END %]
 
-<div class="links-section">
 [% INCLUDE links %]
-</div>
 
 </div>
 
