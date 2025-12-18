@@ -224,7 +224,7 @@ sub callback {
         gitlab => {
             redirect_uri => $cb,
         }
-    )->get;
+    )->wait;
 
     return $c->_error( "Authentication failed", $err ) if $err;
     return $c->_error( "Authentication failed", "No token received" )
