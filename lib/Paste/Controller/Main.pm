@@ -220,6 +220,8 @@ sub callback {
           $c->base_url
         . '/auth/callback';
 
+    $c->app->log->debug("OAuth2 callback: base_url=" . $c->base_url . " redirect_uri=$cb");
+
     my ($res) = $c->oauth2->get_token_p(
         gitlab => {
             redirect_uri => $cb,
