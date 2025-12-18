@@ -391,7 +391,6 @@ sub _create {
     my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
     $c->paste_model->log_request($ip, $id, $c->req->url->path->to_string, 'create');
 
-    if ( my $remember = $c->param('remember') ) {
     my $location = $hidden eq 'f' ? "/$id" : "/hidden/$id";
     return $c->redirect_to($location);
 }
