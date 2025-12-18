@@ -220,26 +220,26 @@ sub callback {
           $c->base_url
         . '/auth/callback';
 
-    my ( $err, $data ) = $c->oauth2->get_token_p(
+    my ($res) = $c->oauth2->get_token_p(
         gitlab => {
             redirect_uri => $cb,
         }
     )->wait;
 
-    return $c->_error( "Authentication failed", $err ) if $err;
+    return $c->_error( "Authentication failed", $res ) unless ref $res;
     return $c->_error( "Authentication failed", "No token received" )
-        unless $data->{access_token};
+        unless $res->{access_token};
 
     my $ua    = Mojo::UserAgent->new;
     my $site  = $ENV{GITLAB_API_URL} || $ENV{GITLAB_SITE} . '/api/v4';
-    my $res   = $ua->get(
-        $site . '/user' => { Authorization => "Bearer $data->{access_token}" } )
+    my $fetch_res = $ua->get(
+        $site . '/user' => { Authorization => "Bearer $res->{access_token}" } )
         ->result;
     return $c->_error( "Authentication failed",
-        $res->message || "GitLab user fetch failed" )
-        if $res->is_error;
+        $fetch_res->message || "GitLab user fetch failed" )
+        if $fetch_res->is_error;
 
-    my $user = $res->json || {};
+    my $user = $fetch_res->json || {};
     my $user_session = { id => $user->{id}, name => $user->{name} };
     my $session_id   = sha1_hex( $user->{id} );
     $c->session( user => $user_session );
