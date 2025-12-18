@@ -77,7 +77,7 @@ sub show {
 
     # Log the request
     my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
-    $c->paste_model->log_request($ip, $entry->{id}, $c->req->url->path->to_string);
+    $c->paste_model->log_request($ip, $entry->{id}, $c->req->url->path->to_string, 'show');
 
     $c->render_tt(
         $tmpl,
@@ -109,7 +109,7 @@ sub plain {
 
     # Log the request
     my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
-    $c->paste_model->log_request($ip, $paste->{id}, $c->req->url->path->to_string);
+    $c->paste_model->log_request($ip, $paste->{id}, $c->req->url->path->to_string, 'plain');
 
     $c->res->headers->content_type('text/plain; charset=utf-8');
     $c->render( data => $paste->{code} );
@@ -133,7 +133,7 @@ sub download {
 
     # Log the request
     my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
-    $c->paste_model->log_request($ip, $paste->{id}, $c->req->url->path->to_string);
+    $c->paste_model->log_request($ip, $paste->{id}, $c->req->url->path->to_string, 'download');
 
     $c->res->headers->content_type('text/plain; charset=utf-8');
     $c->res->headers->content_disposition("attachment; filename=paste_$id");
@@ -387,6 +387,11 @@ sub _create {
         return $c->render_tt( 'paste', { status => $status, langs => $langs } );
     }
 
+    # Log the creation
+    my $ip = $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
+    $c->paste_model->log_request($ip, $id, $c->req->url->path->to_string, 'create');
+
+    if ( my $remember = $c->param('remember') ) {
     my $location = $hidden eq 'f' ? "/$id" : "/hidden/$id";
     return $c->redirect_to($location);
 }

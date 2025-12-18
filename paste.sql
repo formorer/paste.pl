@@ -172,7 +172,8 @@ CREATE TABLE request_log (
     request_time timestamp without time zone DEFAULT now(),
     ip inet,
     paste_id integer,
-    path text
+    path text,
+    action text
 );
 
 

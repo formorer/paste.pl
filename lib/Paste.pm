@@ -131,10 +131,22 @@ CREATE TABLE request_log (
     request_time timestamp without time zone DEFAULT now(),
     ip inet,
     paste_id integer,
-    path text
+    path text,
+    action text
 )
 SQL
             warn "Created request_log table for automatic migration.\n";
+        } else {
+            # Check if 'action' column exists (migration for existing table)
+            my $col_exists = $dbh->selectrow_array("
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name='request_log' AND column_name='action'
+            ");
+            unless ($col_exists) {
+                $dbh->do("ALTER TABLE request_log ADD COLUMN action text");
+                warn "Added 'action' column to request_log table.\n";
+            }
         }
     }
 
@@ -144,12 +156,12 @@ SQL
 }
 
 sub log_request {
-    my ($self, $ip, $paste_id, $path) = @_;
+    my ($self, $ip, $paste_id, $path, $action) = @_;
     return unless $self->{dbh};
 
-    my $sth = $self->{dbh}->prepare("INSERT INTO request_log (ip, paste_id, path) VALUES (?, ?, ?)");
+    my $sth = $self->{dbh}->prepare("INSERT INTO request_log (ip, paste_id, path, action) VALUES (?, ?, ?, ?)");
     if ($sth) {
-        $sth->execute($ip, $paste_id, $path);
+        $sth->execute($ip, $paste_id, $path, $action);
     } else {
         warn "Failed to prepare log_request statement: " . $self->{dbh}->errstr . "\n";
     }
