@@ -220,46 +220,38 @@ sub callback {
           $c->base_url
         . '/auth/callback';
 
-    $c->app->log->debug("OAuth2 callback: base_url=" . $c->base_url . " redirect_uri=$cb");
-    $c->app->log->debug("Secret present: " . ($ENV{GITLAB_CLIENT_SECRET} ? "YES" : "NO"));
+    # Manual token exchange using Mojo::UserAgent (bypassing plugin due to promise issues)
+    my $token_url = $ENV{GITLAB_TOKEN_URL} || "$ENV{GITLAB_SITE}/oauth/token";
+    my $code = $c->param('code');
+    
+    return $c->_error( "Authentication failed", "No authorization code received" )
+        unless $code;
 
-    my ($res) = $c->oauth2->get_token_p(
-        gitlab => {
-            redirect_uri => $cb,
+    my $tx = $c->ua->post(
+        $token_url => form => {
+            client_id     => $ENV{GITLAB_CLIENT_ID},
+            client_secret => $ENV{GITLAB_CLIENT_SECRET},
+            code          => $code,
+            grant_type    => 'authorization_code',
+            redirect_uri  => $cb,
         }
-    )->wait;
+    );
 
-    if ( !ref $res ) {
-        # Temporary debugging: Manual token exchange to see error details
-        $c->app->log->debug("Plugin failed with: $res. Attempting manual debug...");
-        my $token_url = $ENV{GITLAB_TOKEN_URL} || "$ENV{GITLAB_SITE}/oauth/token";
-        my $code = $c->param('code');
-        my $tx = $c->ua->post(
-            $token_url => form => {
-                client_id     => $ENV{GITLAB_CLIENT_ID},
-                client_secret => $ENV{GITLAB_CLIENT_SECRET},
-                code          => $code,
-                grant_type    => 'authorization_code',
-                redirect_uri  => $cb,
-            }
-        );
-        if ( my $err = $tx->error ) {
-            $c->app->log->debug("Manual token exchange failed: " . ($err->{message} // ''));
-            $c->app->log->debug("Response body: " . $tx->res->body);
-        } else {
-             $c->app->log->debug("Manual token exchange SUCCESS! (Plugin logic might be mismatched)");
-             $c->app->log->debug("Response: " . $tx->res->body);
-        }
-        return $c->_error( "Authentication failed", $res );
+    if ( my $err = $tx->error ) {
+        my $msg = $err->{message} || 'Unknown error';
+        $c->app->log->debug("Token exchange failed: $msg");
+        $c->app->log->debug("Response: " . $tx->res->body);
+        return $c->_error( "Authentication failed", "Token exchange failed: $msg" );
     }
 
-    return $c->_error( "Authentication failed", "No token received" )
-        unless $res->{access_token};
+    my $data = $tx->res->json;
+    return $c->_error( "Authentication failed", "Invalid token response" )
+        unless $data && $data->{access_token};
 
     my $ua    = Mojo::UserAgent->new;
     my $site  = $ENV{GITLAB_API_URL} || $ENV{GITLAB_SITE} . '/api/v4';
     my $fetch_res = $ua->get(
-        $site . '/user' => { Authorization => "Bearer $res->{access_token}" } )
+        $site . '/user' => { Authorization => "Bearer $data->{access_token}" } )
         ->result;
     return $c->_error( "Authentication failed",
         $fetch_res->message || "GitLab user fetch failed" )
