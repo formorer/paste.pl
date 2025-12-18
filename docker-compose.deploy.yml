@@ -14,6 +14,7 @@ services:
       GITLAB_CLIENT_SECRET: ${GITLAB_CLIENT_SECRET:-}
       PASTE_SECRET: ${PASTE_SECRET:-change_me_please}
       MOJO_MODE: production
+      MOJO_REVERSE_PROXY: 1
     volumes:
       - ./paste.conf:/app/paste.conf:ro
     ports:
