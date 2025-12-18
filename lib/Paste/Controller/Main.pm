@@ -70,9 +70,9 @@ sub show {
         if $c->paste_model->error;
 
     my $own_entry =
-        $c->cookie('session_id')
+        $c->current_user
         && $entry->{sessionid}
-        && $c->cookie('session_id') eq $entry->{sessionid};
+        && sha1_hex( $c->current_user->{id} ) eq $entry->{sessionid};
     $entry->{hidden_id} ||= $id if $hidden;
 
     $c->render_tt(
@@ -261,8 +261,6 @@ sub callback {
     my $user_session = { id => $user->{id}, name => $user->{name} };
     my $session_id   = sha1_hex( $user->{id} );
     $c->session( user => $user_session );
-    $c->cookie( session_id => $session_id,
-        { expires => time + 60 * 60 * 24 * 30 } );
     $c->session( oauth_state => undef );
     $c->flash( status => "Signed in as $user->{name}" );
     return $c->redirect_to('/');
@@ -271,7 +269,6 @@ sub callback {
 sub logout {
     my $c = shift;
     delete $c->session->{user};
-    $c->cookie( session_id => undef, { expires => 1 } );
     $c->flash( status => "Signed out" );
     return $c->redirect_to('/');
 }
@@ -329,10 +326,17 @@ sub _create {
 
     my $name = $c->param('poster') || 'anonymous';
 
-    my $session_id =
-           $c->param('session_id')
-        || $c->cookie('session_id')
-        || sha1_hex( rand() . time() );
+    my $authenticated = $c->current_user ? 1 : 0;
+    my $session_id;
+
+    if ($authenticated) {
+        # If logged in, use the user's stable session ID
+        $session_id = sha1_hex( $c->current_user->{id} );
+        $name = $c->current_user->{name} if $c->current_user->{name};
+    } else {
+        # Anonymous paste (no persistent session)
+        $session_id = sha1_hex( rand() . time() );
+    }
 
     my $wrap   = $c->param('wrap');
     my $expire = defined $c->param('expire') ? $c->param('expire') : 86400;
@@ -340,10 +344,6 @@ sub _create {
     my $hidden = 't';    # enforce hidden pastes by default
 
     my $cgi_obj = _build_cgi_from_tx($c);
-
-    my $authenticated = $c->current_user ? 1 : 0;
-    $session_id = sha1_hex( $c->current_user->{id} )
-        if $c->current_user && !$c->cookie('session_id');
 
     my ( $id, $digest ) = $c->paste_model->add_paste(
         {   code       => $code,
@@ -362,20 +362,6 @@ sub _create {
         my $status = "Could not add your entry to the paste database:<br><br>\n";
         $status .= '<b>' . $c->paste_model->error . '</b><br>';
         return $c->render_tt( 'paste', { status => $status, langs => $langs } );
-    }
-
-    if ( my $remember = $c->param('remember') ) {
-        my $expires = time + 60 * 60 * 24 * 60;    # ~2 months
-        if ( $remember eq 'both' ) {
-            $c->cookie( paste_lang   => $c->param('lang'),   { expires => $expires } );
-            $c->cookie( paste_expire => $c->param('expire'), { expires => $expires } );
-        }
-        $c->cookie( paste_name => $name, { expires => $expires } );
-        $c->cookie( session_id => $session_id,
-            { expires => time + 60 * 60 * 24 * 30 } );
-    } else {
-        $c->cookie( session_id => $session_id,
-            { expires => time + 60 * 60 * 24 * 30 } );
     }
 
     my $location = $hidden eq 'f' ? "/$id" : "/hidden/$id";

@@ -14,7 +14,7 @@
     [% END %]
 [% END %]
 
-[% IF CGI.cookie('session_id') && user_pastes.size > 0 -%]
+[% IF current_user && user_pastes.size > 0 -%]
 <h1>Your pastes</h1>
 <ul>
 [% FOREACH post = user_pastes %]

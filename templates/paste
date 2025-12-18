@@ -14,31 +14,23 @@
 
 <form name="editor" id="editor" method="post" action="./" enctype="multipart/form-data">
 <label for="poster" form="editor"><b>Name</b></label><br />
-<input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% CGI.cookie('paste_name') | html %]" />
+<input type="text" maxlength="24" size="24" name="poster" id="poster" value="[% current_user.name | html %]" />
 <br />
-[% IF CGI.cookie('session_id') -%]
-<input type='hidden' name='session_id'  value="[% CGI.cookie('session_id')  | html %]">
-[% END -%]
-<input type="checkbox" name="remember" id="remember_name" value="name" [% IF CGI.cookie('paste_name') && !CGI.cookie('paste_lang') %] checked='checked' [% END %] />
-<label for="remember_name">Remember my name in a cookie</label>
-<br />
-<input type="checkbox" name="remember" id="remember_both" value="both" [% IF CGI.cookie('paste_lang') %] checked='checked' [% END %] />
-<label for="remember_both">Remember my name and my selected language in a cookie</label>
 <br /> <br />
 <label for="lang"><b>Language</b></label>
 <select name="lang" id="lang">
 	<option value="-1">text</option>
 	[% FOREACH lang IN langs -%]
-		<option [% IF lang.desc == CGI.cookie('paste_lang') %] selected [% END %] value="[% lang.desc %]" >[% lang.desc %]</option>
+		<option value="[% lang.desc %]" >[% lang.desc %]</option>
 	[% END %]
 </select>
 <label for="expire"><b>Expiration</b></label>
 <select name="expire" id="expire">
-<option value="-1" [% IF  CGI.cookie('paste_expire') == -1 %] selected [% END %]>Never</option>
-<option value="7776000"  [% IF  CGI.cookie('paste_expire') == 7776000  %] selected [% END %]>90d</option>
-<option value="259200" [% IF  CGI.cookie('paste_expire') == 259200 %] selected [% END %]>3d</option>
-<option value="86400" [% IF  CGI.cookie('paste_expire') == 86400 || ! CGI.cookie('paste_expire') %] selected [% END %]>24h</option>
-<option value="3600" [% IF  CGI.cookie('paste_expire') == 3600 %] selected [% END %]>1h</option>
+<option value="-1">Never</option>
+<option value="7776000">90d</option>
+<option value="259200">3d</option>
+<option value="86400" selected>24h</option>
+<option value="3600">1h</option>
 </select>
 <br />
 <br />

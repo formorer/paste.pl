@@ -88,7 +88,8 @@ sub startup {
             local %ENV = %{ $c->req->env };    # TT CGI plugin expects %ENV
             $c->paste_model->cleanup_expired;
             my $user_pastes = [];
-            if ( my $sid = $c->cookie('session_id') ) {
+            if ( $c->current_user ) {
+                my $sid = Digest::SHA::sha1_hex( $c->current_user->{id} );
                 $user_pastes = $c->paste_model->get_user_pastes($sid) || [];
             }
             my %stash =
@@ -98,6 +99,7 @@ sub startup {
                     user_pastes  => $user_pastes,
                     current_user => $c->current_user,
                     auth_enabled => $c->app->defaults('auth_enabled'),
+                    base_url     => $c->base_url,
                 );
             $c->app->tt->process( $template, \%stash, \$output )
                 or die $c->app->tt->error . "\n";
