@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/formorer/paste.pl:${IMAGE_TAG:-latest}
+    build: .
     environment:
       PASTE_CONFIG: /app/paste.conf
       MOJO_LOG_LEVEL: info
