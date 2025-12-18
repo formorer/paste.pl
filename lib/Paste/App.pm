@@ -15,6 +15,11 @@ sub startup {
     # Apache-style access logs to STDOUT
     $self->plugin( 'AccessLog', { log => $self->log->handle, format => 'combined' } );
 
+    # Secrets
+    if ( $ENV{PASTE_SECRET} ) {
+        $self->secrets( [ $ENV{PASTE_SECRET} ] );
+    }
+
     # Load config and core objects once; keep TT templates unchanged
     my $config_file =
         $ENV{PASTE_CONFIG}
@@ -39,10 +44,9 @@ sub startup {
           defined $ENV{DB_PASSWORD}
         ? $ENV{DB_PASSWORD}
         : ( $paste->get_config_key( 'database', 'dbpassword' ) || '' );
-    my $base_url   = $ENV{BASE_URL} || $paste->get_config_key( 'www', 'base_url' ) || '';
 
-    my $dbhost = $ENV{DB_HOST} || $paste->get_config_key( 'database', 'dbhost' );
-    my $dbport = $ENV{DB_PORT} || $paste->get_config_key( 'database', 'dbport' );
+    my $dbhost = defined $ENV{DB_HOST} ? $ENV{DB_HOST} : $paste->get_config_key( 'database', 'dbhost' );
+    my $dbport = defined $ENV{DB_PORT} ? $ENV{DB_PORT} : $paste->get_config_key( 'database', 'dbport' );
 
     my $dsn = "dbi:Pg:dbname=$dbname";
     $dsn .= ";host=$dbhost" if $dbhost;
@@ -57,7 +61,22 @@ sub startup {
         dbname     => $dsn,
         dbuser     => $dbuser,
         dbpass     => $dbpass,
-        base_url   => $base_url,
+    );
+
+    # Helper for dynamic base_url based on request headers
+    $self->helper(
+        base_url => sub {
+            my $c      = shift;
+            my $req    = $c->req;
+            my $host   = $req->headers->header('X-Forwarded-Host') || $req->headers->host;
+            my $proto  = $req->headers->header('X-Forwarded-Proto') || $req->url->base->scheme || 'http';
+            
+            # If multiple comma-separated values (e.g. from multiple proxies), take the first one
+            $host =~ s/,.*$//;
+            $proto =~ s/,.*$//;
+
+            return "$proto://$host";
+        }
     );
 
     $self->helper( paste_model   => sub { return $paste } );

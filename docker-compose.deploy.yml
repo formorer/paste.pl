@@ -12,6 +12,7 @@ services:
       GITLAB_SITE: ${GITLAB_SITE:-}
       GITLAB_CLIENT_ID: ${GITLAB_CLIENT_ID:-}
       GITLAB_CLIENT_SECRET: ${GITLAB_CLIENT_SECRET:-}
+      PASTE_SECRET: ${PASTE_SECRET:-change_me_please}
     volumes:
       - ./paste.conf:/app/paste.conf:ro
     ports:

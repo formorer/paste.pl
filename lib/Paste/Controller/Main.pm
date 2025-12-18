@@ -190,7 +190,7 @@ sub login {
     return $c->redirect_to('/') unless $c->app->defaults('auth_enabled');
 
     my $cb =
-          $c->app->defaults('base_url')
+          $c->base_url
         . '/auth/callback';
     my $state = $c->csrf_token;
     $c->session( oauth_state => $state );
@@ -215,7 +215,7 @@ sub callback {
     }
 
     my $cb =
-          $c->app->defaults('base_url')
+          $c->base_url
         . '/auth/callback';
 
     my ( $err, $data ) = $c->oauth2->get_token_p(
