@@ -30,9 +30,9 @@ never
 <a href='[% base_url %]/plain/[% entry.id %]'>Show as text</a> | 
 <a href='[% base_url %]/download/[% entry.id %]'>Download</a> |
 [% IF lines == 0 %]
-<a href='[% base_url %]/?show=[% entry.id %];lines=1'>With linenumbers</a> |
+<a href='[% base_url %]/[% entry.id %]?lines=1'>With linenumbers</a> |
 [% ELSE %]
-<a href='[% base_url %]/?show=[% entry.id %];lines=0'>Without linenumbers</a> |
+<a href='[% base_url %]/[% entry.id %]?lines=0'>Without linenumbers</a> |
 [% END %]
 <a href='[% base_url %]/'>Paste new</a> |
 <a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>

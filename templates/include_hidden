@@ -29,9 +29,9 @@ never
 <a href='[% base_url %]/plainh/[% entry.hidden_id %]'>Show as text</a> | 
 <a href='[% base_url %]/downloadh/[% entry.hidden_id %]'>Download</a> |
 [% IF lines == 0 %]
-<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=1'>With linenumbers</a> |
+<a href='[% base_url %]/hidden/[% entry.hidden_id %]?lines=1'>With linenumbers</a> |
 [% ELSE %]
-<a href='[% base_url %]/?hidden=[% entry.hidden_id %];lines=0'>Without linenumbers</a> |
+<a href='[% base_url %]/hidden/[% entry.hidden_id %]?lines=0'>Without linenumbers</a> |
 [% END %]
 <a href='[% base_url %]/?as_hidden=1'>Paste new</a> |
 <br/>
