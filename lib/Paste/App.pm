@@ -92,6 +92,14 @@ sub startup {
                 my $sid = Digest::SHA::sha1_hex( $c->current_user->{id} );
                 $user_pastes = $c->paste_model->get_user_pastes($sid) || [];
             }
+
+            my $is_admin = 0;
+            if ( $c->current_user && $c->current_user->{username} ) {
+                my $admins_config = $c->paste_model->get_config_key('www', 'admins') || '';
+                my %admin_map = map { $_ => 1 } split( /\s*,\s*/, $admins_config );
+                $is_admin = 1 if $admin_map{ $c->current_user->{username} };
+            }
+
             my %stash =
                 (   %{ $c->stash },
                     %{ $vars || {} },
@@ -100,6 +108,7 @@ sub startup {
                     current_user => $c->current_user,
                     auth_enabled => $c->app->defaults('auth_enabled'),
                     base_url     => $c->base_url,
+                    is_admin     => $is_admin,
                 );
             $c->app->tt->process( $template, \%stash, \$output )
                 or die $c->app->tt->error . "\n";

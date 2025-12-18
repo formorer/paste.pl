@@ -36,6 +36,9 @@ never
 [% END %]
 <a href='[% base_url %]/'>Paste new</a> |
 <a href='[% base_url %]/?pnew=[% entry.id %]'>Paste as new</a>
+[% IF is_admin %]
+| <a href='[% base_url %]/delete/[% entry.sha1 %]' style="color: red;">Delete (Admin)</a>
+[% END %]
 <br/>
 
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

@@ -270,7 +270,7 @@ sub callback {
         if $fetch_res->is_error;
 
     my $user = $fetch_res->json || {};
-    my $user_session = { id => $user->{id}, name => $user->{name} };
+    my $user_session = { id => $user->{id}, name => $user->{name}, username => $user->{username} };
     my $session_id   = sha1_hex( $user->{id} );
     $c->session( user => $user_session );
     $c->session( oauth_state => undef );
