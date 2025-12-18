@@ -126,7 +126,7 @@ sub startup {
                     secret        => $ENV{GITLAB_CLIENT_SECRET},
                     site          => $ENV{GITLAB_SITE},
                     authorize_url => $ENV{GITLAB_AUTHORIZE_URL}
-                        || "$ENV{GITLAB_SITE}/oauth/authorize",
+                        || "$ENV{GITLAB_SITE}/oauth/authorize?response_type=code",
                     token_url => $ENV{GITLAB_TOKEN_URL}
                         || "$ENV{GITLAB_SITE}/oauth/token",
                 }
