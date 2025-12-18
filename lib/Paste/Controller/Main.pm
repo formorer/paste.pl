@@ -221,6 +221,7 @@ sub callback {
         . '/auth/callback';
 
     $c->app->log->debug("OAuth2 callback: base_url=" . $c->base_url . " redirect_uri=$cb");
+    $c->app->log->debug("Secret present: " . ($ENV{GITLAB_CLIENT_SECRET} ? "YES" : "NO"));
 
     my ($res) = $c->oauth2->get_token_p(
         gitlab => {
