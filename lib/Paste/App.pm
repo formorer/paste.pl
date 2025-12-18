@@ -180,6 +180,13 @@ sub startup {
     $r->get('/:id')->to( 'main#show', hidden => 0, lines => 1 )
         ->name('show');
     $r->get('/:id/')->to( 'main#show', hidden => 0, lines => 1 );
+
+    # Catch-all for 404
+    $r->any('*')->to(cb => sub {
+        my $c = shift;
+        $c->res->code(404);
+        $c->render_tt('not_found');
+    });
 }
 
 1;
