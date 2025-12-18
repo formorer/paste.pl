@@ -229,7 +229,30 @@ sub callback {
         }
     )->wait;
 
-    return $c->_error( "Authentication failed", $res ) unless ref $res;
+    if ( !ref $res ) {
+        # Temporary debugging: Manual token exchange to see error details
+        $c->app->log->debug("Plugin failed with: $res. Attempting manual debug...");
+        my $token_url = $ENV{GITLAB_TOKEN_URL} || "$ENV{GITLAB_SITE}/oauth/token";
+        my $code = $c->param('code');
+        my $tx = $c->ua->post(
+            $token_url => form => {
+                client_id     => $ENV{GITLAB_CLIENT_ID},
+                client_secret => $ENV{GITLAB_CLIENT_SECRET},
+                code          => $code,
+                grant_type    => 'authorization_code',
+                redirect_uri  => $cb,
+            }
+        );
+        if ( my $err = $tx->error ) {
+            $c->app->log->debug("Manual token exchange failed: " . ($err->{message} // ''));
+            $c->app->log->debug("Response body: " . $tx->res->body);
+        } else {
+             $c->app->log->debug("Manual token exchange SUCCESS! (Plugin logic might be mismatched)");
+             $c->app->log->debug("Response: " . $tx->res->body);
+        }
+        return $c->_error( "Authentication failed", $res );
+    }
+
     return $c->_error( "Authentication failed", "No token received" )
         unless $res->{access_token};
 
