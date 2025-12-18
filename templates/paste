@@ -34,9 +34,6 @@
 </select>
 <br />
 <br />
-<input type="checkbox" name="private" id="private" value=1 [% IF as_hidden %] checked='checked' [% END %]/>
-<label for="private">Create this paste as a non-public (hidden) paste?</label>
-<br />
 <input type="checkbox" name="wrap" id="wrap" value=1 />
 <label for="wrap">Wrap text at 78 characters</label>
 <br />
