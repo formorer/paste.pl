@@ -194,12 +194,14 @@ sub login {
         . '/auth/callback';
     my $state = $c->csrf_token;
     $c->session( oauth_state => $state );
-    $c->oauth2->authorize(
-        gitlab => {
-            redirect_uri => $cb,
-            scope        => 'read_user',
-            state        => $state,
-        }
+    $c->redirect_to(
+        $c->oauth2->auth_url(
+            gitlab => {
+                redirect_uri => $cb,
+                scope        => 'read_user',
+                state        => $state,
+            }
+        )
     );
 }
 
