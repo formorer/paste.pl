@@ -9,8 +9,8 @@ use Mojo::JSON qw(encode_json);
 sub startup {
     my $self = shift;
 
-    # Ensure logs go to STDOUT
-    $self->log( Mojo::Log->new( handle => \*STDOUT ) );
+    # Ensure logs go to STDOUT, but keep existing level config
+    $self->log->handle( \*STDOUT );
 
     # Apache-style access logs to STDOUT
     $self->plugin( 'AccessLog', { log => $self->log->handle, format => 'combined' } );
