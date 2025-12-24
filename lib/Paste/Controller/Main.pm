@@ -399,6 +399,11 @@ sub _create {
 
 sub _error {
     my ( $c, $title, $errormessage ) = @_;
+    
+    if ( $title =~ /not found/i ) {
+        $c->res->code(404);
+    }
+    
     $c->render_tt(
         'show_message',
         { title => $title, message => $errormessage }
