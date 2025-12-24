@@ -26,7 +26,6 @@
 </select>
 <label for="expire"><b>Expiration</b></label>
 <select name="expire" id="expire">
-<option value="-1">Never</option>
 <option value="7776000">90d</option>
 <option value="259200">3d</option>
 <option value="86400" selected>24h</option>

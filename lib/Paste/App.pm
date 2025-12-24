@@ -81,12 +81,21 @@ sub startup {
 
     $self->helper( paste_model   => sub { return $paste } );
     $self->helper( tt             => sub { return $tt } );
+
+    # Periodic cleanup (every hour)
+    Mojo::IOLoop->recurring(
+        3600 => sub {
+            $self->log->debug("Running scheduled paste cleanup...");
+            $paste->cleanup_expired;
+        }
+    );
+
     $self->helper(
         render_tt => sub {
             my ( $c, $template, $vars ) = @_;
             my $output = '';
             local %ENV = %{ $c->req->env };    # TT CGI plugin expects %ENV
-            $c->paste_model->cleanup_expired;
+            
             my $user_pastes = [];
             if ( $c->current_user ) {
                 my $sid = Digest::SHA::sha1_hex( $c->current_user->{id} );

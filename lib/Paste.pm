@@ -257,8 +257,12 @@ sub add_paste {
         $lang = $self->get_lang($lang);
         return 0 if $self->error;
     }
-    if ( $expire !~ /^(-1|[0-9]+)/ ) {
-        $self->{error} = "Expire must be an integer or -1";
+    
+    # Enforce 90 days max expiration (7776000 seconds)
+    my $max_expire = 7776000;
+    
+    if ( $expire !~ /^[0-9]+$/ || $expire > $max_expire ) {
+        $self->{error} = "Expire must be an integer <= $max_expire (90 days)";
         return 0;
     }
 
