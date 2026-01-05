@@ -24,11 +24,11 @@ services:
     ports:
       - "8923:42069"
     volumes:
-      - ./docker/iocaine:/etc/iocaine:ro
+      - ./docker/iocaine:/data:ro
       - iocaine-state:/run/iocaine
     environment:
-      - RUST_LOG=debug
-    command: --config-path /etc/iocaine/config.d
+      - RUST_LOG=info
+    command: --config-path /data/config.d
     depends_on:
       - app
 

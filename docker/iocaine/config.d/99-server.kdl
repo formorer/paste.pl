@@ -1,9 +1,0 @@
-http-server "main" {
-    bind "0.0.0.0:42069"
-    use handler-from="lua_blocker"
-}
-
-declare-handler "lua_blocker" {
-    path "/etc/iocaine/config.d"
-    language "lua"
-}
