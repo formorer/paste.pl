@@ -13,7 +13,6 @@ let ip_blocker = matcher::Matcher::from_ip_prefixes(prefixes)?;
 globals.add("IP_BLOCKER", ip_blocker);
 
 // --- USER-AGENT BLOCKLIST SETUP ---
-// We replicate the 'unwanted-visitors' logic here to enable logging
 let ua_list = strings::StringList::new()
     .push("DotBot")
     .push("Googlebot")
@@ -32,24 +31,31 @@ let ua_list = strings::StringList::new()
     .push("MegaIndex")
     .push("BLEXBot")
     .push("ZoomBot")
-    .push("PetalBot");
+    .push("PetalBot")
+    .push("Python")     // Added Python
+    .push("aiohttp");    // Added aiohttp
 
 let ua_matcher = matcher::Matcher::from_string_list(ua_list)?;
 globals.add("UA_BLOCKER", ua_matcher);
 
 
 fn handle_request(request) {
-    let client_ip = request.header("x-forwarded-for");
+    let xff = request.header("x-forwarded-for");
     let user_agent = request.header("user-agent");
     
+    // X-Forwarded-For can be a list. Take the first one.
+    // If it's empty, we might need another way to get the IP, 
+    // but Roto request seems limited to headers for now.
+    let client_ip = xff.split_by(",").get(0);
+
     // Check IP Blocklist
-    if IP_BLOCKER.matches(client_ip) {
+    if client_ip != "" && IP_BLOCKER.matches(client_ip) {
         runtime::Logger.info("BLOCKED IP: " + client_ip + " UA: " + user_agent);
         return Some("garbage");
     }
 
     // Check User-Agent Blocklist
-    if UA_BLOCKER.matches(user_agent) {
+    if user_agent != "" && UA_BLOCKER.matches(user_agent) {
         runtime::Logger.info("BLOCKED UA: " + user_agent + " IP: " + client_ip);
         return Some("garbage");
     }
