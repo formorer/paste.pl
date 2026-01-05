@@ -50,8 +50,6 @@ services:
     image: git.madhouse-project.org/iocaine/iocaine:3
     ports:
       - "8923:42069"
-    environment:
-      TARGET: http://app_dev:3000
     depends_on:
       - app_dev
 
