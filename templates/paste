@@ -4,7 +4,21 @@
 
 <h1>New paste:</h1>
 
-[% IF status %]
+<noscript>
+    <style>
+        .news-section { order: 99 !important; margin-top: 20px; }
+        .news-block.collapsed .news-content { display: block !important; } /* force expand */
+        .toggle-icon { display: none; }
+    </style>
+</noscript>
+
+<div class="paste-layout-container">
+    <div class="news-section">
+        [% INCLUDE news_block %]
+    </div>
+
+    <div class="form-section">
+        [% IF status %]
 <div class=status> 
 [% status %]
 </div>
@@ -46,6 +60,8 @@ Include comments to indicate what you need feedback on.</label><br />
 <input type="file" name="upload" /><input type="submit" name="paste" value="Send"/>
 
 </form>
+    </div>
+</div>
 
 [% END %]
 [%# vim: syntax=html sw=4 ts=4 noet shiftround

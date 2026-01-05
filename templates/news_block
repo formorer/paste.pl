@@ -1,0 +1,17 @@
+<div id="news-block" class="news-block collapsed">
+    <div class="news-header" onclick="toggleNews()">
+        <h3>Latest News</h3>
+        <span class="toggle-icon">▼</span>
+    </div>
+    <div class="news-content">
+        <p><strong>2026-01-05:</strong> Comprehensive Service Overhaul. We have modernized the backend using <strong>Mojolicious</strong> and integrated <strong>Debian/Salsa authentication</strong>. Authenticated users now enjoy relaxed rate limits and spam validation.</p>
+        <p>To enhance privacy, <strong>public indexing is disabled</strong> (all pastes are hidden by default) and the legacy <strong>XML-RPC API</strong> has been retired. We have also deployed <strong>iocaine</strong> to protect against AI scrapers. Please note that paste retention is now strictly capped at <strong>90 days</strong>.</p>
+    </div>
+</div>
+
+<script>
+function toggleNews() {
+    var block = document.getElementById('news-block');
+    block.classList.toggle('collapsed');
+}
+</script>
