@@ -1,24 +1,56 @@
 
-use std::strings;
 use iocaine::matcher;
 use iocaine::file;
+use iocaine::runtime;
 
+// --- IP BLOCKLIST SETUP ---
 let content = file::File::read_as_string("/etc/iocaine/blocked_ips.txt");
-
 let prefixes = match content {
     Some(data) => data.split_by("\n"),
     None => strings::StringList::new(),
 };
-
 let ip_blocker = matcher::Matcher::from_ip_prefixes(prefixes)?;
-
-// Register the matcher globally so it persists
 globals.add("IP_BLOCKER", ip_blocker);
+
+// --- USER-AGENT BLOCKLIST SETUP ---
+// We replicate the 'unwanted-visitors' logic here to enable logging
+let ua_list = strings::StringList::new()
+    .push("DotBot")
+    .push("Googlebot")
+    .push("Bingbot")
+    .push("Slurp")
+    .push("DuckDuckBot")
+    .push("Baiduspider")
+    .push("YandexBot")
+    .push("Sogou")
+    .push("Exabot")
+    .push("facebot")
+    .push("ia_archiver")
+    .push("AhrefsBot")
+    .push("SemrushBot")
+    .push("MJ12bot")
+    .push("MegaIndex")
+    .push("BLEXBot")
+    .push("ZoomBot")
+    .push("PetalBot");
+
+let ua_matcher = matcher::Matcher::from_string_list(ua_list)?;
+globals.add("UA_BLOCKER", ua_matcher);
+
 
 fn handle_request(request) {
     let client_ip = request.header("x-forwarded-for");
+    let user_agent = request.header("user-agent");
     
+    // Check IP Blocklist
     if IP_BLOCKER.matches(client_ip) {
+        runtime::Logger.info("BLOCKED IP: " + client_ip + " UA: " + user_agent);
+        return Some("garbage");
+    }
+
+    // Check User-Agent Blocklist
+    if UA_BLOCKER.matches(user_agent) {
+        runtime::Logger.info("BLOCKED UA: " + user_agent + " IP: " + client_ip);
         return Some("garbage");
     }
     

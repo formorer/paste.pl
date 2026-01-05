@@ -4,6 +4,5 @@ http-server "default" {
 }
 
 declare-handler "default" {
-    unwanted-visitors "DotBot" "Googlebot" "Bingbot" "Slurp" "DuckDuckBot" "Baiduspider" "YandexBot" "Sogou" "Exabot" "facebot" "ia_archiver" "AhrefsBot" "SemrushBot" "MJ12bot" "MegaIndex" "BLEXBot" "ZoomBot" "PetalBot"
     script "ip_block.roto"
 }
