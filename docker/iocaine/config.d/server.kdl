@@ -3,4 +3,6 @@ http-server "default" {
     use handler-from="default"
 }
 
-declare-handler "default"
+declare-handler "default" {
+    unwanted-visitors "DotBot"
+}
