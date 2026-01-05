@@ -47,9 +47,9 @@ services:
                morbo -l http://0.0.0.0:3000 app.psgi"
 
   iocane:
-    image: ghcr.io/techarohq/iocane:latest
+    image: git.madhouse-project.org/iocaine/iocaine:3
     ports:
-      - "8923:8923"
+      - "8923:42069"
     environment:
       TARGET: http://app_dev:3000
     depends_on:

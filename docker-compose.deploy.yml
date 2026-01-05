@@ -20,9 +20,9 @@ services:
     ports:
       - "3000:3000"
   iocane:
-    image: ghcr.io/techarohq/iocane:latest
+    image: git.madhouse-project.org/iocaine/iocaine:3
     ports:
-      - "8923:8923"
+      - "8923:42069"
     environment:
       TARGET: http://app:3000
     depends_on:
