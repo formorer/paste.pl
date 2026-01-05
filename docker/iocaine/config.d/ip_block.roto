@@ -1,0 +1,26 @@
+
+use std::strings;
+use iocaine::matcher;
+use iocaine::file;
+
+let content = file::File::read_as_string("/etc/iocaine/blocked_ips.txt");
+
+let prefixes = match content {
+    Some(data) => data.split_by("\n"),
+    None => strings::StringList::new(),
+};
+
+let ip_blocker = matcher::Matcher::from_ip_prefixes(prefixes)?;
+
+// Register the matcher globally so it persists
+globals.add("IP_BLOCKER", ip_blocker);
+
+fn handle_request(request) {
+    let client_ip = request.header("x-forwarded-for");
+    
+    if IP_BLOCKER.matches(client_ip) {
+        return Some("garbage");
+    }
+    
+    return None;
+}
