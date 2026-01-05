@@ -46,20 +46,4 @@ services:
       bash -c "until pg_isready -h db -U paste; do sleep 1; done;
                morbo -l http://0.0.0.0:3000 app.psgi"
 
-  iocane:
-    image: git.madhouse-project.org/iocaine/iocaine:3
-    ports:
-      - "8923:42069"
-    volumes:
-      - ./docker/iocaine:/data:ro
-      - iocaine-state:/run/iocaine
-    environment:
-      - RUST_LOG=info
-    command: --config-path /data/config.d --state-path /run/iocaine/state.json
-    depends_on:
-      - app_dev
-
-volumes:
-  iocaine-state:
-
 # vim: sw=2 ts=2 et

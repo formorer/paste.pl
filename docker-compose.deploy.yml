@@ -19,18 +19,3 @@ services:
       - ./paste.conf:/app/paste.conf:ro
     ports:
       - "3000:3000"
-  iocane:
-    image: git.madhouse-project.org/iocaine/iocaine:3
-    ports:
-      - "8923:42069"
-    volumes:
-      - ./docker/iocaine:/data:ro
-      - iocaine-state:/run/iocaine
-    environment:
-      - RUST_LOG=info
-    command: --config-path /data/config.d --state-path /run/iocaine/state.json
-    depends_on:
-      - app
-
-volumes:
-  iocaine-state:
