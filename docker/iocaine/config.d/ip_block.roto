@@ -58,7 +58,7 @@ globals.add("UA_BLOCKER", ua_matcher);
 runtime::Logger.info("UA_BLOCKER registered.");
 
 
-fn handle_request(request) {
+fn decide(request) {
     let xff = request.header("x-forwarded-for");
     let user_agent = request.header("user-agent");
     
