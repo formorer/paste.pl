@@ -1,33 +1,24 @@
-
 use iocaine::matcher;
 use iocaine::file;
 use iocaine::runtime;
 
-runtime::Logger.info("--- IP BLOCK SCRIPT LOADING ---");
+runtime::Logger.stdout("!!! ROTO SCRIPT LOADING !!!");
 
 // --- IP BLOCKLIST SETUP ---
 let content = file::File::read_as_string("/etc/iocaine/blocked_ips.txt");
 
-let prefixes = match content {
-    Some(data) => {
-        let list = data.split_by("\n");
-        runtime::Logger.info("Loaded blocked_ips.txt. Prefix count: " + list.len());
-        list
-    },
-    None => {
-        runtime::Logger.error("FAILED to read /etc/iocaine/blocked_ips.txt");
-        strings::StringList::new()
-    },
+let prefixes = if content.is_some() {
+    let data = content.unwrap();
+    let list = data.split_by("\n");
+    runtime::Logger.stdout("Loaded blocked_ips.txt");
+    list
+} else {
+    runtime::Logger.stdout("FAILED to read /etc/iocaine/blocked_ips.txt");
+    strings::StringList::new()
 };
 
-let ip_blocker_result = matcher::Matcher::from_ip_prefixes(prefixes);
-if ip_blocker_result.is_err() {
-    runtime::Logger.error("Failed to create IP Matcher: " + ip_blocker_result.unwrap_err());
-}
-let ip_blocker = ip_blocker_result.unwrap();
-
+let ip_blocker = matcher::Matcher::from_ip_prefixes(prefixes).unwrap();
 globals.add("IP_BLOCKER", ip_blocker);
-runtime::Logger.info("IP_BLOCKER registered.");
 
 // --- USER-AGENT BLOCKLIST SETUP ---
 let ua_list = strings::StringList::new()
@@ -52,36 +43,34 @@ let ua_list = strings::StringList::new()
     .push("Python")
     .push("aiohttp");
 
-let ua_matcher_result = matcher::Matcher::from_string_list(ua_list);
-let ua_matcher = ua_matcher_result.unwrap();
+let ua_matcher = matcher::Matcher::from_string_list(ua_list).unwrap();
 globals.add("UA_BLOCKER", ua_matcher);
-runtime::Logger.info("UA_BLOCKER registered.");
-
+runtime::Logger.stdout("Matchers registered.");
 
 fn decide(request) {
     let xff = request.header("x-forwarded-for");
     let user_agent = request.header("user-agent");
     
-    // Debug log the raw header
-    runtime::Logger.info("Checking Request -> XFF: '" + xff + "' UA: '" + user_agent + "'");
+    // Roto doesn't have StringList.get(0) in some versions, 
+    // let's just use the whole header if it's a single IP
+    let client_ip = xff;
 
-    // X-Forwarded-For can be a list. Take the first one.
-    let client_ip = xff.split_by(",").get(0);
+    runtime::Logger.stdout("Deciding for IP: " + client_ip);
 
     // Check IP Blocklist
     if client_ip != "" {
         if IP_BLOCKER.matches(client_ip) {
-            runtime::Logger.info("MATCH! BLOCKED IP: " + client_ip);
+            runtime::Logger.stdout("MATCH IP: " + client_ip);
             return Some("garbage");
-        } else {
-             runtime::Logger.info("NO MATCH for IP: " + client_ip);
         }
     }
 
     // Check User-Agent Blocklist
-    if user_agent != "" && UA_BLOCKER.matches(user_agent) {
-        runtime::Logger.info("MATCH! BLOCKED UA: " + user_agent);
-        return Some("garbage");
+    if user_agent != "" {
+        if UA_BLOCKER.matches(user_agent) {
+            runtime::Logger.stdout("MATCH UA: " + user_agent);
+            return Some("garbage");
+        }
     }
     
     return None;

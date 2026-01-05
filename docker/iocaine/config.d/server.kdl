@@ -3,6 +3,6 @@ http-server "default" {
     use handler-from="default"
 }
 
-declare-handler "default" {
-    script "ip_block.roto"
+declare-handler "default" language="roto" {
+    script "/etc/iocaine/config.d/ip_block.roto"
 }
