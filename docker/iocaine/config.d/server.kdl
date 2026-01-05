@@ -5,5 +5,5 @@ http-server "default" {
 
 declare-handler "default" {
     path "/etc/iocaine/config.d"
-    language "roto"
+    language "lua"
 }
