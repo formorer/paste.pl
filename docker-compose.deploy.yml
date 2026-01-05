@@ -27,7 +27,7 @@ services:
       - ./docker/iocaine:/etc/iocaine:ro
       - iocaine-state:/run/iocaine
     environment:
-      - RUST_LOG=info
+      - RUST_LOG=iocaine=trace
     command: --config-path /etc/iocaine/config.d
     depends_on:
       - app
