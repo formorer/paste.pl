@@ -1,27 +1,50 @@
 local M = {}
 
--- --- Initialization ---
+print("!!! LUA SCRIPT LOADING !!!")
+
+-- Helper to read file
+local function read_file(path)
+    -- Try iocaine.file first if available
+    if iocaine and iocaine.file and iocaine.file.read_as_string then
+        local content = iocaine.file.read_as_string(path)
+        if content then return content end
+    end
+    -- Fallback to standard io
+    local f = io.open(path, "r")
+    if f then
+        local content = f:read("*all")
+        f:close()
+        return content
+    end
+    return nil
+end
 
 -- 1. Load IP Blocklist
 local ip_file = "/etc/iocaine/blocked_ips.txt"
 local ip_prefixes = {}
-local content = iocaine.file.read_as_string(ip_file)
+local content = read_file(ip_file)
 if content then
     for line in content:gmatch("[^\r\n]+") do
         if line:match("^%d") then
             table.insert(ip_prefixes, line)
         end
     end
-    iocaine.log.info("Loaded " .. #ip_prefixes .. " IP prefixes from " .. ip_file)
+    print("Loaded " .. #ip_prefixes .. " IP prefixes from " .. ip_file)
 else
-    iocaine.log.error("Failed to read " .. ip_file)
+    print("Failed to read " .. ip_file)
 end
 local IP_MATCHER = iocaine.matcher.IPPrefixes(unpack(ip_prefixes))
 
 -- 2. Load AI Robots Blocklist
 local robots_file = "/etc/iocaine/ai.robots.txt-robots.json"
 local ai_agents = {}
-local robots_data = iocaine.file.read_as_json(robots_file)
+-- We need JSON parsing. If iocaine.file.read_as_json isn't there, we might need a manual parse or regex hack for simple lists.
+-- Assuming iocaine environment provides it as per docs.
+local robots_data = nil
+if iocaine and iocaine.file and iocaine.file.read_as_json then
+    robots_data = iocaine.file.read_as_json(robots_file)
+end
+
 if robots_data then
     for _, item in ipairs(robots_data) do
         if item.agents then
@@ -30,9 +53,9 @@ if robots_data then
             end
         end
     end
-    iocaine.log.info("Loaded " .. #ai_agents .. " AI agents from " .. robots_file)
+    print("Loaded " .. #ai_agents .. " AI agents from " .. robots_file)
 else
-    iocaine.log.error("Failed to read " .. robots_file)
+    print("Failed to read/parse " .. robots_file)
 end
 
 -- 3. Hardcoded SEO Bots
@@ -58,7 +81,7 @@ local MARKOV = iocaine.generator.Markov(
 )
 local WORDLIST = iocaine.generator.WordList(corpus_path .. "words.txt")
 
-iocaine.log.info("Lua handler initialized with custom corpus and blocklists.")
+print("Lua handler initialized with custom corpus and blocklists.")
 
 -- --- Decision Logic ---
 
@@ -71,13 +94,13 @@ function M.decide(request)
     
     -- Check IP
     if client_ip ~= "" and IP_MATCHER:matches(client_ip) then
-        iocaine.log.info("BLOCKED IP: " .. client_ip .. " (UA: " .. ua .. ")")
+        print("BLOCKED IP: " .. client_ip .. " (UA: " .. ua .. ")")
         return "garbage"
     end
     
     -- Check UA
     if ua ~= "" and UA_MATCHER:matches(ua) then
-        iocaine.log.info("BLOCKED UA: " .. ua .. " (IP: " .. client_ip .. ")")
+        print("BLOCKED UA: " .. ua .. " (IP: " .. client_ip .. ")")
         return "garbage"
     end
     

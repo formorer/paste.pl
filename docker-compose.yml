@@ -55,7 +55,7 @@ services:
       - iocaine-state:/run/iocaine
     environment:
       - RUST_LOG=debug
-    command: --no-default-config --config-path /etc/iocaine/config.d
+    command: --config-path /etc/iocaine/config.d
     depends_on:
       - app_dev
 
