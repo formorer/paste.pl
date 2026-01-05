@@ -67,6 +67,11 @@ fn decide(request) {
 
     // Check User-Agent Blocklist
     if user_agent != "" {
+        if user_agent.contains("curl") {
+             runtime::Logger.stdout("TEST MATCH: Blocking curl");
+             return Some("garbage");
+        }
+
         if UA_BLOCKER.matches(user_agent) {
             runtime::Logger.stdout("MATCH UA: " + user_agent);
             return Some("garbage");
