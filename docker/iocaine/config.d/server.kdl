@@ -1,0 +1,6 @@
+http-server "default" {
+    bind "0.0.0.0:42069"
+    use handler-from="default"
+}
+
+declare-handler "default"
